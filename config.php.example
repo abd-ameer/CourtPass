@@ -1,0 +1,32 @@
+<?php
+/**
+ * CourtPass Configuration — EXAMPLE
+ * Copy this file to config.php and fill in your values.
+ * config.php is gitignored and must never be committed.
+ */
+
+// Timezone — all business logic uses Asia/Colombo
+date_default_timezone_set('Asia/Colombo');
+
+// Database
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'courtpass');
+
+// Application
+define('BASE_URL', 'http://localhost/courtpass');
+define('APP_NAME', 'CourtPass');
+
+// PayHere Sandbox
+define('PAYHERE_MERCHANT_ID', 'YOUR_SANDBOX_MERCHANT_ID');
+define('PAYHERE_MERCHANT_SECRET', 'YOUR_SANDBOX_MERCHANT_SECRET');
+define('PAYHERE_SANDBOX_URL', 'https://sandbox.payhere.lk/pay/checkout');
+
+// Upload paths
+define('UPLOAD_DIR', __DIR__ . '/uploads/');
+define('VENUE_UPLOAD_DIR', UPLOAD_DIR . 'venues/');
+define('COACH_NIC_UPLOAD_DIR', UPLOAD_DIR . 'coach_nic/');
+
+// Session config
+define('SESSION_LIFETIME', 3600); // 1 hour

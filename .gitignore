@@ -1,0 +1,27 @@
+# CourtPass .gitignore
+
+# Local config (contains DB creds and PayHere keys)
+config.php
+
+# Uploads
+uploads/venues/*
+uploads/coach_nic/*
+!uploads/venues/.gitkeep
+!uploads/coach_nic/.gitkeep
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Dependencies (dev only)
+vendor/
+
+# Logs
+*.log
