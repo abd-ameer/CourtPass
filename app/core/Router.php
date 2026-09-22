@@ -1,8 +1,8 @@
 <?php
 /**
  * Minimal router.
- *   $router->get('/venues/{slug}', [VenueController::class, 'show']);
- *   $router->post('/api/bookings', [BookingController::class, 'store'], ['customer']);
+ *   $router->get('/venues/{slug}', [ExampleController::class, 'show']);
+ *   $router->post('/api/bookings', [ExampleController::class, 'store'], ['customer']);
  * The optional third argument lists roles allowed; ['*'] means any logged-in user.
  * {params} are passed to the controller method in order.
  */
