@@ -1,0 +1,85 @@
+<?php
+/**
+ * Simple input validation. Collects errors per field.
+ *
+ *   $v = new Validator($request->all());
+ *   $v->required('email')->email('email')->required('password')->minLength('password', 8);
+ *   if ($v->fails()) { ... $v->errors() ... }
+ */
+class Validator
+{
+    private array $errors = [];
+
+    public function __construct(private array $data)
+    {
+    }
+
+    private function value(string $field): string
+    {
+        return trim((string) ($this->data[$field] ?? ''));
+    }
+
+    /** Character count (uses mbstring when available so Sinhala/Tamil text counts correctly). */
+    private function length(string $field): int
+    {
+        $v = $this->value($field);
+        return function_exists('mb_strlen') ? mb_strlen($v) : strlen($v);
+    }
+
+    private function addError(string $field, string $message): self
+    {
+        $this->errors[$field] ??= $message;
+        return $this;
+    }
+
+    public function required(string $field, string $label = ''): self
+    {
+        return $this->value($field) === '' ? $this->addError($field, ($label ?: ucfirst($field)) . ' is required.') : $this;
+    }
+
+    public function email(string $field): self
+    {
+        $v = $this->value($field);
+        return $v !== '' && !filter_var($v, FILTER_VALIDATE_EMAIL) ? $this->addError($field, 'Enter a valid email address.') : $this;
+    }
+
+    public function minLength(string $field, int $min): self
+    {
+        return $this->length($field) < $min ? $this->addError($field, "Must be at least {$min} characters.") : $this;
+    }
+
+    public function maxLength(string $field, int $max): self
+    {
+        return $this->length($field) > $max ? $this->addError($field, "Must be at most {$max} characters.") : $this;
+    }
+
+    public function integer(string $field, ?int $min = null, ?int $max = null): self
+    {
+        $v = filter_var($this->value($field), FILTER_VALIDATE_INT);
+        if ($v === false || ($min !== null && $v < $min) || ($max !== null && $v > $max)) {
+            return $this->addError($field, 'Enter a valid whole number.');
+        }
+        return $this;
+    }
+
+    public function in(string $field, array $allowed): self
+    {
+        return !in_array($this->value($field), $allowed, true) ? $this->addError($field, 'Invalid option selected.') : $this;
+    }
+
+    public function date(string $field, string $format = 'Y-m-d'): self
+    {
+        $d = DateTime::createFromFormat($format, $this->value($field));
+        return !$d || $d->format($format) !== $this->value($field) ? $this->addError($field, 'Enter a valid date.') : $this;
+    }
+
+    public function fails(): bool
+    {
+        return $this->errors !== [];
+    }
+
+    public function errors(): array
+    {
+        return $this->errors;
+    }
+}

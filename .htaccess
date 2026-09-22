@@ -1,12 +1,9 @@
+# CourtPass root .htaccess
+# Only the public/ folder is exposed to the browser.
+# Everything else (app, config, database, legacy, tests) stays private.
+Options -Indexes
 RewriteEngine On
 
-# Prevent directory listing
-Options -Indexes
-
-# If the request is for an existing file or directory, serve it directly
-RewriteCond %{REQUEST_FILENAME} -f [OR]
-RewriteCond %{REQUEST_FILENAME} -d
-RewriteRule ^ - [L]
-
-# Route everything else through index.php
-RewriteRule ^(.*)$ index.php?route=$1 [QSA,L]
+RewriteRule ^$ public/ [L]
+RewriteCond %{REQUEST_URI} !/public/
+RewriteRule ^(.*)$ public/$1 [L]

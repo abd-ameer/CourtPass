@@ -300,7 +300,7 @@ CREATE TABLE `notifications` (
 -- COACH_PROFILES
 -- NIC document stored as photo only — no NIC number extracted or stored.
 -- Verification is a binary admin flag. This is a deliberate data-retention
--- decision to avoid PII exposure. See CLAUDE.md coach module notes.
+-- decision to avoid PII exposure.
 -- ============================================================
 CREATE TABLE `coach_profiles` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

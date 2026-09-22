@@ -1,7 +1,7 @@
 <?php
 /**
  * CourtPass — Coach Dashboard Page
- * Built exactly to CLAUDE.md spec: Session Management, Earnings Summary, Student Overview, Session History, Review Summary.
+ * Built to the coach module spec: Session Management, Earnings Summary, Student Overview, Session History, Review Summary.
  */
 
 require_once __DIR__ . '/../../config.php';

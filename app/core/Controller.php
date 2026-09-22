@@ -1,0 +1,40 @@
+<?php
+/**
+ * Base controller. Controllers stay thin:
+ * read and validate input, call a service, return a view or JSON.
+ * No SQL and no business rules here.
+ */
+abstract class Controller
+{
+    public function __construct(protected Request $request)
+    {
+    }
+
+    protected function view(string $view, array $data = [], string $layout = 'main'): void
+    {
+        View::render($view, $data, $layout);
+    }
+
+    protected function json(array $data, int $status = 200): void
+    {
+        Response::json($data, $status);
+    }
+
+    protected function redirect(string $path): void
+    {
+        Response::redirect($path);
+    }
+
+    /** Call at the start of every POST/PUT/DELETE action. */
+    protected function verifyCsrf(): void
+    {
+        $token = $this->request->input('_csrf') ?? $this->request->header('X-CSRF-Token');
+        if (!Session::validCsrf($token)) {
+            if ($this->request->isApi()) {
+                Response::json(['error' => 'Invalid or missing CSRF token. Refresh the page and try again.'], 403);
+            }
+            http_response_code(403);
+            exit('Your session expired. Please go back and try again.');
+        }
+    }
+}

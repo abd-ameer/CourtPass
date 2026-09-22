@@ -1,7 +1,7 @@
 <?php
 /**
  * CourtPass — API: Coach Dashboard Endpoint
- * Produces exact dashboard metrics required by CLAUDE.md spec:
+ * Produces exact dashboard metrics required by the coach module spec:
  * 1. Session Management (upcoming with reg count/capacity, shareable link)
  * 2. Earnings Summary (this month, all-time, group vs private split — no charts)
  * 3. Student Overview (total unique, returning vs first-time this month, "regulars" 3+ sessions)
