@@ -1,31 +1,21 @@
--- =====================================================================
--- CourtPass seed data
--- ---------------------------------------------------------------------
--- Dummy data so every member can build and test their own feature
--- without waiting for another member's screens.
--- Run after schema.sql (schema.sql recreates the database).
+-- CourtPass seed data. Run after database/schema.sql.
+-- Dates are relative to the day the file is loaded.
 --
--- Dates are relative to the day you load the file (CURDATE()), so
--- "upcoming" bookings and sessions stay in the future.
---
--- Login accounts (email / password):
---   admin@courtpass.lk     Admin@123     Platform Admin
---   kamal@sportshub.lk     Owner@123     Venue Owner (2 approved venues)
---   nimal@courtzone.lk     Owner@123     Venue Owner (1 pending venue)
---   saman@gmail.com        Customer@123  Customer, Standard tier
---   ruwan@gmail.com        Customer@123  Customer, New Member
---   dinesh@gmail.com       Customer@123  Customer, Restricted tier
---   ashan@coach.lk         Coach@123     Coach, verified, approved at venue 1
---   dilani@coach.lk        Coach@123     Coach, not verified, request pending
--- =====================================================================
+-- Accounts (email / password):
+--   admin@courtpass.lk   Admin@123     admin
+--   kamal@sportshub.lk   Owner@123     owner, two approved venues
+--   nimal@courtzone.lk   Owner@123     owner, one pending venue
+--   saman@gmail.com      Customer@123  customer, standard tier
+--   ruwan@gmail.com      Customer@123  customer, new member
+--   dinesh@gmail.com     Customer@123  customer, restricted tier
+--   ashan@coach.lk       Coach@123     coach, verified
+--   dilani@coach.lk      Coach@123     coach, request pending
 
 SET NAMES utf8mb4;
 SET time_zone = '+05:30';
 USE courtpass;
 
--- ---------------------------------------------------------------------
--- Sport types (fixed list from the proposal)
--- ---------------------------------------------------------------------
+-- Sport types
 INSERT INTO sport_types (id, code, name) VALUES
     (1, 'futsal',       'Futsal'),
     (2, 'badminton',    'Badminton'),
@@ -35,9 +25,7 @@ INSERT INTO sport_types (id, code, name) VALUES
     (6, 'carrom',       'Carrom'),
     (7, 'table_tennis', 'Table Tennis');
 
--- ---------------------------------------------------------------------
--- Users
--- ---------------------------------------------------------------------
+-- Users and profiles
 INSERT INTO users (id, role, name, email, phone, password_hash) VALUES
     (1, 'admin',    'System Admin',      'admin@courtpass.lk', '0771234567', '$2y$12$TEqvQbcv7hdXUJvXIJzBRuU/hi/PJiVORbQkSlfpFDo0r7kvM1Hf2'),
     (2, 'owner',    'Kamal Perera',      'kamal@sportshub.lk', '0772345678', '$2y$12$B3KXAQHvdgXghpAanoIvTeHqu4Cy.rHrzKeoA3hVErpMwSumYzcZa'),
@@ -48,9 +36,6 @@ INSERT INTO users (id, role, name, email, phone, password_hash) VALUES
     (7, 'coach',    'Ashan Weerasinghe', 'ashan@coach.lk',     '0777890123', '$2y$12$vv/cGZi/Fq/JJV7GWFkMlOAHEXlgNaS4kNzf60i1KmDJ/H2dR0Vfe'),
     (8, 'coach',    'Dilani Rathnayake', 'dilani@coach.lk',    '0778901234', '$2y$12$vv/cGZi/Fq/JJV7GWFkMlOAHEXlgNaS4kNzf60i1KmDJ/H2dR0Vfe');
 
--- Customer profiles. Scores are the cached values the reliability
--- service would have calculated; the formula itself is still to be
--- agreed, so these are sample numbers only.
 INSERT INTO customer_profiles (customer_id, reliability_score, reliability_tier,
         completed_count, no_show_count, responsible_cancel_count,
         moderate_cancel_count, irresponsible_cancel_count, score_calculated_at) VALUES
@@ -69,9 +54,7 @@ INSERT INTO coach_sports (coach_id, sport_type_id) VALUES
     (7, 2), (7, 3),
     (8, 1);
 
--- ---------------------------------------------------------------------
--- Venues, courts, operating hours
--- ---------------------------------------------------------------------
+-- Venues, courts and operating hours
 INSERT INTO venues (id, owner_id, name, slug, description, address, city, contact_phone,
         status, reviewed_by, reviewed_at) VALUES
     (1, 2, 'Colombo Sports Hub', 'colombo-sports-hub',
@@ -99,7 +82,6 @@ INSERT INTO courts (id, venue_id, name, sport_type_id, hourly_rate) VALUES
     (7, 2, 'Billiards Table 1', 5, 1500.00),
     (8, 2, 'Carrom Lounge',     6,  800.00);
 
--- Every court: Mon-Fri 06:00-22:00, Sat-Sun 08:00-23:00.
 INSERT INTO court_operating_hours (court_id, day_of_week, open_time, close_time)
 SELECT c.id, d.dow,
        CASE WHEN d.dow <= 5 THEN '06:00:00' ELSE '08:00:00' END,
@@ -108,36 +90,26 @@ FROM courts c
 CROSS JOIN (SELECT 1 AS dow UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
             UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7) d;
 
--- ---------------------------------------------------------------------
--- Owner block and flash deal (upcoming)
--- ---------------------------------------------------------------------
+-- Owner block and flash deal
 INSERT INTO court_blocks (id, court_id, block_date, start_time, block_type, reason, created_by) VALUES
     (1, 1, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '18:00:00', 'owner', 'School tournament', 2);
 
 INSERT INTO flash_slots (id, court_id, slot_date, start_time, original_price, discounted_price, created_by) VALUES
     (1, 4, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '14:00:00', 2000.00, 1400.00, 2);
 
--- ---------------------------------------------------------------------
--- Bookings
--- ---------------------------------------------------------------------
+-- Bookings and check-in
 INSERT INTO bookings (id, customer_id, court_id, slot_date, start_time, amount, payment_method,
         status, confirmed_at, released_at, cancelled_by, cancelled_at, cancel_reason, cancellation_class) VALUES
-    -- past, checked in (can be reviewed)
     (1, 4, 3, DATE_SUB(CURDATE(), INTERVAL 3 DAY), '17:00:00', 2000.00, 'online',
         'completed', DATE_SUB(NOW(), INTERVAL 5 DAY), NULL, NULL, NULL, NULL, NULL),
-    -- past, cash, no check-in -> no-show
     (2, 6, 1, DATE_SUB(CURDATE(), INTERVAL 2 DAY), '19:00:00', 5000.00, 'cash_on_arrival',
         'no_show', DATE_SUB(NOW(), INTERVAL 4 DAY), NULL, NULL, NULL, NULL, NULL),
-    -- upcoming, online, confirmed
     (3, 4, 1, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '19:00:00', 5000.00, 'online',
         'confirmed', NOW(), NULL, NULL, NULL, NULL, NULL),
-    -- upcoming, cash, waiting for owner
     (4, 4, 6, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '10:00:00', 3000.00, 'cash_on_arrival',
         'pending', NULL, NULL, NULL, NULL, NULL, NULL),
-    -- upcoming, online, released for resale (slot shows as free)
     (5, 5, 3, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '20:00:00', 2000.00, 'online',
         'released', DATE_SUB(NOW(), INTERVAL 1 DAY), NOW(), NULL, NULL, NULL, NULL),
-    -- cash booking cancelled late -> irresponsible
     (6, 6, 5, DATE_SUB(CURDATE(), INTERVAL 1 DAY), '16:00:00', 1000.00, 'cash_on_arrival',
         'cancelled', DATE_SUB(NOW(), INTERVAL 3 DAY), NULL, 6, DATE_SUB(NOW(), INTERVAL 1 DAY),
         'Could not make it', 'irresponsible');
@@ -145,15 +117,11 @@ INSERT INTO bookings (id, customer_id, court_id, slot_date, start_time, amount, 
 INSERT INTO check_ins (booking_id, checked_in_by, checked_in_at) VALUES
     (1, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 3 DAY), '16:55:00'));
 
--- ---------------------------------------------------------------------
 -- Coach module
--- ---------------------------------------------------------------------
 INSERT INTO coach_venue_approvals (id, coach_id, venue_id, status, requested_at, decided_by, decided_at) VALUES
     (1, 7, 1, 'approved', DATE_SUB(NOW(), INTERVAL 10 DAY), 2, DATE_SUB(NOW(), INTERVAL 9 DAY)),
     (2, 8, 1, 'pending',  DATE_SUB(NOW(), INTERVAL 1 DAY),  NULL, NULL);
 
--- Past session (attended, can be reviewed) and two upcoming sessions.
--- Each live session has its coaching court block.
 INSERT INTO court_blocks (id, court_id, block_date, start_time, block_type, reason, created_by) VALUES
     (2, 4, DATE_SUB(CURDATE(), INTERVAL 2 DAY), '08:00:00', 'coaching', NULL, 7),
     (3, 4, DATE_ADD(CURDATE(), INTERVAL 5 DAY), '08:00:00', 'coaching', NULL, 7),
@@ -173,9 +141,7 @@ INSERT INTO session_registrations (id, session_id, customer_id, status, amount, 
     (2, 1, 5, 'absent',     1500.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
     (3, 2, 4, 'registered', 1800.00, NULL);
 
--- ---------------------------------------------------------------------
--- Payments and a refund
--- ---------------------------------------------------------------------
+-- Payments
 INSERT INTO payments (id, purpose, booking_id, registration_id, order_id, amount, status,
         payhere_payment_id, payhere_status_code, payhere_method, paid_at) VALUES
     (1, 'booking',      1, NULL, 'BKG-1',  2000.00, 'paid', '320027150501', 2, 'VISA', DATE_SUB(NOW(), INTERVAL 5 DAY)),
@@ -185,9 +151,7 @@ INSERT INTO payments (id, purpose, booking_id, registration_id, order_id, amount
     (5, 'registration', NULL, 2, 'REG-2',  1500.00, 'paid', '320027150505', 2, 'VISA', DATE_SUB(NOW(), INTERVAL 6 DAY)),
     (6, 'registration', NULL, 3, 'REG-3',  1800.00, 'paid', '320027150506', 2, 'VISA', NOW());
 
--- ---------------------------------------------------------------------
--- Community
--- ---------------------------------------------------------------------
+-- Reviews, announcements, notifications and audit entries
 INSERT INTO reviews (id, reviewer_id, venue_id, booking_id, rating, comment, response_text, responded_by, responded_at) VALUES
     (1, 4, 1, 1, 5, 'Clean courts and staff were helpful.', 'Thank you, see you again!', 2, NOW());
 

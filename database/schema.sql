@@ -1,24 +1,7 @@
--- =====================================================================
--- CourtPass database schema
--- ---------------------------------------------------------------------
--- Schema-first rule: tables and enum values here are agreed by the team
--- and shared by every module. Do not change an enum value or a column
--- without updating docs and telling the other members.
---
--- Full reasoning for every table, column and constraint is in
--- docs/database-design.md.
---
--- Works on MariaDB 10.4+ (XAMPP) and MySQL 8.0+:
---   * utf8mb4 with utf8mb4_unicode_ci everywhere
---   * InnoDB for foreign keys and transactions
---   * CHECK constraints, STORED generated columns and triggers only
---     (no JSON type, no MySQL-8-only or MariaDB-only syntax)
---
--- All DATETIME values are Asia/Colombo local time. The app sets the
--- connection time zone to +05:30 when it connects.
---
--- Load order: this file, then database/seed.sql
--- =====================================================================
+-- CourtPass database schema.
+-- Run this file, then database/seed.sql. Loading it recreates the database.
+-- Runs on MariaDB 10.4+ and MySQL 8.0+. All DATETIME values are Asia/Colombo time.
+-- Table and column reference: docs/database-design.md
 
 SET NAMES utf8mb4;
 SET time_zone = '+05:30';
@@ -30,12 +13,8 @@ CREATE DATABASE courtpass
 
 USE courtpass;
 
--- =====================================================================
--- 1. ACCOUNTS
--- =====================================================================
+-- 1. Accounts
 
--- Every account. One role per account, email unique across all roles.
--- Accounts are never deleted, only deactivated, so history stays valid.
 CREATE TABLE users (
     id              INT UNSIGNED    NOT NULL AUTO_INCREMENT,
     role            ENUM('customer','owner','coach','admin') NOT NULL,
@@ -59,12 +38,8 @@ CREATE TABLE users (
     )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Customer subclass (1:1 with users where role = 'customer').
--- The (customer_id, role) foreign key means only a customer account can
--- have this row, and bookings / registrations / reviews point here, so
--- a coach or owner account can never book or register at DB level.
--- The score columns are a cache recalculated on trigger-on-action; the
--- source of truth is the bookings table.
+-- 1:1 with users. The (customer_id, role) FK restricts rows to customer accounts.
+-- Score columns are a cache; bookings are the source of truth.
 CREATE TABLE customer_profiles (
     customer_id             INT UNSIGNED    NOT NULL,
     role                    ENUM('customer','owner','coach','admin') NOT NULL DEFAULT 'customer',
@@ -82,8 +57,6 @@ CREATE TABLE customer_profiles (
     CONSTRAINT chk_customer_profiles_score CHECK (reliability_score IS NULL OR reliability_score BETWEEN 0 AND 100)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Sport types are a lookup table instead of an ENUM so a new sport can
--- be added with an INSERT, and courts, venues and coaches share one list.
 CREATE TABLE sport_types (
     id      SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
     code    VARCHAR(30)  NOT NULL,
@@ -92,8 +65,7 @@ CREATE TABLE sport_types (
     UNIQUE KEY uq_sport_types_code (code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Coach subclass (1:1 with users where role = 'coach').
--- Verified is a flag only: no NIC number or ID image is ever stored.
+-- 1:1 with users. The (coach_id, role) FK restricts rows to coach accounts.
 CREATE TABLE coach_profiles (
     coach_id            INT UNSIGNED    NOT NULL,
     role                ENUM('customer','owner','coach','admin') NOT NULL DEFAULT 'coach',
@@ -113,7 +85,6 @@ CREATE TABLE coach_profiles (
     )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Sports a coach teaches (M:N).
 CREATE TABLE coach_sports (
     coach_id        INT UNSIGNED      NOT NULL,
     sport_type_id   SMALLINT UNSIGNED NOT NULL,
@@ -123,13 +94,9 @@ CREATE TABLE coach_sports (
     CONSTRAINT fk_coach_sports_sport FOREIGN KEY (sport_type_id) REFERENCES sport_types (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =====================================================================
--- 2. VENUES AND COURTS
--- =====================================================================
+-- 2. Venues and courts
 
--- status = admin approval lifecycle (deactivated = forced by admin).
--- is_active = owner's own temporary on/off switch. Kept separate because
--- they are two different decisions made by two different actors.
+-- status = admin approval lifecycle. is_active = owner temporary switch.
 CREATE TABLE venues (
     id                  INT UNSIGNED    NOT NULL AUTO_INCREMENT,
     owner_id            INT UNSIGNED    NOT NULL,
@@ -158,8 +125,6 @@ CREATE TABLE venues (
     CONSTRAINT chk_venues_slug CHECK (slug REGEXP '^[a-z0-9]+(-[a-z0-9]+)*$')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Sports a venue offers (M:N). Needed at registration time, before any
--- court exists, so it cannot be derived from courts.
 CREATE TABLE venue_sports (
     venue_id        INT UNSIGNED      NOT NULL,
     sport_type_id   SMALLINT UNSIGNED NOT NULL,
@@ -169,10 +134,7 @@ CREATE TABLE venue_sports (
     CONSTRAINT fk_venue_sports_sport FOREIGN KEY (sport_type_id) REFERENCES sport_types (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- One court = one sport type. Courts are deactivated, never deleted.
--- The court row is also the lock target: every booking, block and
--- session insert runs SELECT ... FROM courts WHERE id = ? FOR UPDATE
--- first, so all writes on one court are serialised.
+-- Court rows are locked (SELECT ... FOR UPDATE) before any booking, block or session insert.
 CREATE TABLE courts (
     id              INT UNSIGNED      NOT NULL AUTO_INCREMENT,
     venue_id        INT UNSIGNED      NOT NULL,
@@ -190,11 +152,7 @@ CREATE TABLE courts (
     CONSTRAINT chk_courts_rate CHECK (hourly_rate > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Weak entity of courts: one opening range per court per day.
--- day_of_week follows ISO-8601 / PHP date('N'): 1 = Monday ... 7 = Sunday.
--- Whole hours only; close_time is exclusive (08:00-22:00 gives 14 slots,
--- the last one 21:00-22:00). '24:00:00' means open until midnight.
--- Slots are NOT stored: they are calculated from these rows.
+-- day_of_week: 1 = Monday ... 7 = Sunday. Whole hours, close_time exclusive.
 CREATE TABLE court_operating_hours (
     court_id        INT UNSIGNED     NOT NULL,
     day_of_week     TINYINT UNSIGNED NOT NULL,
@@ -209,9 +167,6 @@ CREATE TABLE court_operating_hours (
                                         AND close_time > open_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- A blocked one-hour slot. 'owner' = walk-in or private event,
--- 'coaching' = created by a coach session (owners cannot edit those).
--- The unique key allows at most one block per court slot.
 CREATE TABLE court_blocks (
     id          INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     court_id    INT UNSIGNED  NOT NULL,
@@ -228,9 +183,6 @@ CREATE TABLE court_blocks (
     CONSTRAINT chk_court_blocks_whole CHECK (MINUTE(start_time) = 0 AND SECOND(start_time) = 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Flash deal on one free upcoming slot. One row per slot: if the owner
--- withdraws and re-lists it, the same row is updated.
--- original_price keeps the court rate at listing time for display.
 CREATE TABLE flash_slots (
     id                  INT UNSIGNED   NOT NULL AUTO_INCREMENT,
     court_id            INT UNSIGNED   NOT NULL,
@@ -251,33 +203,10 @@ CREATE TABLE flash_slots (
     CONSTRAINT chk_flash_slots_price CHECK (discounted_price > 0 AND discounted_price < original_price)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =====================================================================
--- 3. BOOKINGS
--- =====================================================================
+-- 3. Bookings
 
--- One row = one customer holding one one-hour court slot.
---
--- Status values (locked):
---   pending_payment      online booking waiting for PayHere (10 min hold)
---   pending              waiting for the owner to confirm or reject
---   confirmed            slot is held for the customer
---   released             customer released it for resale (slot shows as
---                        free to other customers, still blocks owner
---                        blocks and coach sessions)
---   resold               another customer paid for the released slot
---   completed            customer checked in
---   completed_unattended online-paid, no check-in (no reliability impact)
---   no_show              cash-on-arrival, no check-in (reliability penalty)
---   cancelled            cancelled by customer, owner or system
---   rejected             owner rejected a pending booking
---   expired              payment hold ran out, or never confirmed by
---                        slot time (no reliability impact)
---
--- slot_lock is 1 while the booking holds the slot and NULL otherwise.
--- UNIQUE (court_id, slot_date, start_time, slot_lock) means two holding
--- bookings on the same slot can never exist, even if the service-level
--- conflict check has a bug. NULLs do not clash, so any number of
--- cancelled / released / resold rows can share a slot.
+-- slot_lock is 1 while the booking holds the slot and NULL otherwise, so the unique
+-- key blocks a second live booking on the same slot.
 CREATE TABLE bookings (
     id                      INT UNSIGNED   NOT NULL AUTO_INCREMENT,
     customer_id             INT UNSIGNED   NOT NULL,
@@ -328,9 +257,6 @@ CREATE TABLE bookings (
     CONSTRAINT chk_bookings_cancelled CHECK (status <> 'cancelled' OR cancelled_at IS NOT NULL)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Owner's check-in record (UC-VO-24). Weak entity of bookings, 1:1.
--- Kept as its own table because it is a separate event, made by a
--- different actor and owned by a different member than the booking.
 CREATE TABLE check_ins (
     booking_id      INT UNSIGNED NOT NULL,
     checked_in_by   INT UNSIGNED NOT NULL,
@@ -340,9 +266,7 @@ CREATE TABLE check_ins (
     CONSTRAINT fk_check_ins_by FOREIGN KEY (checked_in_by) REFERENCES users (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Customer disputes: a no-show penalty (admin can clear it) or a resale
--- outcome. Evidence is text only (no file uploads).
--- open_lock allows only one open dispute per booking and type.
+-- open_lock allows one open dispute per booking and type.
 CREATE TABLE disputes (
     id              INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     dispute_type    ENUM('no_show','resale') NOT NULL,
@@ -367,12 +291,8 @@ CREATE TABLE disputes (
     )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =====================================================================
--- 4. COACH MODULE
--- =====================================================================
+-- 4. Coach module
 
--- Coach <-> venue approval (M:N with its own attributes). One row per
--- pair; a re-request after decline or revoke updates the same row.
 CREATE TABLE coach_venue_approvals (
     id              INT UNSIGNED NOT NULL AUTO_INCREMENT,
     coach_id        INT UNSIGNED NOT NULL,
@@ -392,12 +312,7 @@ CREATE TABLE coach_venue_approvals (
     CONSTRAINT chk_cva_decided CHECK (status = 'pending' OR decided_at IS NOT NULL)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- One-hour, non-recurring coaching session on one court slot.
--- block_id points at the court block that reserves the slot; it is set
--- to NULL and the block deleted when the session is cancelled.
--- session_date / start_time are kept here too, because the block row is
--- deleted on cancel but the session history must still show its time.
--- access_token is only set for private sessions (bin2hex(random_bytes(16))).
+-- block_id is cleared and the block deleted when the session is cancelled.
 CREATE TABLE coach_sessions (
     id              INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     coach_id        INT UNSIGNED  NOT NULL,
@@ -438,10 +353,7 @@ CREATE TABLE coach_sessions (
     CONSTRAINT chk_coach_sessions_cancelled CHECK (status <> 'cancelled' OR (cancelled_at IS NOT NULL AND block_id IS NULL))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- A customer's place in a session (associative entity between
--- customers and coach_sessions, with its own lifecycle).
--- active_lock stops a customer holding two live registrations for the
--- same session, while cancelled rows are kept as history.
+-- active_lock allows one live registration per customer per session.
 CREATE TABLE session_registrations (
     id                  INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     session_id          INT UNSIGNED  NOT NULL,
@@ -467,17 +379,9 @@ CREATE TABLE session_registrations (
     CONSTRAINT chk_session_reg_attendance CHECK (status NOT IN ('attended','absent') OR attendance_marked_at IS NOT NULL)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =====================================================================
--- 5. PAYMENTS AND REFUNDS (all money is simulated through PayHere Sandbox)
--- =====================================================================
+-- 5. Payments and refunds
 
--- One row per PayHere payment attempt.
--- purpose: booking = new court booking (incl. a released slot),
---          conversion = cash-on-arrival booking paid online before release,
---          registration = coaching session registration.
--- order_id is what PayHere sends back (e.g. BKG-15, CNV-15, REG-7, plus
--- a retry suffix); UNIQUE order_id and payhere_payment_id make repeated
--- notify callbacks safe (idempotent).
+-- order_id and payhere_payment_id are unique so repeated callbacks are safe.
 CREATE TABLE payments (
     id                  INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     purpose             ENUM('booking','conversion','registration') NOT NULL,
@@ -510,11 +414,7 @@ CREATE TABLE payments (
     CONSTRAINT chk_payments_paid CHECK (status <> 'paid' OR (paid_at IS NOT NULL AND payhere_payment_id IS NOT NULL))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Simulated refund ledger. Every refund is against one paid payment and
--- a payment can be refunded only once (UNIQUE payment_id), which is the
--- DB-level guard for "a resold slot is never refunded twice".
--- amount + fee_amount <= the payment amount (checked in the service).
--- fee_amount is the 10% resale processing fee kept by the platform.
+-- One refund per payment.
 CREATE TABLE refunds (
     id              INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     payment_id      INT UNSIGNED  NOT NULL,
@@ -534,16 +434,9 @@ CREATE TABLE refunds (
     CONSTRAINT chk_refunds_amount CHECK (amount > 0 AND fee_amount >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =====================================================================
--- 6. COMMUNITY
--- =====================================================================
+-- 6. Community
 
--- One table for venue reviews and coach reviews (EER: REVIEW with a
--- disjoint, total specialisation into VENUE_REVIEW and COACH_REVIEW).
---   venue review: venue_id + booking_id set (booking must be checked in)
---   coach review: coach_id + registration_id set (registration attended)
--- UNIQUE booking_id / registration_id = one review per visit or session.
--- response_text is the single public response by the owner or coach.
+-- Venue reviews set venue_id + booking_id, coach reviews set coach_id + registration_id.
 CREATE TABLE reviews (
     id              INT UNSIGNED     NOT NULL AUTO_INCREMENT,
     reviewer_id     INT UNSIGNED     NOT NULL,
@@ -601,11 +494,8 @@ CREATE TABLE announcements (
     CONSTRAINT chk_announcements_removed CHECK (status <> 'removed' OR removed_by IS NOT NULL)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =====================================================================
--- 7. PLATFORM SERVICES
--- =====================================================================
+-- 7. Platform services
 
--- In-app notifications only (no SMS / email).
 CREATE TABLE notifications (
     id          INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     user_id     INT UNSIGNED  NOT NULL,
@@ -621,9 +511,6 @@ CREATE TABLE notifications (
     CONSTRAINT fk_notifications_user FOREIGN KEY (user_id) REFERENCES users (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Immutable audit trail of every state change. actor_id NULL = the
--- automated system (trigger-on-action). details holds a JSON string
--- (TEXT, because MariaDB and MySQL treat the JSON type differently).
 CREATE TABLE audit_log (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     actor_id    INT UNSIGNED    NULL,
@@ -641,7 +528,6 @@ CREATE TABLE audit_log (
     CONSTRAINT fk_audit_actor FOREIGN KEY (actor_id) REFERENCES users (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- The audit log is append-only: any UPDATE or DELETE is refused.
 DELIMITER //
 CREATE TRIGGER trg_audit_log_no_update BEFORE UPDATE ON audit_log
 FOR EACH ROW
