@@ -13,7 +13,7 @@ CourtPass is a web platform for the Sri Lankan indoor sports market (futsal, bad
 - **Payments:** online payments through PayHere Sandbox
 - **Resale and flash deals:** resell a booking at up to 90% of its price, discounted last-minute slots
 - **Coaching:** coach profiles, venue approval, public and private sessions with paid registration and attendance
-- **Community:** Sports Diary, Most Active This Month, verified reviews for venues and coaches, announcements
+- **Reviews and announcements:** verified reviews for venues and coaches, venue announcements
 - **Owner insights:** revenue tracking, court utilisation heatmap and customer profiles
 - **Administration:** venue approval, coach verification, user management and dispute handling
 - **Notifications:** in-app notifications for key events

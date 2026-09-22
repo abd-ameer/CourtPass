@@ -121,11 +121,11 @@ class BookingController extends Controller
 
 ## Module ownership
 
-| Member | Module | Typical files |
+| Member | Features | Typical files |
 |---|---|---|
-| A | Auth core, Booking Engine, Reliability | `AuthController`, `BookingController/Service/Model`, `ReliabilityService` |
-| B | Owner sign-up, Venues, Courts, Payments, Resale, Flash, user management | `VenueController/Service/Model`, `CourtModel`, `PaymentService`, `ResaleService`, `FlashService` |
-| C | Coach Operations | `CoachController`, `CoachSessionService/Model`, `SessionRegistrationModel` |
-| D | Customer sign-up, Discovery, Check-in, Community, Insights, shared UI layout | `ReviewController/Service/Model`, `AnalyticsService`, `NotificationService`, `views/layouts` |
+| A | Auth core, Customer sign-up, Booking Engine (slot grid, conflict check, state machine, cancellation), Reliability (no-show detection, score and tiers, cash-on-arrival eligibility, disputes) | `AuthController/Service`, `BookingController/Service/Model`, `ReliabilityService` |
+| B | Owner sign-up, Venues, Courts and slot generation, slot blocking, Payments (PayHere Sandbox), Resale | `VenueController/Service/Model`, `CourtController/Service/Model`, `SlotService`, `PaymentService`, `ResaleService` |
+| C | Coach Module (coach sign-up, venue approval, sessions, registration, Coaching page, attendance, coach dashboard, coach reviews) | `CoachController`, `CoachingController`, `SessionRegistrationController`, `CoachService`, `CoachSessionService`, `SessionRegistrationService` |
+| D | Shared UI layout, Discovery, Check-in, venue Reviews, Announcements, Flash slots, Notifications, Audit log, Owner analytics, Customer intelligence, User management | `views/layouts`, `views/partials`, `DiscoveryController`, `CheckInService`, `ReviewService`, `FlashService`, `NotificationService`, `AuditService`, `AnalyticsService` |
 
 Shared files (`app/core`, `config/routes.php`, `database/schema.sql`) need the team's agreement before changing.
