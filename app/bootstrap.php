@@ -21,9 +21,9 @@ date_default_timezone_set(APP_TIMEZONE);
 /**
  * Autoloader (native PHP, no Composer).
  * Class name suffix decides the folder:
- *   BookingController -> app/controllers/BookingController.php
- *   BookingService    -> app/services/BookingService.php
- *   BookingModel      -> app/models/BookingModel.php
+ *   ExampleController -> app/controllers/ExampleController.php
+ *   ExampleService    -> app/services/ExampleService.php
+ *   ExampleModel      -> app/models/ExampleModel.php
  * Anything else is looked up in app/core, then app/helpers.
  */
 spl_autoload_register(function (string $class): void {

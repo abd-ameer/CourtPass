@@ -25,7 +25,7 @@ Browser
 | **View** | Display data, escape everything with `e()` | Queries, logic beyond simple `if` / `foreach` |
 
 Other rules:
-- If your feature needs logic from another member's module, call **their service**. Do not copy it. Example: creating a coach session calls `BookingService`'s conflict check.
+- If your feature needs logic from another member's module, call **their service**. Do not copy it. Example: creating a coach session calls the booking module's slot conflict check.
 - No cron jobs. Automatic status changes (no-shows, expired flash slots, reliability) run when a user acts (login, booking attempt, page load).
 - Every state change writes to the audit log.
 - All times are Asia/Colombo.
@@ -37,10 +37,12 @@ Other rules:
 
 | Class | File |
 |---|---|
-| `BookingController` | `app/controllers/BookingController.php` |
-| `BookingService` | `app/services/BookingService.php` |
-| `BookingModel` | `app/models/BookingModel.php` |
+| `ExampleController` | `app/controllers/ExampleController.php` |
+| `ExampleService` | `app/services/ExampleService.php` |
+| `ExampleModel` | `app/models/ExampleModel.php` |
 | `Validator`, `Token` | `app/helpers/` |
+
+Class names are chosen by the member who builds the feature. `Example` below stands in for the real name.
 
 - Views: `app/views/<module>/<page>.php`, e.g. `app/views/bookings/index.php`.
 - API routes start with `/api/` and return JSON. Page routes return views.
@@ -49,13 +51,13 @@ Other rules:
 
 **1. Route** in your section of `config/routes.php`:
 ```php
-$router->get('/bookings', [BookingController::class, 'index'], ['customer']);
-$router->get('/api/bookings', [BookingController::class, 'list'], ['customer']);
+$router->get('/bookings', [ExampleController::class, 'index'], ['customer']);
+$router->get('/api/bookings', [ExampleController::class, 'list'], ['customer']);
 ```
 
-**2. Model** `app/models/BookingModel.php`:
+**2. Model** `app/models/ExampleModel.php`:
 ```php
-class BookingModel extends Model
+class ExampleModel extends Model
 {
     public function forCustomer(int $customerId): array
     {
@@ -68,11 +70,11 @@ class BookingModel extends Model
 }
 ```
 
-**3. Service** `app/services/BookingService.php`:
+**3. Service** `app/services/ExampleService.php`:
 ```php
-class BookingService
+class ExampleService
 {
-    public function __construct(private BookingModel $bookings = new BookingModel())
+    public function __construct(private ExampleModel $bookings = new ExampleModel())
     {
     }
 
@@ -83,19 +85,19 @@ class BookingService
 }
 ```
 
-**4. Controller** `app/controllers/BookingController.php`:
+**4. Controller** `app/controllers/ExampleController.php`:
 ```php
-class BookingController extends Controller
+class ExampleController extends Controller
 {
     public function index(): void
     {
-        $bookings = (new BookingService())->myBookings(Auth::id());
+        $bookings = (new ExampleService())->myBookings(Auth::id());
         $this->view('bookings/index', ['title' => 'My Bookings', 'bookings' => $bookings]);
     }
 
     public function list(): void
     {
-        $this->json(['bookings' => (new BookingService())->myBookings(Auth::id())]);
+        $this->json(['bookings' => (new ExampleService())->myBookings(Auth::id())]);
     }
 }
 ```
@@ -121,11 +123,13 @@ class BookingController extends Controller
 
 ## Module ownership
 
-| Member | Features | Typical files |
-|---|---|---|
-| A | Auth core, Customer sign-up, Booking Engine (slot grid, conflict check, state machine, cancellation), Reliability (no-show detection, score and tiers, cash-on-arrival eligibility, disputes) | `AuthController/Service`, `BookingController/Service/Model`, `ReliabilityService` |
-| B | Owner sign-up, Venues, Courts and slot generation, slot blocking, Payments (PayHere Sandbox), Resale | `VenueController/Service/Model`, `CourtController/Service/Model`, `SlotService`, `PaymentService`, `ResaleService` |
-| C | Coach Module (coach sign-up, venue approval, sessions, registration, Coaching page, attendance, coach dashboard, coach reviews) | `CoachController`, `CoachingController`, `SessionRegistrationController`, `CoachService`, `CoachSessionService`, `SessionRegistrationService` |
-| D | Shared UI layout, Discovery, Check-in, venue Reviews, Announcements, Flash slots, Notifications, Audit log, Owner analytics, Customer intelligence, User management | `views/layouts`, `views/partials`, `DiscoveryController`, `CheckInService`, `ReviewService`, `FlashService`, `NotificationService`, `AuditService`, `AnalyticsService` |
+| Member | Features |
+|---|---|
+| A | Auth core, Customer sign-up, Booking Engine (slot grid, conflict check, state machine, cancellation), Reliability (no-show detection, score and tiers, cash-on-arrival eligibility, disputes) |
+| B | Owner sign-up, Venues, Courts and slot generation, slot blocking, Payments (PayHere Sandbox), Resale |
+| C | Coach Module (coach sign-up, venue approval, sessions, registration, Coaching page, attendance, coach dashboard, coach reviews) |
+| D | Shared UI layout, Discovery, Check-in, venue Reviews, Announcements, Flash slots, Notifications, Audit log, Owner analytics, Customer intelligence, User management |
+
+Each member names their own classes when they build the feature, following the naming rules above.
 
 Shared files (`app/core`, `config/routes.php`, `database/schema.sql`) need the team's agreement before changing.
