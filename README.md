@@ -11,7 +11,7 @@ CourtPass is a web platform for the Sri Lankan indoor sports market (futsal, bad
 - **Booking:** slot availability grid, conflict-free booking, owner confirmation and a tiered cancellation policy
 - **Reliability and trust:** reliability score and tiers, cash-on-arrival for reliable customers, no-show tracking
 - **Payments:** online payments through PayHere Sandbox
-- **Resale and flash deals:** resell a booking at up to 90% of its price, discounted last-minute slots
+- **Resale and flash deals:** release a booking back into the booking grid and get a 90% refund when another customer books it, plus discounted last-minute slots
 - **Coaching:** coach profiles, venue approval, public and private sessions with paid registration and attendance
 - **Reviews and announcements:** verified reviews for venues and coaches, venue announcements
 - **Owner insights:** revenue tracking, court utilisation heatmap and customer profiles
@@ -55,6 +55,19 @@ Get-Content database\schema.sql | C:\xampp\mysql\bin\mysql -u root
 Get-Content database\seed.sql | C:\xampp\mysql\bin\mysql -u root
 ```
 You can also import `database/schema.sql` and then `database/seed.sql` through phpMyAdmin at http://localhost/phpmyadmin.
+
+Running `schema.sql` deletes and recreates the `courtpass` database, so run both files again whenever you want a fresh copy of the sample data. The database design is explained in [docs/database-design.md](docs/database-design.md).
+
+**Sample accounts** (created by `seed.sql`)
+
+| Role | Email | Password |
+|---|---|---|
+| Platform Admin | admin@courtpass.lk | Admin@123 |
+| Venue Owner | kamal@sportshub.lk | Owner@123 |
+| Customer | saman@gmail.com | Customer@123 |
+| Coach | ashan@coach.lk | Coach@123 |
+
+More accounts are listed at the top of `database/seed.sql`.
 
 ## Running the system
 
