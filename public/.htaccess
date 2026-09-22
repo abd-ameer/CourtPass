@@ -1,0 +1,9 @@
+Options -Indexes
+RewriteEngine On
+
+# Serve real files (css, js, images) directly
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Everything else goes to the front controller
+RewriteRule ^ index.php [QSA,L]
