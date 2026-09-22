@@ -13,10 +13,10 @@
 $router->get('/', [HomeController::class, 'index']);
 $router->get('/api/health', [SystemController::class, 'health']);
 
-// ---------- Member A: Auth core, Booking Engine, Reliability ----------
+// ---------- Member A: Auth core, Customer sign-up, Booking Engine, Reliability ----------
 
-// ---------- Member B: Owner sign-up, Venues, Courts, Payments, Resale, Flash, User management ----------
+// ---------- Member B: Owner sign-up, Venues, Courts, Payments, Resale ----------
 
-// ---------- Member C: Coach Operations ----------
+// ---------- Member C: Coach Module ----------
 
-// ---------- Member D: Customer sign-up, Discovery, Check-in, Community, Insights ----------
+// ---------- Member D: Discovery, Check-in, Reviews, Announcements, Flash slots, Notifications, Insights, User management ----------
