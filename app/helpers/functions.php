@@ -32,3 +32,10 @@ function now(): string
 {
     return date('Y-m-d H:i:s');
 }
+
+/** Check if current route matches target route path for sidebar/navigation active state. */
+function is_active_route(string $target, ?string $current = null): string
+{
+    $current = $current ?? Request::current()?->path() ?? '';
+    return ($target === $current || str_starts_with($current, $target . '/')) ? 'active' : '';
+}
