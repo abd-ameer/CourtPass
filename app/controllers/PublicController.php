@@ -35,7 +35,7 @@ class PublicController extends Controller
 
     public function resale(): void
     {
-        $this->view('customer/resale', ['title' => 'Resale Ticket Marketplace'], 'main');
+        $this->redirect(url('/venues'));
     }
 
     public function reliability(): void

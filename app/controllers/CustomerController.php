@@ -55,12 +55,12 @@ class CustomerController extends Controller
 
     public function resale(): void
     {
-        $this->show('resale', 'Resale Market');
+        $this->redirect(url('/customer/my-resales'));
     }
 
     public function myResales(): void
     {
-        $this->show('my-resales', 'My Resale Listings');
+        $this->show('my-resales', 'Slot Resale & Refund Management');
     }
 
     public function coaching(): void

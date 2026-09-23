@@ -33,7 +33,7 @@
                     <li><a href="<?= url('/owner/dashboard') ?>" style="color: var(--color-text-muted);">Venue Owner Dashboard</a></li>
                     <li><a href="<?= url('/coach/dashboard') ?>" style="color: var(--color-text-muted);">Coach Operations &amp; Sessions</a></li>
                     <li><a href="<?= url('/admin/dashboard') ?>" style="color: var(--color-text-muted);">Platform Administration</a></li>
-                    <li><a href="<?= url('/resale') ?>" style="color: var(--color-text-muted);">Resale Ticket Marketplace</a></li>
+                    <li><a href="<?= url('/help') ?>" style="color: var(--color-text-muted);">Cancellation &amp; Resale Policy</a></li>
                     <li><a href="<?= url('/register-role') ?>" style="color: var(--color-text-muted);">Join as Partner / Coach</a></li>
                 </ul>
             </div>

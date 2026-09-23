@@ -12,7 +12,9 @@ class Response
     /** $path is app-relative, e.g. "/login". */
     public static function redirect(string $path): never
     {
-        header('Location: ' . url($path));
+        if (!headers_sent()) {
+            header('Location: ' . url($path));
+        }
         exit;
     }
 }

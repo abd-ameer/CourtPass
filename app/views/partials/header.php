@@ -17,9 +17,6 @@ $currentUri = Request::current()?->path() ?? '/';
             <a href="<?= url('/coaching') ?>" style="font-weight: 600; font-size: 14px; color: <?= str_starts_with($currentUri, '/coaching') ? 'var(--color-primary-hover)' : 'var(--color-text-main)' ?>;">
                 Coaching Sessions
             </a>
-            <a href="<?= url('/resale') ?>" style="font-weight: 600; font-size: 14px; color: <?= str_starts_with($currentUri, '/resale') ? 'var(--color-primary-hover)' : 'var(--color-text-main)' ?>;">
-                Resale Market
-            </a>
             <a href="<?= url('/#how-it-works') ?>" style="font-weight: 600; font-size: 14px; color: var(--color-text-muted);">
                 How It Works
             </a>

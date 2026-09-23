@@ -28,11 +28,18 @@
             </p>
         </div>
 
-        <div class="card" style="margin-bottom: var(--space-6);">
-            <h3 style="font-size: 18px; margin-bottom: 12px; color: var(--color-navy);">How does the Resale Market 90% price cap work?</h3>
-            <p class="text-sm" style="color: var(--color-text-main); line-height: 1.6;">
-                If you cannot attend a confirmed booking, you may list your slot on the CourtPass Resale Marketplace. To prevent scalping and black-market markup, all resale prices are strictly capped at a maximum of 90% of the original booking fee.
+        <div class="card" style="margin-bottom: var(--space-6);" id="resale">
+            <h3 style="font-size: 18px; margin-bottom: 12px; color: var(--color-navy);">How does the Slot Resale &amp; 90% Refund process work?</h3>
+            <p class="text-sm" style="color: var(--color-text-main); line-height: 1.6; margin-bottom: 10px;">
+                There is no separate marketplace for purchasing resold booking slots. When you choose to resell an unwanted booking slot:
             </p>
+            <ul style="padding-left: 20px; font-size: 14px; color: var(--color-text-main); line-height: 1.7; margin-bottom: 12px;">
+                <li><strong>Standard Booking Availability:</strong> The slot immediately re-enters the standard booking pool and appears on the venue's regular availability calendar for any customer to purchase at standard rates.</li>
+                <li><strong>90% Refund upon Successful Rebooking:</strong> You will receive a <strong>90% refund</strong> of your original payment only after another customer successfully completes a booking for that released slot.</li>
+                <li><strong>10% Resale Processing Fee:</strong> The remaining 10% is retained by CourtPass as a platform processing fee.</li>
+                <li><strong>Unsold Slots:</strong> If no other customer purchases the slot before the session starts, no refund will be issued.</li>
+                <li><strong>Revocation:</strong> You can revoke your resale request and keep your booking at any time as long as no other customer has purchased it yet.</li>
+            </ul>
         </div>
 
         <div class="card" style="background: var(--color-primary-light); border: 1px solid var(--color-primary-border);">

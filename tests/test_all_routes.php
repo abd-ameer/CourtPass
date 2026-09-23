@@ -3,11 +3,6 @@
  * Test all registered routes across Public, Customer, Owner, Coach, and Admin portals.
  */
 
-require_once __DIR__ . '/../app/bootstrap.php';
-
-$router = new Router();
-require __DIR__ . '/../config/routes.php';
-
 $testRoutes = [
     // Public routes
     ['GET', '/', 'Home Landing'],
@@ -16,7 +11,6 @@ $testRoutes = [
     ['GET', '/court-details', 'Public Court Details'],
     ['GET', '/coaching', 'Public Coaching'],
     ['GET', '/coach-profile', 'Public Coach Profile'],
-    ['GET', '/resale', 'Public Resale'],
     ['GET', '/reliability', 'Public Reliability'],
     ['GET', '/help', 'Public Help'],
     ['GET', '/login', 'Login Form'],
@@ -35,8 +29,7 @@ $testRoutes = [
     ['GET', '/customer/booking-details', 'Customer Booking Details'],
     ['GET', '/customer/cancel-booking', 'Customer Cancel Booking'],
     ['GET', '/customer/reschedule-booking', 'Customer Reschedule Booking'],
-    ['GET', '/customer/resale', 'Customer Resale'],
-    ['GET', '/customer/my-resales', 'Customer My Resales'],
+    ['GET', '/customer/my-resales', 'Customer My Resales & Refund Management'],
     ['GET', '/customer/coaching', 'Customer Coaching'],
     ['GET', '/customer/session-details', 'Customer Session Details'],
     ['GET', '/customer/my-sessions', 'Customer My Sessions'],
@@ -59,13 +52,13 @@ $testRoutes = [
     ['GET', '/owner/slot-management', 'Owner Slot Management'],
     ['GET', '/owner/bookings', 'Owner Bookings'],
     ['GET', '/owner/booking-details', 'Owner Booking Details'],
-    ['GET', '/owner/check-in', 'Owner Check-in'],
-    ['GET', '/owner/flash-slots', 'Owner Flash Slots'],
-    ['GET', '/owner/announcements', 'Owner Announcements'],
-    ['GET', '/owner/coach-requests', 'Owner Coach Requests'],
-    ['GET', '/owner/customers', 'Owner Customers'],
+    ['GET', '/owner/manual-booking', 'Owner Manual Booking'],
+    ['GET', '/owner/coaches', 'Owner Coaches'],
     ['GET', '/owner/revenue', 'Owner Revenue'],
-    ['GET', '/owner/utilisation', 'Owner Utilisation'],
+    ['GET', '/owner/reviews', 'Owner Reviews'],
+    ['GET', '/owner/reports', 'Owner Reports'],
+    ['GET', '/owner/discounts', 'Owner Discounts'],
+    ['GET', '/owner/flash-deals', 'Owner Flash Deals'],
     ['GET', '/owner/notifications', 'Owner Notifications'],
     ['GET', '/owner/profile', 'Owner Profile'],
 
@@ -76,29 +69,36 @@ $testRoutes = [
     ['GET', '/coach/edit-session', 'Coach Edit Session'],
     ['GET', '/coach/cancel-session', 'Coach Cancel Session'],
     ['GET', '/coach/session-details', 'Coach Session Details'],
-    ['GET', '/coach/session-registrations', 'Coach Session Registrations'],
-    ['GET', '/coach/attendance', 'Coach Attendance'],
     ['GET', '/coach/venues', 'Coach Venues'],
+    ['GET', '/coach/request-venue', 'Coach Request Venue'],
+    ['GET', '/coach/students', 'Coach Students'],
     ['GET', '/coach/earnings', 'Coach Earnings'],
     ['GET', '/coach/reviews', 'Coach Reviews'],
+    ['GET', '/coach/disputes', 'Coach Disputes'],
     ['GET', '/coach/notifications', 'Coach Notifications'],
     ['GET', '/coach/profile', 'Coach Profile'],
-    ['GET', '/coach/settings', 'Coach Settings'],
 
     // Admin portal routes
     ['GET', '/admin/dashboard', 'Admin Dashboard'],
     ['GET', '/admin/users', 'Admin Users'],
     ['GET', '/admin/user-details', 'Admin User Details'],
-    ['GET', '/admin/venue-approvals', 'Admin Venue Approvals'],
-    ['GET', '/admin/venue-details', 'Admin Venue Details'],
-    ['GET', '/admin/coach-verifications', 'Admin Coach Verifications'],
-    ['GET', '/admin/disputes-no-show', 'Admin Disputes No Show'],
+    ['GET', '/admin/venues-pending', 'Admin Venues Pending'],
+    ['GET', '/admin/venue-approval', 'Admin Venue Approval'],
+    ['GET', '/admin/coaches-pending', 'Admin Coaches Pending'],
+    ['GET', '/admin/coach-approval', 'Admin Coach Approval'],
+    ['GET', '/admin/financials', 'Admin Financials'],
+    ['GET', '/admin/payouts', 'Admin Payouts'],
+    ['GET', '/admin/disputes-noshow', 'Admin Disputes No-show'],
     ['GET', '/admin/disputes-resale', 'Admin Disputes Resale'],
-    ['GET', '/admin/review-moderation', 'Admin Review Moderation'],
-    ['GET', '/admin/announcement-moderation', 'Admin Announcement Moderation'],
-    ['GET', '/admin/notifications', 'Admin Notifications'],
+    ['GET', '/admin/disputes-coach', 'Admin Disputes Coach'],
+    ['GET', '/admin/audit-logs', 'Admin Audit Logs'],
     ['GET', '/admin/settings', 'Admin Settings'],
 ];
+
+require_once __DIR__ . '/../app/bootstrap.php';
+
+$router = new Router();
+require __DIR__ . '/../config/routes.php';
 
 $passed = 0;
 $failed = 0;
