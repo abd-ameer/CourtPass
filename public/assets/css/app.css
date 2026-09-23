@@ -1,44 +1,52 @@
-/* CourtPass base styles (plain CSS, no framework).
-   Shared UI layout is owned by Member D; this is a starting point. */
-:root {
-    --primary: #1f7a4d;
-    --primary-dark: #145c39;
-    --text: #1d1d1d;
-    --muted: #666;
-    --bg: #f6f7f5;
-    --card: #ffffff;
-    --border: #dcdfd9;
-    --danger: #b3261e;
+/**
+ * CourtPass Main Stylesheet Bundle
+ */
+@import url('tokens.css');
+@import url('base.css');
+@import url('components.css');
+@import url('availability.css');
+@import url('dashboard.css');
+
+/* Flash message enhancements matching token palette */
+.flash-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 16px auto 0 auto;
+    padding: 0 16px;
 }
 
-* { box-sizing: border-box; }
-
-body {
-    margin: 0;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    color: var(--text);
-    background: var(--bg);
-    line-height: 1.5;
+.flash {
+    padding: 12px 18px;
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid transparent;
 }
 
-a { color: var(--primary); }
+.flash-success {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    border-color: var(--color-success-border);
+}
 
-.container { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+.flash-error {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+    border-color: var(--color-danger-border);
+}
 
-.site-header { background: var(--primary); color: #fff; }
-.site-header .container { display: flex; align-items: center; justify-content: space-between; height: 60px; }
-.site-header a { color: #fff; text-decoration: none; margin-left: 16px; }
-.site-header .brand { font-weight: 700; font-size: 1.2rem; margin-left: 0; }
+.flash-warning {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+    border-color: var(--color-warning-border);
+}
 
-main { padding: 32px 0; min-height: 70vh; }
-
-.card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 16px; }
-
-.btn { display: inline-block; padding: 10px 18px; border-radius: 6px; border: none; background: var(--primary); color: #fff; text-decoration: none; cursor: pointer; font-size: 1rem; }
-.btn:hover { background: var(--primary-dark); }
-
-.flash { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; }
-.flash-success { background: #e3f4ea; color: var(--primary-dark); }
-.flash-error { background: #fbe9e7; color: var(--danger); }
-
-.site-footer { border-top: 1px solid var(--border); padding: 16px 0; color: var(--muted); font-size: 0.9rem; }
+.flash-info {
+    background: var(--color-info-bg);
+    color: var(--color-info);
+    border-color: var(--color-info-border);
+}

@@ -1,0 +1,132 @@
+<?php
+/**
+ * Test all registered routes across Public, Customer, Owner, Coach, and Admin portals.
+ */
+
+require_once __DIR__ . '/../app/bootstrap.php';
+
+$router = new Router();
+require __DIR__ . '/../config/routes.php';
+
+$testRoutes = [
+    // Public routes
+    ['GET', '/', 'Home Landing'],
+    ['GET', '/venues', 'Public Venues'],
+    ['GET', '/venue-details', 'Public Venue Details'],
+    ['GET', '/court-details', 'Public Court Details'],
+    ['GET', '/coaching', 'Public Coaching'],
+    ['GET', '/coach-profile', 'Public Coach Profile'],
+    ['GET', '/resale', 'Public Resale'],
+    ['GET', '/reliability', 'Public Reliability'],
+    ['GET', '/help', 'Public Help'],
+    ['GET', '/login', 'Login Form'],
+    ['GET', '/register-role', 'Register Role'],
+    ['GET', '/register-customer', 'Register Customer'],
+    ['GET', '/register-owner', 'Register Owner'],
+    ['GET', '/register-coach', 'Register Coach'],
+
+    // Customer portal routes
+    ['GET', '/customer/dashboard', 'Customer Dashboard'],
+    ['GET', '/customer/venues', 'Customer Venues'],
+    ['GET', '/customer/venue-details', 'Customer Venue Details'],
+    ['GET', '/customer/court-availability', 'Customer Court Availability'],
+    ['GET', '/customer/create-booking', 'Customer Create Booking'],
+    ['GET', '/customer/bookings', 'Customer Bookings'],
+    ['GET', '/customer/booking-details', 'Customer Booking Details'],
+    ['GET', '/customer/cancel-booking', 'Customer Cancel Booking'],
+    ['GET', '/customer/reschedule-booking', 'Customer Reschedule Booking'],
+    ['GET', '/customer/resale', 'Customer Resale'],
+    ['GET', '/customer/my-resales', 'Customer My Resales'],
+    ['GET', '/customer/coaching', 'Customer Coaching'],
+    ['GET', '/customer/session-details', 'Customer Session Details'],
+    ['GET', '/customer/my-sessions', 'Customer My Sessions'],
+    ['GET', '/customer/reliability', 'Customer Reliability'],
+    ['GET', '/customer/reviews', 'Customer Reviews'],
+    ['GET', '/customer/create-review', 'Customer Create Review'],
+    ['GET', '/customer/notifications', 'Customer Notifications'],
+    ['GET', '/customer/profile', 'Customer Profile'],
+
+    // Owner portal routes
+    ['GET', '/owner/dashboard', 'Owner Dashboard'],
+    ['GET', '/owner/venues', 'Owner Venues'],
+    ['GET', '/owner/add-venue', 'Owner Add Venue'],
+    ['GET', '/owner/edit-venue', 'Owner Edit Venue'],
+    ['GET', '/owner/delete-venue', 'Owner Delete Venue'],
+    ['GET', '/owner/venue-details', 'Owner Venue Details'],
+    ['GET', '/owner/courts', 'Owner Courts'],
+    ['GET', '/owner/edit-court', 'Owner Edit Court'],
+    ['GET', '/owner/operating-hours', 'Owner Operating Hours'],
+    ['GET', '/owner/slot-management', 'Owner Slot Management'],
+    ['GET', '/owner/bookings', 'Owner Bookings'],
+    ['GET', '/owner/booking-details', 'Owner Booking Details'],
+    ['GET', '/owner/check-in', 'Owner Check-in'],
+    ['GET', '/owner/flash-slots', 'Owner Flash Slots'],
+    ['GET', '/owner/announcements', 'Owner Announcements'],
+    ['GET', '/owner/coach-requests', 'Owner Coach Requests'],
+    ['GET', '/owner/customers', 'Owner Customers'],
+    ['GET', '/owner/revenue', 'Owner Revenue'],
+    ['GET', '/owner/utilisation', 'Owner Utilisation'],
+    ['GET', '/owner/notifications', 'Owner Notifications'],
+    ['GET', '/owner/profile', 'Owner Profile'],
+
+    // Coach portal routes
+    ['GET', '/coach/dashboard', 'Coach Dashboard'],
+    ['GET', '/coach/sessions', 'Coach Sessions'],
+    ['GET', '/coach/create-session', 'Coach Create Session'],
+    ['GET', '/coach/edit-session', 'Coach Edit Session'],
+    ['GET', '/coach/cancel-session', 'Coach Cancel Session'],
+    ['GET', '/coach/session-details', 'Coach Session Details'],
+    ['GET', '/coach/session-registrations', 'Coach Session Registrations'],
+    ['GET', '/coach/attendance', 'Coach Attendance'],
+    ['GET', '/coach/venues', 'Coach Venues'],
+    ['GET', '/coach/earnings', 'Coach Earnings'],
+    ['GET', '/coach/reviews', 'Coach Reviews'],
+    ['GET', '/coach/notifications', 'Coach Notifications'],
+    ['GET', '/coach/profile', 'Coach Profile'],
+    ['GET', '/coach/settings', 'Coach Settings'],
+
+    // Admin portal routes
+    ['GET', '/admin/dashboard', 'Admin Dashboard'],
+    ['GET', '/admin/users', 'Admin Users'],
+    ['GET', '/admin/user-details', 'Admin User Details'],
+    ['GET', '/admin/venue-approvals', 'Admin Venue Approvals'],
+    ['GET', '/admin/venue-details', 'Admin Venue Details'],
+    ['GET', '/admin/coach-verifications', 'Admin Coach Verifications'],
+    ['GET', '/admin/disputes-no-show', 'Admin Disputes No Show'],
+    ['GET', '/admin/disputes-resale', 'Admin Disputes Resale'],
+    ['GET', '/admin/review-moderation', 'Admin Review Moderation'],
+    ['GET', '/admin/announcement-moderation', 'Admin Announcement Moderation'],
+    ['GET', '/admin/notifications', 'Admin Notifications'],
+    ['GET', '/admin/settings', 'Admin Settings'],
+];
+
+$passed = 0;
+$failed = 0;
+
+foreach ($testRoutes as [$method, $uri, $label]) {
+    $_SERVER['REQUEST_METHOD'] = $method;
+    $_SERVER['REQUEST_URI'] = $uri;
+    $_SERVER['SCRIPT_NAME'] = '/public/index.php';
+
+    $req = new Request();
+    ob_start();
+    try {
+        $router->dispatch($req);
+        $output = ob_get_clean();
+        if (str_contains($output, 'Something went wrong') || str_contains($output, 'Fatal error') || str_contains($output, 'Parse error')) {
+            echo "FAIL: [{$method} {$uri}] ({$label}) - error in output\n";
+            $failed++;
+        } else {
+            echo "OK:   [{$method} {$uri}] ({$label}) - " . strlen($output) . " bytes\n";
+            $passed++;
+        }
+    } catch (Throwable $e) {
+        ob_end_clean();
+        echo "FAIL: [{$method} {$uri}] ({$label}) - Exception: " . $e->getMessage() . "\n";
+        $failed++;
+    }
+}
+
+echo "\n===============================\n";
+echo "SUMMARY: Passed: {$passed} | Failed: {$failed} | Total: " . count($testRoutes) . "\n";
+echo "===============================\n";
