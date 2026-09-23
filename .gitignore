@@ -1,9 +1,6 @@
 # Local config (DB credentials and PayHere sandbox keys)
 config/config.php
 
-# UI Reference (must not be committed or run directly)
-courtpass_v2/
-
 # User uploads
 public/uploads/*
 !public/uploads/.gitkeep
