@@ -25,6 +25,14 @@ abstract class Controller
         Response::redirect($path);
     }
 
+    /** Used by the login and sign-up pages, which have no use for a logged-in user. */
+    protected function redirectIfLoggedIn(): void
+    {
+        if (Auth::check()) {
+            $this->redirect(Auth::homeUrl());
+        }
+    }
+
     /** Call at the start of every POST/PUT/DELETE action. */
     protected function verifyCsrf(): void
     {
