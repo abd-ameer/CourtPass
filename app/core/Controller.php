@@ -25,6 +25,17 @@ abstract class Controller
         Response::redirect($path);
     }
 
+    /** Record missing or owned by someone else: 404 page, or JSON on /api/ routes. */
+    protected function notFound(): never
+    {
+        if ($this->request->isApi()) {
+            Response::json(['error' => 'Not found.'], 404);
+        }
+        http_response_code(404);
+        View::render('errors/404');
+        exit;
+    }
+
     /** Used by the login and sign-up pages, which have no use for a logged-in user. */
     protected function redirectIfLoggedIn(): void
     {

@@ -27,7 +27,10 @@ Browser
 Other rules:
 - If your feature needs logic from another member's module, call **their service**. Do not copy it. Example: creating a coach session calls the booking module's slot conflict check.
 - No cron jobs. Automatic status changes (no-shows, expired flash slots, reliability) run when a user acts (login, booking attempt, page load).
-- Every state change writes to the audit log.
+- Every state change writes to the audit log through `AuditService::log()`, and user-facing changes send an in-app message through `NotificationService::notify()`. Event names use `entity.action`, e.g. `booking.confirmed`.
+- A model writes only its own table, but its SELECT queries may JOIN other tables to show names and labels (read only).
+- A service method that another module calls inside its transaction never opens its own transaction; a nested `begin_transaction()` commits the outer one early.
+- A record that does not exist, or belongs to someone else, gets `$this->notFound()` in the controller.
 - All times are Asia/Colombo.
 
 ## Naming
