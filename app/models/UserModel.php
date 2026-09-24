@@ -27,6 +27,11 @@ class UserModel extends Model
         );
     }
 
+    public function updateDetails(int $id, string $name, ?string $phone): int
+    {
+        return $this->execute('UPDATE users SET name = ?, phone = ? WHERE id = ?', 'ssi', [$name, $phone, $id]);
+    }
+
     public function updatePasswordHash(int $id, string $passwordHash): int
     {
         return $this->execute('UPDATE users SET password_hash = ? WHERE id = ?', 'si', [$passwordHash, $id]);

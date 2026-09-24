@@ -30,8 +30,9 @@ class AccountController extends Controller
             return;
         }
 
-        // TODO: update name and phone of the logged-in user, then refresh the session name.
-        Session::flash('info', 'Saving account details is not built yet.');
+        $user = (new AccountService())->updateDetails(Auth::id(), $account['name'], $phone);
+        Auth::login($user);
+        Session::flash('success', 'Your account details have been saved.');
         $this->redirect('/account');
     }
 
@@ -41,7 +42,7 @@ class AccountController extends Controller
         $data = $this->request->all();
         $v = (new Validator($data))
             ->required('current_password', 'Current password')
-            ->required('new_password', 'New password')->minLength('new_password', 8)->maxLength('new_password', 72);
+            ->required('new_password', 'New password')->password('new_password');
         $errors = $v->errors();
         if (!isset($errors['new_password']) && ($data['new_password'] ?? '') !== ($data['confirm_password'] ?? '')) {
             $errors['confirm_password'] = 'Passwords do not match.';
@@ -53,16 +54,25 @@ class AccountController extends Controller
             return;
         }
 
-        // TODO: password_verify the current password, then store a new password_hash.
-        Session::flash('info', 'Changing passwords is not built yet.');
+        try {
+            (new AccountService())->changePassword(
+                Auth::id(),
+                (string) ($data['current_password'] ?? ''),
+                (string) $data['new_password']
+            );
+        } catch (ValidationException $e) {
+            http_response_code(422);
+            $this->view('account/edit', ['title' => 'Account Settings', 'account' => $this->account(), 'errors' => $e->errors()], 'dashboard');
+            return;
+        }
+
+        Session::regenerate();
+        Session::flash('success', 'Your password has been changed.');
         $this->redirect('/account');
     }
 
-    /** Session data until the account lookup exists. */
     private function account(): array
     {
-        // TODO: load name, email and phone of Auth::id() from the users table.
-        $user = Auth::user() ?? [];
-        return ['name' => $user['name'] ?? '', 'email' => '', 'phone' => '', 'role' => $user['role'] ?? ''];
+        return (new AccountService())->details(Auth::id());
     }
 }
