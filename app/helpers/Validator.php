@@ -79,6 +79,25 @@ class Validator
         return $this;
     }
 
+    /** Money or other decimal amount with at most two decimal places. */
+    public function decimal(string $field, ?float $min = null, ?float $max = null): self
+    {
+        $v = $this->value($field);
+        if (!preg_match('/^\d+(\.\d{1,2})?$/', $v)) {
+            return $this->addError($field, 'Enter a valid amount.');
+        }
+        if (($min !== null && (float) $v < $min) || ($max !== null && (float) $v > $max)) {
+            return $this->addError($field, 'Enter an amount in the allowed range.');
+        }
+        return $this;
+    }
+
+    /** Slot start time on the hour, e.g. 18:00 (seconds allowed as :00). */
+    public function hour(string $field): self
+    {
+        return preg_match('/^([01]\d|2[0-3]):00(:00)?$/', $this->value($field)) ? $this : $this->addError($field, 'Choose a start time on the hour.');
+    }
+
     public function in(string $field, array $allowed): self
     {
         return !in_array($this->value($field), $allowed, true) ? $this->addError($field, 'Invalid option selected.') : $this;
