@@ -6,7 +6,7 @@
  <span>System Alerts</span>
  </div>
  <h1 class="page-title">Administrative Alerts </h1>
- <div class="page-subtitle">Platform health warnings, pending approval alerts, and settlement notifications.</div>
+ <div class="page-subtitle">Platform alerts, pending approvals and dispute updates.</div>
  </div>
 
  <div>

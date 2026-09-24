@@ -165,8 +165,8 @@
 
  <div style="display: flex; justify-content: space-between; align-items: center;">
  <div>
- <div style="font-weight: 600; font-size: 13px;">Dialog SMS Gateway</div>
- <div style="font-size: 11px; color: var(--color-text-subtle);">99.98% delivery rate</div>
+ <div style="font-weight: 600; font-size: 13px;">In-App Notifications</div>
+ <div style="font-size: 11px; color: var(--color-text-subtle);">Shown on the user's next page load</div>
  </div>
  <span class="badge badge-confirmed">Operational</span>
  </div>
@@ -174,15 +174,15 @@
  <div style="display: flex; justify-content: space-between; align-items: center;">
  <div>
  <div style="font-weight: 600; font-size: 13px;">Reliability Scoring Engine</div>
- <div style="font-size: 11px; color: var(--color-text-subtle);">Automated nightly batch</div>
+ <div style="font-size: 11px; color: var(--color-text-subtle);">Recalculated when a booking is completed or cancelled</div>
  </div>
  <span class="badge badge-confirmed">Active</span>
  </div>
 
  <div style="display: flex; justify-content: space-between; align-items: center;">
  <div>
- <div style="font-weight: 600; font-size: 13px;">Resale Marketplace Daemon</div>
- <div style="font-size: 11px; color: var(--color-text-subtle);">Cap enforcement <= 90%</div>
+ <div style="font-weight: 600; font-size: 13px;">Resale Settlement</div>
+ <div style="font-size: 11px; color: var(--color-text-subtle);">90% refund when a released slot is rebooked</div>
  </div>
  <span class="badge badge-confirmed">Active</span>
  </div>

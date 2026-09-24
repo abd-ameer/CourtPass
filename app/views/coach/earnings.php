@@ -60,7 +60,7 @@
  </div>
  </div>
 
- <!-- Chart & Bank Details Row -->
+ <!-- Monthly Revenue Row -->
  <div class="grid grid-cols-3 gap-6" style="margin-bottom: var(--space-6);">
  <!-- Chart -->
  <div class="card" style="grid-column: span 2;">
@@ -81,7 +81,7 @@
  <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
  <div>
  <h3 class="card-title">Session-by-Session Earnings Breakdown</h3>
- <div class="card-subtitle">Transparent breakdown of fees, student counts, and platform deductions.</div>
+ <div class="card-subtitle">Registration fees collected per session, minus refunds.</div>
  </div>
 
  <div style="display: flex; gap: 8px;">
@@ -101,8 +101,8 @@
  <th>Date & Session</th>
  <th>Venue & Court</th>
  <th>Students</th>
- <th>Gross (LKR)</th>
- <th>Platform Fee (5%)</th>
+ <th>Fees Collected (LKR)</th>
+ <th>Refunds (LKR)</th>
  <th>Net (LKR)</th>
  <th>Status</th>
  <th>Action</th>
@@ -141,7 +141,7 @@
  <td>LKR 21,000</td>
  <td style="color: var(--color-danger);">-LKR 1,050</td>
  <td style="font-weight: 800; color: var(--color-primary-active);">LKR 19,950</td>
- <td><span class="badge badge-confirmed"> Disbursed (Sep 20)</span></td>
+ <td><?= status_badge('completed') ?></td>
  <td>
  <a href="<?= url('/coach/sessions/3') ?>" class="btn btn-sm btn-outline">Details</a>
  </td>
@@ -160,7 +160,7 @@
  <td>LKR 18,000</td>
  <td style="color: var(--color-danger);">-LKR 900</td>
  <td style="font-weight: 800; color: var(--color-primary-active);">LKR 17,100</td>
- <td><span class="badge badge-confirmed"> Disbursed (Sep 15)</span></td>
+ <td><?= status_badge('completed') ?></td>
  <td>
  <a href="<?= url('/coach/sessions/1') ?>" class="btn btn-sm btn-outline">Details</a>
  </td>
@@ -179,7 +179,7 @@
  <td>LKR 25,000</td>
  <td style="color: var(--color-danger);">-LKR 1,250</td>
  <td style="font-weight: 800; color: var(--color-primary-active);">LKR 23,750</td>
- <td><span class="badge badge-confirmed"> Disbursed (Sep 15)</span></td>
+ <td><?= status_badge('completed') ?></td>
  <td>
  <a href="<?= url('/coach/sessions/2') ?>" class="btn btn-sm btn-outline">Details</a>
  </td>

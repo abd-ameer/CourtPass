@@ -26,7 +26,7 @@
  <h3 style="font-size: 16px; font-weight: 700; color: #991b1b; margin-bottom: 6px;">Are you sure you want to cancel this session?</h3>
  <p style="font-size: 13px; color: #b91c1c; line-height: 1.6; margin: 0;">
  Cancelling this session will <strong>automatically refund all 3 registered students</strong> via their original payment method (PayHere). 
- This action cannot be undone. Students will receive an email notification about the cancellation.
+ This action cannot be undone. Registered customers get an in-app notification and a full refund.
  </p>
  </div>
  </div>

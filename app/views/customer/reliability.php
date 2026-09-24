@@ -78,7 +78,7 @@
  </tr>
  <tr style="background: var(--color-primary-light);">
  <td><span class="badge tier-standard">Standard & Above</span></td>
- <td><strong>70% and above</strong> (with $\ge 5$ completed)</td>
+ <td><strong>70% and above</strong> (with 5 or more completed)</td>
  <td><strong>Choice of Online Payment or Cash-on-Arrival</strong></td>
  <td><span class="badge badge-confirmed">CURRENT TIER</span></td>
  </tr>

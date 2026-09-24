@@ -109,19 +109,11 @@
  <span class="text-muted">Registrations</span>
  <strong>6 / 8</strong>
  </div>
- <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--color-border-light);">
- <span class="text-muted">Gross Revenue</span>
- <strong>LKR 9,000</strong>
- </div>
- <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--color-border-light);">
- <span class="text-muted">Platform Fee (10%)</span>
- <strong style="color: var(--color-danger);">- LKR 900</strong>
- </div>
  </div>
  <div style="margin-top: var(--space-3); padding-top: var(--space-3); border-top: 2px solid var(--color-primary);">
  <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700;">
- <span>Your Earnings</span>
- <span style="color: var(--color-primary);">LKR 8,100</span>
+ <span>Fees Collected</span>
+ <span style="color: var(--color-primary);">LKR 9,000</span>
  </div>
  </div>
  </div>

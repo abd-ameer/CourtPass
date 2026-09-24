@@ -19,16 +19,15 @@
 
  <!-- Filters -->
  <div style="display: flex; gap: 8px; margin-bottom: var(--space-6); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-3);">
- <button class="btn btn-sm btn-primary notif-tab active" onclick="filterOwnerNotifs('all', this)">All Alerts (5)</button>
+ <button class="btn btn-sm btn-primary notif-tab active" onclick="filterOwnerNotifs('all', this)">All Alerts (3)</button>
  <button class="btn btn-sm btn-outline notif-tab" onclick="filterOwnerNotifs('booking', this)">Bookings (2)</button>
  <button class="btn btn-sm btn-outline notif-tab" onclick="filterOwnerNotifs('coach', this)">Coach Requests (1)</button>
- <button class="btn btn-sm btn-outline notif-tab" onclick="filterOwnerNotifs('finance', this)">Settlements (2)</button>
  </div>
 
  <!-- Notification List -->
  <div style="display: flex; flex-direction: column; gap: var(--space-3);" id="owner-notifs-container">
 
- <!-- Notif 1: New Booking Request -->
+ <!-- Notif 1: New Online Booking -->
  <div class="card notif-item unread" data-type="booking" style="background: #ffffff; border-left: 4px solid var(--color-primary-active);">
  <div class="card-body" style="padding: var(--space-4);">
  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
@@ -38,18 +37,18 @@
  </div>
  <div>
  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
- <strong style="color: var(--color-text-heading); font-size: var(--font-size-sm);">New Booking Request: Turf Court 1 (Floodlit)</strong>
+ <strong style="color: var(--color-text-heading); font-size: var(--font-size-sm);">New Booking Confirmed: Turf Court 1 (Floodlit)</strong>
  <span class="badge badge-primary">New</span>
  </div>
  <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-bottom: 6px;">
- Customer <strong>Kasun Mendis</strong> booked Today at 20:00 - 21:00. Paid LKR 5,000 via PayHere.
+ Customer <strong>Kasun Mendis</strong> booked Today at 20:00 - 21:00. Paid LKR 5,000 via PayHere and confirmed automatically.
  </p>
  <div style="font-size: 11px; color: var(--color-text-subtle);">10 minutes ago</div>
  </div>
  </div>
 
  <div style="display: flex; gap: 6px; flex-shrink: 0;">
- <a href="<?= url('/owner/bookings') ?>" class="btn btn-sm btn-primary">Review Booking</a>
+ <a href="<?= url('/owner/bookings') ?>" class="btn btn-sm btn-primary">View Booking</a>
  </div>
  </div>
  </div>
@@ -82,34 +81,7 @@
  </div>
  </div>
 
- <!-- Notif 3: Automated Settlement -->
- <div class="card notif-item" data-type="finance">
- <div class="card-body" style="padding: var(--space-4);">
- <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
- <div style="display: flex; gap: 14px;">
- <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: #eff6ff; color: #3b82f6; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
- <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
- </div>
- <div>
- <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
- <strong style="color: var(--color-text-heading); font-size: var(--font-size-sm);">Bi-Weekly Settlement Disbursed: LKR 335,160</strong>
- <span class="badge badge-confirmed">Settled</span>
- </div>
- <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-bottom: 6px;">
- Online revenue batch transferred to Sampath Bank (A/C: *9980). Ref: CP-ST-9941.
- </p>
- <div style="font-size: 11px; color: var(--color-text-subtle);">15 Sep 2026, 12:00</div>
- </div>
- </div>
-
- <div style="display: flex; gap: 6px; flex-shrink: 0;">
- <a href="<?= url('/owner/revenue') ?>" class="btn btn-sm btn-outline">Statement</a>
- </div>
- </div>
- </div>
- </div>
-
- <!-- Notif 4: Booking Cancellation -->
+ <!-- Notif 3: Booking Released for Resale -->
  <div class="card notif-item" data-type="booking">
  <div class="card-body" style="padding: var(--space-4);">
  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
@@ -119,10 +91,10 @@
  </div>
  <div>
  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
- <strong style="color: var(--color-text-heading); font-size: var(--font-size-sm);">Booking Resale Listed: Turf Court 2</strong>
+ <strong style="color: var(--color-text-heading); font-size: var(--font-size-sm);">Booking Released for Resale: Turf Court 2</strong>
  </div>
  <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-bottom: 6px;">
- Customer listed their booking for 24 Sep (19:00) on the Resale Marketplace at LKR 4,050 (10% discount).
+ Customer released their booking for 24 Sep (19:00). The slot is back in the booking grid at the normal price.
  </p>
  <div style="font-size: 11px; color: var(--color-text-subtle);">18 Sep 2026</div>
  </div>
@@ -158,15 +130,5 @@ function filterOwnerNotifs(type, btn) {
  item.style.display = 'none';
  }
  });
-}
-
-function CourtPass.post('/notifications/read') {
- document.querySelectorAll('.notif-item').forEach(item => {
- item.classList.remove('unread');
- item.style.borderLeft = '';
- const badge = item.querySelector('.badge-primary');
- if (badge) badge.remove();
- });
- CourtPassApp.showToast('success', 'Done', 'All owner notifications marked as read');
 }
 </script>

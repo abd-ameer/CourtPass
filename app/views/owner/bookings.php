@@ -17,7 +17,7 @@
  <!-- Filter Tabs -->
  <div class="nav-tabs">
  <button class="tab-btn active" onclick="filterOwnerBookings('all', this)">All (5)</button>
- <button class="tab-btn" onclick="filterOwnerBookings('pending', this)">Pending Review (2)</button>
+ <button class="tab-btn" onclick="filterOwnerBookings('pending', this)">Pending Review (1)</button>
  <button class="tab-btn" onclick="filterOwnerBookings('confirmed', this)">Confirmed (2)</button>
  <button class="tab-btn" onclick="filterOwnerBookings('completed', this)">Completed (1)</button>
  </div>
@@ -64,8 +64,8 @@
  </td>
  </tr>
 
- <!-- Pending Booking 2 -->
- <tr class="owner-booking-row" data-status="pending">
+ <!-- Awaiting Payment Booking -->
+ <tr class="owner-booking-row" data-status="pending_payment">
  <td>
  <strong>#1</strong>
  <div class="text-xs text-muted">Pass: #1</div>
@@ -79,13 +79,12 @@
  <strong>Turf Court 2 (Indoor)</strong>
  <div class="text-xs text-muted">Sept 25, 2026 · 07:00 PM - 08:00 PM</div>
  </td>
- <td><span class="badge badge-paid">Online (PayHere)</span></td>
+ <td><span class="badge badge-status-online">Online (PayHere)</span></td>
  <td><strong>LKR 4,500</strong></td>
- <td><span class="badge badge-pending">Pending</span></td>
+ <td><span class="badge badge-status-pending_payment">Awaiting Payment</span></td>
  <td style="text-align: right;">
- <button type="button" class="btn btn-sm btn-primary" onclick="CourtPassApp.confirmPost('Confirm Booking', 'Confirm this booking request?', 'Confirm', '/owner/bookings/4/confirm')">Confirm</button>
- <button type="button" class="btn btn-sm btn-secondary" style="color: var(--color-danger);" onclick="CourtPassApp.postWithReason('Reject Booking', 'A reason is required and is shown to the customer.', '/owner/bookings/4/reject')">Reject...</button>
- <a href="<?= url('/owner/bookings/4') ?>" class="btn btn-sm btn-outline">Profile</a>
+ <span class="text-xs text-muted" style="margin-right: 6px;">Confirms automatically once paid</span>
+ <a href="<?= url('/owner/bookings/4') ?>" class="btn btn-sm btn-outline">View</a>
  </td>
  </tr>
 

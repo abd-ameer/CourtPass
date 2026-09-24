@@ -94,7 +94,7 @@
     <div class="card-header">
         <div>
             <h3 class="card-title">My Active Bookings & Passes</h3>
-            <div class="card-subtitle">Show your digital pass or QR at the venue check-in desk on arrival.</div>
+            <div class="card-subtitle">Give your booking ID at the venue desk on arrival. The venue marks your check-in.</div>
         </div>
         <a href="<?= url('/customer/bookings') ?>" class="btn btn-sm btn-outline">View All Bookings</a>
     </div>
@@ -138,7 +138,7 @@
                     </td>
                     <td>
                         <div style="display: flex; gap: 6px;">
-                            <a href="<?= url('/customer/bookings/3') ?>" class="btn btn-sm btn-primary">Pass & QR</a>
+                            <a href="<?= url('/customer/bookings/3') ?>" class="btn btn-sm btn-primary">View Booking</a>
                         </div>
                     </td>
                 </tr>

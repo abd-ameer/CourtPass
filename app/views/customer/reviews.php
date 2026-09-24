@@ -36,7 +36,7 @@
  <span class="text-xs text-muted">Submitted on Sept 19, 2026</span>
  </div>
  <p class="text-sm" style="color: var(--color-text-main); margin-bottom: 12px;">
- "Excellent turf condition after the recent upgrade! The drainage held up even during evening rain. Check-in at the front desk was smooth via QR code."
+ "Excellent turf condition after the recent upgrade! The drainage held up even during evening rain. Check-in at the front desk was quick and smooth."
  </p>
 
  <!-- Venue Owner Response -->

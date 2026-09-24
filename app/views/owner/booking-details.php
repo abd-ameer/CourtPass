@@ -118,20 +118,3 @@
  </div>
 
  </div>
-
- 
- 
-
-
-<script>
-function CourtPassApp.postWithReason('Cancel Booking', 'A reason is required and is shown to the customer.', '/owner/bookings/<?= (int) $bookingId ?>/cancel') {
- document.getElementById('reasonModalTitle').textContent = 'Owner Cancel Booking #3';
- document.getElementById('reasonModalSubtitle').textContent = 'State mandatory reason for operational cancellation.';
- document.getElementById('mandatoryReasonSubmitBtn').onclick = function() {
- CourtPassApp.closeModal('mandatoryReasonModal');
- CourtPassApp.showToast('info', 'Booking Cancelled', 'Booking cancelled and simulated full refund issued to customer.');
- setTimeout(() => window.location.href = '<?= url('/owner/bookings') ?>', 1200);
- };
- CourtPassApp.openModal('mandatoryReasonModal');
-}
-</script>

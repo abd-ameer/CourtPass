@@ -28,9 +28,9 @@
  <span class="text-xs text-muted">2 hours ago</span>
  </div>
  <p class="text-sm" style="color: var(--color-text-main); margin-bottom: 4px;">
- Your online reservation for Turf Court 1 at Colombo Futsal Club on Sept 24, 08:00 PM is confirmed. Pass ready.
+ Your online reservation for Turf Court 1 at Colombo Futsal Club on Sept 24, 08:00 PM is confirmed.
  </p>
- <a href="<?= url('/customer/bookings/3') ?>" style="font-size: 12px; font-weight: 700;">View Pass & QR &rarr;</a>
+ <a href="<?= url('/customer/bookings/3') ?>" style="font-size: 12px; font-weight: 700;">View Booking &rarr;</a>
  </div>
  </div>
 

@@ -179,20 +179,12 @@
  <span class="text-muted">Fee / Person</span>
  <strong id="summFee">LKR 1,500</strong>
  </div>
- <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--color-border-light);">
- <span class="text-muted">Max Revenue</span>
- <strong id="summRevenue" style="color: var(--color-primary);">LKR 12,000</strong>
- </div>
- <div style="display: flex; justify-content: space-between; padding: 8px 0;">
- <span class="text-muted">Platform Fee (10%)</span>
- <strong id="summPlatformFee" style="color: var(--color-danger);">- LKR 1,200</strong>
- </div>
  </div>
 
  <div style="margin-top: var(--space-4); padding-top: var(--space-4); border-top: 2px solid var(--color-primary);">
  <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700;">
- <span>Net Earnings (Max)</span>
- <span style="color: var(--color-primary);" id="summNet">LKR 10,800</span>
+ <span>Max Revenue (if full)</span>
+ <span style="color: var(--color-primary);" id="summRevenue">LKR 12,000</span>
  </div>
  </div>
 
@@ -253,11 +245,8 @@ function updateRevenue() {
  const cap = parseInt(document.getElementById('sessionCapacity').value) || 0;
  const fee = parseInt(document.getElementById('sessionFee').value) || 0;
  const total = cap * fee;
- const platform = Math.round(total * 0.1);
  document.getElementById('summFee').textContent = 'LKR ' + fee.toLocaleString();
  document.getElementById('summRevenue').textContent = 'LKR ' + total.toLocaleString();
- document.getElementById('summPlatformFee').textContent = '- LKR ' + platform.toLocaleString();
- document.getElementById('summNet').textContent = 'LKR ' + (total - platform).toLocaleString();
 }
 
 </script>
