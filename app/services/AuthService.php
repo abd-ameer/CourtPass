@@ -47,6 +47,13 @@ class AuthService
         return self::sessionUser($this->users->findById($id));
     }
 
+    /** An owner is only a users row; venues are registered after sign-up. */
+    public function registerOwner(array $data): array
+    {
+        $id = Database::transaction(fn (): int => $this->createUser('owner', $data));
+        return self::sessionUser($this->users->findById($id));
+    }
+
     /**
      * Inserts the users row for a sign-up and returns its id.
      * Does not open a transaction: the caller wraps it together with the profile rows,

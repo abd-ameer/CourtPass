@@ -3,12 +3,14 @@ class VenueController extends Controller
 {
     public function ownerForm(): void
     {
+        $this->redirectIfLoggedIn();
         $this->view('auth/register-owner', ['title' => 'Venue Owner Sign Up', 'old' => [], 'errors' => []]);
     }
 
     public function registerOwner(): void
     {
         $this->verifyCsrf();
+        $this->redirectIfLoggedIn();
         $data = $this->request->all();
         $errors = AuthController::accountErrors($data);
         $old = AuthController::accountOld($data);
@@ -19,10 +21,17 @@ class VenueController extends Controller
             return;
         }
 
-        // TODO: create the users row (role owner) through the auth service, log in
-        // and redirect to /owner/venues/create so the owner can register a venue.
-        Session::flash('info', 'Sign-up is not connected to the database yet.');
-        $this->view('auth/register-owner', ['title' => 'Venue Owner Sign Up', 'old' => $old, 'errors' => []]);
+        try {
+            $user = (new AuthService())->registerOwner($data);
+        } catch (ValidationException $e) {
+            http_response_code(422);
+            $this->view('auth/register-owner', ['title' => 'Venue Owner Sign Up', 'old' => $old, 'errors' => $e->errors()]);
+            return;
+        }
+
+        Auth::login($user);
+        Session::flash('success', 'Welcome to CourtPass, ' . $user['name'] . '! Register your first venue to get started.');
+        $this->redirect('/owner/venues/create');
     }
 
     public function dashboard(): void
@@ -137,15 +146,6 @@ class VenueController extends Controller
 
     private function sportTypes(): array
     {
-        // TODO: read from sport_types.
-        return [
-            ['id' => 1, 'code' => 'futsal', 'name' => 'Futsal'],
-            ['id' => 2, 'code' => 'badminton', 'name' => 'Badminton'],
-            ['id' => 3, 'code' => 'pickleball', 'name' => 'Pickleball'],
-            ['id' => 4, 'code' => 'squash', 'name' => 'Squash'],
-            ['id' => 5, 'code' => 'billiards', 'name' => 'Billiards'],
-            ['id' => 6, 'code' => 'carrom', 'name' => 'Carrom'],
-            ['id' => 7, 'code' => 'table_tennis', 'name' => 'Table Tennis'],
-        ];
+        return (new VenueService())->sportTypes();
     }
 }
