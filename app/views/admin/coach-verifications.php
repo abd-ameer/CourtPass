@@ -58,11 +58,8 @@
  </div>
 
  <div>
- <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase; font-weight: 700;">Uploaded Evidence</span>
- <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
- <button class="btn btn-xs btn-outline" onclick="CourtPassApp.showToast('info', 'Note', 'Previewing WSF Certificate PDF...')"> WSF Certificate</button>
- <button class="btn btn-xs btn-outline" onclick="CourtPassApp.showToast('info', 'Note', 'Previewing NIC Copy...')"> NIC Copy</button>
- </div>
+ <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase; font-weight: 700;">Certifications</span>
+ <div style="font-size: 13px; margin-top: 4px;">WSF Level 1 Coaching Certificate (checked offline)</div>
  </div>
  </div>
 
@@ -113,10 +110,8 @@
  </div>
 
  <div>
- <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase; font-weight: 700;">Uploaded Evidence</span>
- <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
- <button class="btn btn-xs btn-outline" onclick="CourtPassApp.showToast('info', 'Note', 'Previewing ITTF Certificate PDF...')"> ITTF Accreditation</button>
- </div>
+ <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase; font-weight: 700;">Certifications</span>
+ <div style="font-size: 13px; margin-top: 4px;">ITTF Accreditation (checked offline)</div>
  </div>
  </div>
 

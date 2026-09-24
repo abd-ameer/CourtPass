@@ -12,9 +12,6 @@
  </div>
 
  <div style="display: flex; gap: 10px;">
- <button class="btn btn-outline" onclick="CourtPassApp.showToast('info', 'Note', 'Security warning SMS sent to user phone')">
- Send Notice SMS
- </button>
  <button class="btn btn-outline" style="color: var(--color-danger); border-color: var(--color-danger);" onclick="CourtPassApp.confirmPost('Deactivate Account', 'The user loses access. A coach also has future sessions cancelled with full refunds.', 'Deactivate', '/admin/users/<?= (int) $userId ?>/deactivate')">
  Deactivate Account
  </button>
@@ -41,7 +38,6 @@
  <div><span style="color: var(--color-text-subtle);">Email:</span> <strong>kasun.m@gmail.com</strong></div>
  <div><span style="color: var(--color-text-subtle);">Phone:</span> <strong>+94 77 123 4567</strong></div>
  <div><span style="color: var(--color-text-subtle);">Joined:</span> <strong>12 Jun 2026</strong></div>
- <div><span style="color: var(--color-text-subtle);">NIC / Passport:</span> <strong>199618203912 (Verified)</strong></div>
  </div>
  </div>
  </div>
@@ -156,16 +152,3 @@
  </div>
 
  </div>
-
- 
- 
-
-
-<script>
-function CourtPassApp.confirmPost('Deactivate Account', 'The user loses access. A coach also has future sessions cancelled with full refunds.', 'Deactivate', '/admin/users/<?= (int) $userId ?>/deactivate') {
- const reason = prompt('Please specify reason for suspending this user account:');
- if (reason) {
- CourtPassApp.showToast('error', 'Error', 'User account deactivated. Login sessions revoked.');
- }
-}
-</script>

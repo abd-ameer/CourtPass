@@ -189,7 +189,7 @@
  <div class="card-body">
  <div class="table-responsive"><table class="data-table"><thead><tr><th>Month</th><th>Net Earnings (paid registrations minus refunds)</th></tr></thead><tbody><tr><td>May</td><td>LKR 42,000</td></tr><tr><td>Jun</td><td>LKR 56,000</td></tr><tr><td>Jul</td><td>LKR 78,000</td></tr><tr><td>Aug</td><td>LKR 92,000</td></tr><tr><td>Sep</td><td>LKR 87,500</td></tr></tbody></table></div>
  <div class="text-xs text-muted" style="text-align: center; margin-top: 8px;">
- Earnings from coaching session fees collected via PayHere. Platform commission: 10%.
+ Coaching session fees collected via PayHere, minus refunds.
  </div>
  </div>
  </div>

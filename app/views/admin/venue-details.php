@@ -29,9 +29,6 @@
  <span class="badge badge-confirmed" style="font-size: 13px; padding: 6px 14px;">Status: ACTIVE & VERIFIED</span>
  <span style="font-size: var(--font-size-xs); color: var(--color-text-body);">Approved on 12 Jan 2026 by Admin (ref #ADM-V-001)</span>
  </div>
- <div style="font-size: var(--font-size-xs); font-weight: 700; color: var(--color-primary-active);">
- Platform Commission: 5.0% Standard
- </div>
  </div>
  </div>
  </div>
@@ -164,45 +161,7 @@
  </div>
  </div>
 
- <!-- Commission & Policy Settings -->
- <div class="card">
- <div class="card-header">
- <h3 class="card-title">Administrative Overrides</h3>
- </div>
- <div class="card-body">
- <div class="form-group" style="margin-bottom: var(--space-3);">
- <label class="form-label">Platform Take Rate (%)</label>
- <input type="number" class="form-control" value="5.0" step="0.5" min="0" max="25">
- </div>
-
- <div class="form-group" style="margin-bottom: var(--space-4);">
- <label class="form-label">Cash-on-Arrival Support</label>
- <select class="form-control">
- <option selected>Enabled for Standard Users (>=70%)</option>
- <option>Disabled (Online Payments Only)</option>
- <option>Enabled for All Users</option>
- </select>
- </div>
-
- <button class="btn btn-sm btn-outline" style="width: 100%; justify-content: center;" onclick="CourtPassApp.showToast('success', 'Done', 'Administrative parameters updated!')">
- Save Parameter Overrides
- </button>
- </div>
- </div>
 
  </div>
 
  </div>
-
- 
- 
-
-
-<script>
-function CourtPassApp.postWithReason('Deactivate Venue', 'All future bookings and coaching sessions at this venue will be cancelled. A reason is required.', '/admin/venues/<?= (int) $venueId ?>/deactivate') {
- const reason = prompt('Please specify reason for suspending this venue (e.g. Safety complaints, unpaid disputes):');
- if (reason) {
- CourtPassApp.showToast('error', 'Error', 'Venue suspended from public discovery and slot booking.');
- }
-}
-</script>

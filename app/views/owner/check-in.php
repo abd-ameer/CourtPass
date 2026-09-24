@@ -8,8 +8,8 @@
  <span class="breadcrumb-separator">/</span>
  <span>Check-in Desk</span>
  </div>
- <h1 class="page-title">Front Desk Customer Check-in (UC-VO-13)</h1>
- <div class="page-subtitle">Scan customer digital passes, verify physical arrival, and enforce no-show policies.</div>
+ <h1 class="page-title">Front Desk Customer Check-in (UC-VO-24)</h1>
+ <div class="page-subtitle">Find a booking by booking ID or customer name, then mark the customer as arrived.</div>
  </div>
 
  <div class="badge badge-confirmed" style="font-size: 13px; padding: 6px 14px;">
@@ -34,7 +34,7 @@
  <table class="data-table">
  <thead>
  <tr>
- <th>Pass Code</th>
+ <th>Booking ID</th>
  <th>Customer Name & Standing</th>
  <th>Court & Time Slot</th>
  <th>Payment Mode</th>

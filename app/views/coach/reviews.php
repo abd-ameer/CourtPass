@@ -201,7 +201,7 @@
  <div style="font-size: 10px; color: var(--color-text-subtle);">07 Sep 2026</div>
  </div>
  <p style="font-size: 12px; color: var(--color-text-body); margin-bottom: 0; line-height: 1.5;">
- "Thanks for the valuable suggestion Naveen! We are planning a 2-hour weekend masterclass soon that will include 45 minutes of supervised match rallies."
+ "Thanks for the valuable suggestion Naveen! I will add more supervised match rallies to the next sessions."
  </p>
  </div>
  </div>

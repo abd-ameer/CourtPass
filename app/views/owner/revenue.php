@@ -69,7 +69,7 @@
  <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
  <div>
  <h3 class="card-title">Monthly Revenue Trends (Online vs Cash)</h3>
- <div class="card-subtitle">Excludes coaching fees which are disbursed directly to coaches.</div>
+ <div class="card-subtitle">Court bookings only. Coaching session fees are not included.</div>
  </div>
  <div style="display: flex; gap: 8px;">
  <button class="btn btn-sm btn-primary">Monthly</button>
@@ -123,37 +123,24 @@
  </div>
  </div>
 
- <!-- Payment Settlement Summary -->
+ <!-- Payments by Method -->
  <div class="card">
  <div class="card-header">
- <h3 class="card-title">Payout & Settlement Status</h3>
+ <h3 class="card-title">Payments by Method (Sep)</h3>
  </div>
  <div class="card-body">
- <div style="background: var(--color-bg); border-radius: var(--radius-lg); padding: var(--space-4); margin-bottom: var(--space-4);">
- <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
- <span style="font-size: var(--font-size-xs); color: var(--color-text-subtle);">NEXT AUTOMATED SETTLEMENT:</span>
- <span class="badge badge-confirmed">30 Sep 2026</span>
- </div>
- <div style="font-size: 24px; font-weight: 900; color: var(--color-text-heading); margin-bottom: 4px;">
- LKR 335,160
- </div>
- <div style="font-size: 11px; color: var(--color-text-muted);">
- Gross Online (LKR 342,000) - 2.0% PayHere Processing Fee (LKR 6,840)
- </div>
- </div>
-
  <div style="font-size: var(--font-size-xs); color: var(--color-text-body); line-height: 1.6;">
  <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
- <span>Bank Account:</span>
- <strong>Sampath Bank (A/C: 0019 4432 9980)</strong>
+ <span>Online (PayHere Sandbox):</span>
+ <strong>LKR 342,000</strong>
  </div>
  <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
- <span>Account Holder:</span>
- <strong>Colombo Futsal Club (Pvt) Ltd</strong>
+ <span>Cash on Arrival (collected at the venue):</span>
+ <strong>LKR 62,000</strong>
  </div>
- <div style="display: flex; justify-content: space-between;">
- <span>Settlement Frequency:</span>
- <strong>Bi-Weekly (15th & 30th)</strong>
+ <div style="display: flex; justify-content: space-between; padding-top: 6px; border-top: 1px solid var(--color-border);">
+ <span>Total:</span>
+ <strong>LKR 404,000</strong>
  </div>
  </div>
  </div>

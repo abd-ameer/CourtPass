@@ -63,9 +63,6 @@
  <p style="font-size: var(--font-size-xs); color: var(--color-text-body); line-height: 1.5; margin-bottom: 6px;">
  "Our team reached the venue gate at 9:05 PM, but the area experienced an unexpected transformer fuse blow / blackout on De Alwis Place. The venue floodlights were off for 40 minutes. We left because playing was impossible in darkness."
  </p>
- <div style="font-size: 11px; color: var(--color-text-subtle);">
- Uploaded Proof: <button class="btn btn-xs btn-outline" onclick="CourtPassApp.showToast('info', 'Note', 'Previewing CEB Power Interruption Notice SMS image...')"> CEB Outage SMS Log</button>
- </div>
  </div>
 
  </div>

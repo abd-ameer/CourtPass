@@ -65,7 +65,7 @@
  <td style="text-align: right;">
  <div style="display: inline-flex; gap: 6px;">
  <a href="<?= url('/customer/bookings/3') ?>" class="btn btn-sm btn-primary">
- Pass / QR
+ View
  </a>
  <a href="<?= url('/customer/bookings/3/cancel') ?>" class="btn btn-sm btn-secondary" style="color: var(--color-danger);">
  Cancel / Resell
@@ -100,7 +100,7 @@
  <td style="text-align: right;">
  <div style="display: inline-flex; gap: 6px;">
  <a href="<?= url('/customer/bookings/4') ?>" class="btn btn-sm btn-primary">
- Pass / QR
+ View
  </a>
  <a href="<?= url('/customer/bookings/4/cancel') ?>" class="btn btn-sm btn-secondary" style="color: var(--color-danger);">
  Cancel
