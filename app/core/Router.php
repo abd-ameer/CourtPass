@@ -5,9 +5,17 @@
  *   $router->post('/api/bookings', [ExampleController::class, 'store'], ['customer']);
  * The optional third argument lists roles allowed; ['*'] means any logged-in user.
  * {params} are passed to the controller method in order.
+ * Parameter names set what they match: {id} digits, {slug} a venue slug,
+ * {token} a 32-hex private session token, anything else one path segment.
  */
 class Router
 {
+    private const PARAM_PATTERNS = [
+        'id'    => '([1-9][0-9]*)',
+        'slug'  => '([a-z0-9]+(?:-[a-z0-9]+)*)',
+        'token' => '([a-f0-9]{32})',
+    ];
+
     private array $routes = [];
 
     public function get(string $path, array $handler, array $roles = []): void
@@ -32,7 +40,7 @@ class Router
 
     private function add(string $method, string $path, array $handler, array $roles): void
     {
-        $pattern = preg_replace('#\{[a-zA-Z_]+\}#', '([^/]+)', '/' . trim($path, '/'));
+        $pattern = preg_replace_callback('#\{([a-zA-Z_]+)\}#', fn ($m) => self::PARAM_PATTERNS[$m[1]] ?? '([^/]+)', '/' . trim($path, '/'));
         $this->routes[] = [
             'method'  => $method,
             'pattern' => '#^' . ($pattern === '/' ? '/' : $pattern) . '$#',
