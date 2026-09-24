@@ -53,6 +53,23 @@ class Validator
         return $this->length($field) > $max ? $this->addError($field, "Must be at most {$max} characters.") : $this;
     }
 
+    /**
+     * Passwords are checked exactly as typed (no trimming).
+     * bcrypt only reads the first 72 bytes, and Sinhala or Tamil letters take 3 bytes each.
+     */
+    public function password(string $field, int $min = 8): self
+    {
+        $raw = (string) ($this->data[$field] ?? '');
+        $chars = function_exists('mb_strlen') ? mb_strlen($raw) : strlen($raw);
+        if ($chars < $min) {
+            return $this->addError($field, "Must be at least {$min} characters.");
+        }
+        if (strlen($raw) > 72) {
+            return $this->addError($field, 'Too long. Use at most 72 English characters (Sinhala and Tamil letters count as 3).');
+        }
+        return $this;
+    }
+
     public function integer(string $field, ?int $min = null, ?int $max = null): self
     {
         $v = filter_var($this->value($field), FILTER_VALIDATE_INT);
