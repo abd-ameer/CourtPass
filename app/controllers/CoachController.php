@@ -5,12 +5,14 @@ class CoachController extends Controller
 
     public function coachForm(): void
     {
+        $this->redirectIfLoggedIn();
         $this->view('auth/register-coach', $this->formData([], []));
     }
 
     public function registerCoach(): void
     {
         $this->verifyCsrf();
+        $this->redirectIfLoggedIn();
         $data = $this->request->all();
         $errors = AuthController::accountErrors($data);
 
@@ -37,10 +39,17 @@ class CoachController extends Controller
             return;
         }
 
-        // TODO: create the users row (role coach) through the auth service, then
-        // coach_profiles and coach_sports in the same transaction; log in and redirect.
-        Session::flash('info', 'Sign-up is not connected to the database yet.');
-        $this->view('auth/register-coach', $this->formData($old, []));
+        try {
+            $user = (new CoachService())->register(['sports' => $sportIds] + $data);
+        } catch (ValidationException $e) {
+            http_response_code(422);
+            $this->view('auth/register-coach', $this->formData($old, $e->errors()));
+            return;
+        }
+
+        Auth::login($user);
+        Session::flash('success', 'Welcome to CourtPass, ' . $user['name'] . '! Your coach account is ready.');
+        $this->redirect(Auth::homeUrl());
     }
 
     public function dashboard(): void
@@ -188,15 +197,6 @@ class CoachController extends Controller
 
     private function sportTypes(): array
     {
-        // TODO: read from sport_types.
-        return [
-            ['id' => 1, 'code' => 'futsal', 'name' => 'Futsal'],
-            ['id' => 2, 'code' => 'badminton', 'name' => 'Badminton'],
-            ['id' => 3, 'code' => 'pickleball', 'name' => 'Pickleball'],
-            ['id' => 4, 'code' => 'squash', 'name' => 'Squash'],
-            ['id' => 5, 'code' => 'billiards', 'name' => 'Billiards'],
-            ['id' => 6, 'code' => 'carrom', 'name' => 'Carrom'],
-            ['id' => 7, 'code' => 'table_tennis', 'name' => 'Table Tennis'],
-        ];
+        return (new VenueService())->sportTypes();
     }
 }
