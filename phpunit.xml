@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PHPUnit 11, run from the project root. Tests use their own courtpass_test database (tests/DatabaseTestCase.php). -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         cacheDirectory=".phpunit.cache"
+         colors="true"
+         failOnWarning="true"
+         failOnNotice="true"
+         failOnDeprecation="true"
+         failOnRisky="true"
+         beStrictAboutOutputDuringTests="true">
+    <testsuites>
+        <testsuite name="booking">
+            <directory>tests/Booking</directory>
+        </testsuite>
+        <testsuite name="venue">
+            <directory>tests/Venue</directory>
+        </testsuite>
+        <testsuite name="coach-session">
+            <directory>tests/CoachSession</directory>
+        </testsuite>
+        <testsuite name="review">
+            <directory>tests/Review</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
