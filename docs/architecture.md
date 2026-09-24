@@ -133,3 +133,20 @@ class ExampleController extends Controller
 Each member names their own classes when they build the feature, following the naming rules above.
 
 Shared files (`app/core`, `config/routes.php`, `database/schema.sql`) need the team's agreement before changing.
+
+
+## Controllers now exist (feature-based, one owner each)
+
+Controllers are split by feature area, not by role, so each member owns whole files
+and the interim CRUD entities land one per controller. Current controllers:
+
+| Member | Controllers |
+|---|---|
+| A | AuthController, AccountController, BookingController, ReliabilityController |
+| B | VenueController, CourtController, ResaleController |
+| C | CoachController, CoachSessionController, SessionRegistrationController |
+| D | DiscoveryController, ReviewController, CheckInController, AnnouncementController, FlashSlotController, NotificationController, AnalyticsController, AdminUserController |
+
+Shared: SystemController. Every controller action that changes state calls
+`$this->verifyCsrf()` and passes route params straight to its view. Views render
+from controller-supplied data; models and services are not built yet.
