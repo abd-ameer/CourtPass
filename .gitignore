@@ -11,6 +11,7 @@ public/uploads/*
 # Dev dependencies (PHPUnit phar etc.)
 /vendor/
 *.phar
+.phpunit.cache/
 
 # IDE / editor
 .vscode/
