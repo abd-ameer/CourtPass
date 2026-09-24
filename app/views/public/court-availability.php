@@ -1,3 +1,6 @@
+<?php
+/** @var array $court @var array $courts @var ?array $hoursToday @var bool $isGuest */
+?>
 <div style="background: var(--color-white); border-bottom: 1px solid var(--color-border); padding: var(--space-8) 0 var(--space-6);">
  <div class="container">
  <div class="breadcrumb">
@@ -5,25 +8,26 @@
  <span class="breadcrumb-separator">/</span>
  <a href="<?= url('/venues') ?>">Venues</a>
  <span class="breadcrumb-separator">/</span>
- <a href="<?= url('/venue/colombo-sports-hub') ?>">Colombo Sports Hub</a>
+ <a href="<?= url('/venue/' . $court['venue_slug']) ?>"><?= e($court['venue_name']) ?></a>
  <span class="breadcrumb-separator">/</span>
- <span>Futsal Court A</span>
+ <span><?= e($court['name']) ?></span>
  </div>
 
  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-top: var(--space-4);">
  <div>
  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
- <h1 style="font-size: var(--font-size-2xl);">Futsal Court A</h1>
- <span class="badge badge-confirmed"> Futsal</span>
- <span class="badge badge-active">Available Today</span>
+ <h1 style="font-size: var(--font-size-2xl);"><?= e($court['name']) ?></h1>
+ <?php if ($court['sport'] !== ''): ?>
+ <span class="badge badge-confirmed"><?= e($court['sport']) ?></span>
+ <?php endif; ?>
  </div>
  <p class="text-sm" style="color: var(--color-text-muted); margin-bottom: 0;">
- Colombo Sports Hub · FIFA-grade synthetic turf · Operating Hours: 06:00 AM - 11:00 PM
+ <?= e($court['venue_name']) ?> · <?= $hoursToday === null ? 'Closed today' : 'Open today ' . e($hoursToday['open']) . ' - ' . e($hoursToday['close']) ?>
  </p>
  </div>
 
  <div style="text-align: right;">
- <div style="font-size: 24px; font-weight: 900; color: var(--color-primary-active);">LKR 5,000</div>
+ <div style="font-size: 24px; font-weight: 900; color: var(--color-primary-active);"><?= e(lkr($court['hourly_rate'])) ?></div>
  <div class="text-xs" style="color: var(--color-text-muted);">Standard 1-hour slot rate</div>
  </div>
  </div>
@@ -33,11 +37,11 @@
 <section style="padding: var(--space-8) 0;">
  <div class="container">
  
- <!-- Court Selection (sample links until the court list is bound) -->
+ <!-- Court Selection -->
  <div class="court-tabs-nav" style="margin-bottom: var(--space-4);">
- <a href="<?= url('/courts/1') ?>" class="court-tab-btn <?= $courtId === 1 ? 'active' : '' ?>">Futsal Court A</a>
- <a href="<?= url('/courts/2') ?>" class="court-tab-btn <?= $courtId === 2 ? 'active' : '' ?>">Futsal Court B</a>
- <a href="<?= url('/courts/3') ?>" class="court-tab-btn <?= $courtId === 3 ? 'active' : '' ?>">Badminton Court 1</a>
+ <?php foreach ($courts as $tab): ?>
+ <a href="<?= url('/courts/' . $tab['id']) ?>" class="court-tab-btn <?= $tab['id'] === $court['id'] ? 'active' : '' ?>"><?= e($tab['name']) ?></a>
+ <?php endforeach; ?>
  </div>
 
  <!-- Availability Grid Container -->
@@ -108,7 +112,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
  CourtPassAvailability.init({
- courtId: <?= (int) $courtId ?>,
+ courtId: <?= (int) $court['id'] ?>,
  isGuest: <?= $isGuest ? 'true' : 'false' ?>
  });
 });

@@ -16,6 +16,12 @@ class CourtModel extends Model
         );
     }
 
+    /** Active courts of a venue, for the court tabs on the slot grid. */
+    public function activeForVenue(int $venueId): array
+    {
+        return $this->select('SELECT id, name FROM courts WHERE venue_id = ? AND is_active = 1 ORDER BY id', 'i', [$venueId]);
+    }
+
     /** Must run inside a transaction; the lock is held until commit or rollback. */
     public function lockForUpdate(int $id): bool
     {

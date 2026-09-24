@@ -1,3 +1,6 @@
+<?php
+/** @var array $bookings */
+?>
 <div class="page-header">
  <div>
  <div class="breadcrumb">
@@ -19,16 +22,23 @@
  <button type="button" class="tab-btn active" onclick="filterBookingTabs('all', this)">All</button>
  <button type="button" class="tab-btn" onclick="filterBookingTabs('upcoming', this)">Upcoming</button>
  <button type="button" class="tab-btn" onclick="filterBookingTabs('past', this)">Past</button>
- <button type="button" class="tab-btn" onclick="filterBookingTabs('closed', this)">Cancelled / Rejected</button>
+ <button type="button" class="tab-btn" onclick="filterBookingTabs('closed', this)">Cancelled / Closed</button>
  </div>
 
  <!-- Bookings Table -->
  <div class="card">
+ <?php if ($bookings === []): ?>
+ <div class="empty-state">
+ <div class="empty-state-title">No bookings yet</div>
+ <div class="empty-state-desc">Pick a venue, choose a court and book a free one-hour slot.</div>
+ <a href="<?= url('/venues') ?>" class="btn btn-primary" style="margin-top: 12px;">Browse Venues</a>
+ </div>
+ <?php else: ?>
  <div class="table-responsive">
  <table class="data-table">
  <thead>
  <tr>
- <th>Booking Code</th>
+ <th>Booking</th>
  <th>Venue & Court</th>
  <th>Date & Slot</th>
  <th>Payment Mode</th>
@@ -38,155 +48,66 @@
  </tr>
  </thead>
  <tbody id="bookingsTableBody">
- 
- <!-- Booking 1 -->
- <tr class="booking-row" data-status="confirmed">
+ <?php foreach ($bookings as $b): ?>
+ <tr class="booking-row" data-group="<?= e($b['group']) ?>">
  <td>
- <strong>#3</strong>
- <div class="text-xs text-muted">ID: #3</div>
+ <strong>#<?= e($b['id']) ?></strong>
+ <div class="text-xs text-muted">Booked <?= e(format_datetime($b['created_at'], false)) ?></div>
  </td>
  <td>
- <strong>Colombo Futsal Club</strong>
- <div class="text-xs text-muted">Turf Court 1 (Floodlit)</div>
+ <strong><?= e($b['venue_name']) ?></strong>
+ <div class="text-xs text-muted"><?= e($b['court_name']) ?> · <?= e($b['sport_name']) ?></div>
  </td>
  <td>
- <strong>Sept 24, 2026</strong>
- <div class="text-xs text-muted">08:00 PM - 09:00 PM (In 32 hrs)</div>
+ <strong><?= e(format_datetime($b['slot_date'], false)) ?></strong>
+ <div class="text-xs text-muted"><?= e($b['start']) ?> - <?= e($b['end']) ?></div>
  </td>
  <td>
- <?= status_badge('online') ?>
+ <?= status_badge($b['payment_method']) ?>
  </td>
  <td>
- <strong>LKR 5,000</strong>
+ <strong><?= e(lkr($b['amount'])) ?></strong>
+ <?php if ($b['refund_amount'] !== null): ?>
+ <div class="text-xs text-muted"><?= e(round($b['refund_percent'])) ?>% refunded (<?= e(lkr($b['refund_amount'])) ?>)</div>
+ <?php endif; ?>
  </td>
  <td>
- <?= status_badge('confirmed') ?>
+ <?= status_badge($b['status']) ?>
+ <?php if ($b['status'] === 'pending_payment'): ?>
+ <div class="text-xs text-muted">Held until <?= e(date('H:i', strtotime($b['pending_expires_at']))) ?></div>
+ <?php endif; ?>
  </td>
  <td style="text-align: right;">
  <div style="display: inline-flex; gap: 6px;">
- <a href="<?= url('/customer/bookings/3') ?>" class="btn btn-sm btn-primary">
+ <a href="<?= url('/customer/bookings/' . $b['id']) ?>" class="btn btn-sm btn-primary">
  View
  </a>
- <a href="<?= url('/customer/bookings/3/cancel') ?>" class="btn btn-sm btn-secondary" style="color: var(--color-danger);">
- Cancel / Resell
- </a>
- </div>
- </td>
- </tr>
-
- <!-- Booking 2 -->
- <tr class="booking-row" data-status="pending">
- <td>
- <strong>#4</strong>
- <div class="text-xs text-muted">ID: #4</div>
- </td>
- <td>
- <strong>CR&FC Badminton Complex</strong>
- <div class="text-xs text-muted">Court 1 - Yonex Mat</div>
- </td>
- <td>
- <strong>Sept 23, 2026</strong>
- <div class="text-xs text-muted">06:00 PM - 07:00 PM (In 8 hrs)</div>
- </td>
- <td>
- <?= status_badge('cash_on_arrival') ?>
- </td>
- <td>
- <strong>LKR 2,800</strong>
- </td>
- <td>
- <?= status_badge('pending') ?>
- </td>
- <td style="text-align: right;">
- <div style="display: inline-flex; gap: 6px;">
- <a href="<?= url('/customer/bookings/4') ?>" class="btn btn-sm btn-primary">
- View
- </a>
- <a href="<?= url('/customer/bookings/4/cancel') ?>" class="btn btn-sm btn-secondary" style="color: var(--color-danger);">
+ <?php if ($b['can_cancel']): ?>
+ <a href="<?= url('/customer/bookings/' . $b['id'] . '/cancel') ?>" class="btn btn-sm btn-secondary" style="color: var(--color-danger);">
  Cancel
  </a>
+ <?php endif; ?>
+ <?php if ($b['status'] === 'completed'): ?>
+ <a href="<?= url('/customer/bookings/' . $b['id'] . '/review') ?>" class="btn btn-sm btn-outline">
+ Write Review
+ </a>
+ <?php endif; ?>
  </div>
  </td>
  </tr>
-
- <!-- Booking 3 -->
- <tr class="booking-row" data-status="completed">
- <td>
- <strong>#1</strong>
- <div class="text-xs text-muted">ID: #1</div>
- </td>
- <td>
- <strong>Otters Club Squash</strong>
- <div class="text-xs text-muted">Squash Court A</div>
- </td>
- <td>
- <strong>Sept 18, 2026</strong>
- <div class="text-xs text-muted">07:00 AM - 08:00 AM</div>
- </td>
- <td>
- <?= status_badge('online') ?>
- </td>
- <td>
- <strong>LKR 2,600</strong>
- </td>
- <td>
- <?= status_badge('completed') ?>
- </td>
- <td style="text-align: right;">
- <a href="<?= url('/customer/bookings/1/review') ?>" class="btn btn-sm btn-outline">
- Write Review
- </a>
- </td>
- </tr>
-
- <!-- Booking 4 -->
- <tr class="booking-row" data-status="cancelled">
- <td>
- <strong>#1</strong>
- <div class="text-xs text-muted">ID: #1</div>
- </td>
- <td>
- <strong>SpinMaster TT Club</strong>
- <div class="text-xs text-muted">Butterfly Table 1</div>
- </td>
- <td>
- <strong>Sept 12, 2026</strong>
- <div class="text-xs text-muted">05:00 PM - 06:00 PM</div>
- </td>
- <td>
- <span class="badge" style="background: #f1f5f9; color: #475569;">Refunded</span>
- </td>
- <td>
- <strong>LKR 1,600</strong>
- </td>
- <td>
- <?= status_badge('cancelled') ?>
- </td>
- <td style="text-align: right;">
- <span class="text-xs text-muted">100% Refund Simulated</span>
- </td>
- </tr>
-
+ <?php endforeach; ?>
  </tbody>
  </table>
  </div>
+ <?php endif; ?>
  </div>
-
- 
- 
-
 
 <script>
 function filterBookingTabs(group, btn) {
-    const groups = {
-        upcoming: ['pending_payment', 'pending', 'confirmed', 'released'],
-        past: ['completed', 'completed_unattended', 'no_show', 'resold'],
-        closed: ['cancelled', 'rejected', 'expired'],
-    };
     document.querySelectorAll('.nav-tabs .tab-btn').forEach((b) => b.classList.remove('active'));
     btn.classList.add('active');
     document.querySelectorAll('.booking-row').forEach((row) => {
-        row.style.display = group === 'all' || groups[group].includes(row.dataset.status) ? '' : 'none';
+        row.style.display = group === 'all' || row.dataset.group === group ? '' : 'none';
     });
 }
 </script>
