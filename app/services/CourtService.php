@@ -12,6 +12,15 @@ class CourtService
         return $court;
     }
 
+    /** Active courts of a venue: [['id' => 1, 'name' => 'Futsal Court A'], ...]. */
+    public function venueCourts(int $venueId): array
+    {
+        return array_map(
+            fn (array $c) => ['id' => (int) $c['id'], 'name' => $c['name']],
+            (new CourtModel())->activeForVenue($venueId)
+        );
+    }
+
     /** First lock in the agreed order (court, session, booking or registration, payment). Caller owns the transaction. */
     public function lockCourt(int $courtId): void
     {

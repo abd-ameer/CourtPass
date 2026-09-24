@@ -1,3 +1,6 @@
+<?php
+/** @var array $bookings @var array $counts */
+?>
 <div class="page-header">
  <div>
  <div class="breadcrumb">
@@ -16,20 +19,26 @@
 
  <!-- Filter Tabs -->
  <div class="nav-tabs">
- <button class="tab-btn active" onclick="filterOwnerBookings('all', this)">All (5)</button>
- <button class="tab-btn" onclick="filterOwnerBookings('pending', this)">Pending Review (1)</button>
- <button class="tab-btn" onclick="filterOwnerBookings('confirmed', this)">Confirmed (2)</button>
- <button class="tab-btn" onclick="filterOwnerBookings('completed', this)">Completed (1)</button>
+ <button type="button" class="tab-btn active" onclick="filterOwnerBookings('all', this)">All (<?= count($bookings) ?>)</button>
+ <button type="button" class="tab-btn" onclick="filterOwnerBookings('pending', this)">Pending Review (<?= $counts['pending'] ?? 0 ?>)</button>
+ <button type="button" class="tab-btn" onclick="filterOwnerBookings('confirmed', this)">Confirmed (<?= $counts['confirmed'] ?? 0 ?>)</button>
+ <button type="button" class="tab-btn" onclick="filterOwnerBookings('completed', this)">Completed (<?= $counts['completed'] ?? 0 ?>)</button>
  </div>
 
  <!-- Bookings Table -->
  <div class="card">
+ <?php if ($bookings === []): ?>
+ <div class="empty-state">
+ <div class="empty-state-title">No bookings yet</div>
+ <div class="empty-state-desc">Bookings for courts at your approved venues appear here.</div>
+ </div>
+ <?php else: ?>
  <div class="table-responsive">
  <table class="data-table">
  <thead>
  <tr>
  <th>Booking ID</th>
- <th>Customer Intelligence</th>
+ <th>Customer</th>
  <th>Court & Date Slot</th>
  <th>Payment Mode</th>
  <th>Amount</th>
@@ -38,135 +47,42 @@
  </tr>
  </thead>
  <tbody id="ownerBookingsBody">
- 
- <!-- Pending Booking 1 -->
- <tr class="owner-booking-row" data-status="pending">
+ <?php foreach ($bookings as $b): ?>
+ <tr class="owner-booking-row" data-status="<?= e($b['status']) ?>">
  <td>
- <strong>#1</strong>
- <div class="text-xs text-muted">Pass: #1</div>
+ <strong>#<?= e($b['id']) ?></strong>
+ <div class="text-xs text-muted">Booked <?= e(format_datetime($b['created_at'], false)) ?></div>
  </td>
  <td>
- <strong>Pradeep Bandara</strong>
- <span class="tier-badge tier-standard" style="font-size: 10px; margin-left: 4px;">82% Standard</span>
- <div class="text-xs text-muted">7 venue visits · 0 no-shows</div>
+ <strong><?= e($b['customer_name']) ?></strong>
+ <span class="tier-badge tier-<?= e($b['reliability_tier']) ?>" style="font-size: 10px; margin-left: 4px;"><?= $b['reliability_score'] === null ? '' : e(round($b['reliability_score'])) . '% ' ?><?= e(status_label($b['reliability_tier'])) ?></span>
+ <div class="text-xs text-muted"><?= e($b['completed_count']) ?> completed · <?= e($b['no_show_count']) ?> no-shows</div>
  </td>
  <td>
- <strong>Turf Court 1</strong>
- <div class="text-xs text-muted">Sept 25, 2026 · 06:00 PM - 07:00 PM</div>
+ <strong><?= e($b['court_name']) ?></strong>
+ <div class="text-xs text-muted"><?= e($b['venue_name']) ?> · <?= e(format_datetime($b['slot_date'], false)) ?> · <?= e($b['start']) ?> - <?= e($b['end']) ?></div>
  </td>
- <td><span class="badge badge-unpaid">Cash on Arrival</span></td>
- <td><strong>LKR 5,000</strong></td>
- <td><span class="badge badge-pending">Pending</span></td>
+ <td><?= status_badge($b['payment_method']) ?></td>
+ <td><strong><?= e(lkr($b['amount'])) ?></strong></td>
+ <td><?= status_badge($b['status']) ?></td>
  <td style="text-align: right;">
- <button type="button" class="btn btn-sm btn-primary" onclick="CourtPassApp.confirmPost('Confirm Booking', 'Confirm this booking request?', 'Confirm', '/owner/bookings/4/confirm')">Confirm</button>
- <button type="button" class="btn btn-sm btn-secondary" style="color: var(--color-danger);" onclick="CourtPassApp.postWithReason('Reject Booking', 'A reason is required and is shown to the customer.', '/owner/bookings/4/reject')">Reject...</button>
- <a href="<?= url('/owner/bookings/5') ?>" class="btn btn-sm btn-outline">Profile</a>
- </td>
- </tr>
-
- <!-- Awaiting Payment Booking -->
- <tr class="owner-booking-row" data-status="pending_payment">
- <td>
- <strong>#1</strong>
- <div class="text-xs text-muted">Pass: #1</div>
- </td>
- <td>
- <strong>Dinesh Pathirana</strong>
- <span class="tier-badge tier-new" style="font-size: 10px; margin-left: 4px;">New Member</span>
- <div class="text-xs text-muted">First-time reservation</div>
- </td>
- <td>
- <strong>Turf Court 2 (Indoor)</strong>
- <div class="text-xs text-muted">Sept 25, 2026 · 07:00 PM - 08:00 PM</div>
- </td>
- <td><span class="badge badge-status-online">Online (PayHere)</span></td>
- <td><strong>LKR 4,500</strong></td>
- <td><span class="badge badge-status-pending_payment">Awaiting Payment</span></td>
- <td style="text-align: right;">
+ <?php if ($b['can_decide']): ?>
+ <button type="button" class="btn btn-sm btn-primary" onclick="CourtPassApp.confirmPost('Confirm Booking', 'Confirm booking #<?= (int) $b['id'] ?>?', 'Confirm', '/owner/bookings/<?= (int) $b['id'] ?>/confirm')">Confirm</button>
+ <button type="button" class="btn btn-sm btn-secondary" style="color: var(--color-danger);" onclick="CourtPassApp.postWithReason('Reject Booking', 'A reason is required and is shown to the customer.', '/owner/bookings/<?= (int) $b['id'] ?>/reject')">Reject...</button>
+ <?php elseif ($b['status'] === 'pending_payment'): ?>
  <span class="text-xs text-muted" style="margin-right: 6px;">Confirms automatically once paid</span>
- <a href="<?= url('/owner/bookings/4') ?>" class="btn btn-sm btn-outline">View</a>
+ <?php elseif ($b['can_owner_cancel']): ?>
+ <button type="button" class="btn btn-sm btn-secondary" style="color: var(--color-danger);" onclick="CourtPassApp.postWithReason('Cancel Booking', 'A reason is required and is shown to the customer.', '/owner/bookings/<?= (int) $b['id'] ?>/cancel')">Cancel...</button>
+ <?php endif; ?>
+ <a href="<?= url('/owner/bookings/' . $b['id']) ?>" class="btn btn-sm btn-outline">View</a>
  </td>
  </tr>
-
- <!-- Confirmed Booking 1 -->
- <tr class="owner-booking-row" data-status="confirmed">
- <td>
- <strong>#3</strong>
- <div class="text-xs text-muted">Pass: #3</div>
- </td>
- <td>
- <strong>Kasun Jayawardena</strong>
- <span class="tier-badge tier-standard" style="font-size: 10px; margin-left: 4px;">88% Standard</span>
- <div class="text-xs text-muted">14 venue visits · 0 no-shows</div>
- </td>
- <td>
- <strong>Turf Court 1</strong>
- <div class="text-xs text-muted">Sept 24, 2026 · 08:00 PM - 09:00 PM</div>
- </td>
- <td><span class="badge badge-paid">Online (PayHere)</span></td>
- <td><strong>LKR 5,000</strong></td>
- <td><span class="badge badge-confirmed">Confirmed</span></td>
- <td style="text-align: right;">
- <a href="<?= url('/owner/bookings/3') ?>" class="btn btn-sm btn-outline">Intel Profile</a>
- <button type="button" class="btn btn-sm btn-secondary" style="color: var(--color-danger);" onclick="CourtPassApp.postWithReason('Cancel Booking', 'A reason is required and is shown to the customer.', '/owner/bookings/3/cancel')">Cancel...</button>
- </td>
- </tr>
-
- <!-- Confirmed Booking 2 -->
- <tr class="owner-booking-row" data-status="confirmed">
- <td>
- <strong>#1</strong>
- <div class="text-xs text-muted">Pass: #1</div>
- </td>
- <td>
- <strong>Akila Samarasinghe</strong>
- <span class="tier-badge tier-standard" style="font-size: 10px; margin-left: 4px;">91% Standard</span>
- <div class="text-xs text-muted">16 venue visits · 0 no-shows</div>
- </td>
- <td>
- <strong>Turf Court 2</strong>
- <div class="text-xs text-muted">Sept 24, 2026 · 06:00 PM - 07:00 PM</div>
- </td>
- <td><span class="badge badge-paid">Online (PayHere)</span></td>
- <td><strong>LKR 4,500</strong></td>
- <td><span class="badge badge-confirmed">Confirmed</span></td>
- <td style="text-align: right;">
- <a href="<?= url('/owner/bookings/1') ?>" class="btn btn-sm btn-outline">Intel Profile</a>
- <button type="button" class="btn btn-sm btn-secondary" style="color: var(--color-danger);" onclick="CourtPassApp.postWithReason('Cancel Booking', 'A reason is required and is shown to the customer.', '/owner/bookings/1/cancel')">Cancel...</button>
- </td>
- </tr>
-
- <!-- Completed Booking -->
- <tr class="owner-booking-row" data-status="completed">
- <td>
- <strong>#1</strong>
- <div class="text-xs text-muted">Pass: #1</div>
- </td>
- <td>
- <strong>Shenal Gunaratne</strong>
- <span class="tier-badge tier-restricted" style="font-size: 10px; margin-left: 4px;">62% Restricted</span>
- <div class="text-xs text-muted">8 venue visits · 3 no-shows</div>
- </td>
- <td>
- <strong>Turf Court 1</strong>
- <div class="text-xs text-muted">Sept 14, 2026 · 08:00 PM - 09:00 PM</div>
- </td>
- <td><span class="badge badge-paid">Online (PayHere)</span></td>
- <td><strong>LKR 5,000</strong></td>
- <td><span class="badge badge-completed">Completed</span></td>
- <td style="text-align: right;">
- <span class="text-xs text-muted">Checked in by Desk</span>
- </td>
- </tr>
-
+ <?php endforeach; ?>
  </tbody>
  </table>
  </div>
+ <?php endif; ?>
  </div>
-
- 
- 
-
 
 <script>
 function filterOwnerBookings(status, btn) {
@@ -177,7 +93,4 @@ function filterOwnerBookings(status, btn) {
  row.style.display = (status === 'all' || row.dataset.status === status) ? '' : 'none';
  });
 }
-
-
-
 </script>

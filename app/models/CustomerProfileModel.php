@@ -6,4 +6,15 @@ class CustomerProfileModel extends Model
     {
         $this->insert('INSERT INTO customer_profiles (customer_id) VALUES (?)', 'i', [$customerId]);
     }
+
+    /** Cached reliability figures; a NULL score means not rated yet. */
+    public function find(int $customerId): ?array
+    {
+        return $this->selectOne(
+            'SELECT customer_id, reliability_score, reliability_tier, completed_count, no_show_count
+             FROM customer_profiles WHERE customer_id = ?',
+            'i',
+            [$customerId]
+        );
+    }
 }
