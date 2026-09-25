@@ -1,5 +1,5 @@
 <?php
-/** @var int $venueId @var array $venue @var array $sportTypes @var array $errors */
+/** @var int $venueId @var array $venue @var string $status @var array $sportTypes @var array $errors */
 ?>
 <div class="page-header">
     <div>
@@ -10,8 +10,16 @@
             <span class="breadcrumb-separator">/</span>
             <span>Edit Venue</span>
         </div>
-        <h1 class="page-title">Edit <?= e($venue['name'] ?? 'Venue') ?></h1>
-        <div class="page-subtitle">Changes to an approved venue are shown on its public page straight away.</div>
+        <h1 class="page-title">Edit Venue</h1>
+        <div class="page-subtitle">
+            <?php if ($status === 'rejected'): ?>
+                Saving sends the venue back to the Platform Admin for approval.
+            <?php elseif ($status === 'approved'): ?>
+                Changes to an approved venue are shown on its public page straight away.
+            <?php else: ?>
+                The venue stays Pending until the Platform Admin approves it.
+            <?php endif; ?>
+        </div>
     </div>
 </div>
 
@@ -23,7 +31,7 @@
 
         <div style="display: flex; justify-content: flex-end; gap: 12px;">
             <a href="<?= url('/owner/venues/' . $venueId) ?>" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="submit" class="btn btn-primary"><?= $status === 'rejected' ? 'Save and Resubmit' : 'Save Changes' ?></button>
         </div>
     </form>
 </div>

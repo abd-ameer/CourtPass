@@ -1,75 +1,65 @@
+<?php
+/** @var array $venues */
+?>
 <div class="page-header">
- <div>
- <div class="breadcrumb">
- <a href="<?= url('/owner/dashboard') ?>">Dashboard</a>
- <span class="breadcrumb-separator">/</span>
- <span>Venues</span>
- </div>
- <h1 class="page-title">My Sports Facilities</h1>
- <div class="page-subtitle">Manage venue profiles, shareable public URLs, and court inventories.</div>
- </div>
-
- <a href="<?= url('/owner/venues/create') ?>" class="btn btn-primary">
- + Register New Venue
- </a>
- </div>
-
- <!-- Venues Grid -->
- <div class="grid grid-cols-2 gap-6">
- 
- <!-- Venue 1: Active -->
- <div class="card">
- <div style="height: 180px; position: relative; overflow: hidden;">
- <img src="<?= asset('img/venue-placeholder.svg') ?>" alt="Colombo Futsal Club" style="width: 100%; height: 100%; object-fit: cover;">
- <div style="position: absolute; top: 12px; left: 12px;">
- <span class="badge badge-active">Active</span>
- <span class="badge badge-verified">Admin Approved</span>
- </div>
- <div class="venue-price-badge">Shareable: platform.lk/venue/colombofutsal</div>
- </div>
- <div class="card-body">
- <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
- <div>
- <h3 style="font-size: 18px; margin-bottom: 2px;">Colombo Futsal Club</h3>
- <div class="text-xs text-muted"> No. 42 Marine Drive, Dehiwala · 3 Courts</div>
- </div>
- <span style="font-weight: 700; color: #d97706; font-size: 13px;"> 4.8 (124)</span>
- </div>
- <p class="text-sm text-muted" style="margin-bottom: 16px;">
- Premier synthetic turf by the coast. Operating 06:00 AM - 11:00 PM daily.
- </p>
- <div style="display: flex; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--color-border); padding-top: 14px;">
- <a href="<?= url('/owner/venues/1') ?>" class="btn btn-sm btn-outline flex-1">Overview</a>
- <a href="<?= url('/owner/venues/1/edit') ?>" class="btn btn-sm btn-outline flex-1">Edit Info</a>
- <a href="<?= url('/owner/courts?venue=1') ?>" class="btn btn-sm btn-primary flex-1">Manage Courts</a>
- <a href="<?= url('/owner/venues/1/deactivate') ?>" class="btn btn-sm btn-secondary" style="color: var(--color-danger);">Deactivate</a>
- </div>
- </div>
- </div>
-
- <!-- Venue 2: Pending Approval -->
- <div class="card" style="border: 1.5px dashed #fde68a;">
- <div style="height: 180px; position: relative; overflow: hidden; background: #e2e8f0; display: flex; align-items: center; justify-content: center;">
- <div style="font-size: 40px;"></div>
- <div style="position: absolute; top: 12px; left: 12px;">
- <span class="badge badge-pending">Pending Admin Review</span>
- </div>
- </div>
- <div class="card-body">
- <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
- <div>
- <h3 style="font-size: 18px; margin-bottom: 2px;">CFC Indoor Badminton Arena</h3>
- <div class="text-xs text-muted"> Hill Street, Dehiwala · 2 Courts</div>
- </div>
- </div>
- <p class="text-sm text-muted" style="margin-bottom: 16px;">
- New multi-court badminton annex currently undergoing admin registration review.
- </p>
- <div style="display: flex; gap: 8px; border-top: 1px solid var(--color-border); padding-top: 14px;">
- <span class="text-xs text-muted" style="line-height: 2;">Awaiting platform approval · ID: VEN-098</span>
- <a href="<?= url('/owner/venues/3/edit') ?>" class="btn btn-sm btn-outline" style="margin-left: auto;">Edit Details</a>
- </div>
- </div>
- </div>
+    <div>
+        <div class="breadcrumb">
+            <a href="<?= url('/owner/dashboard') ?>">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>My Venues</span>
+        </div>
+        <h1 class="page-title">My Venues</h1>
+        <div class="page-subtitle">Register venues, track their approval and manage their courts.</div>
+    </div>
+    <a href="<?= url('/owner/venues/create') ?>" class="btn btn-primary">+ Register New Venue</a>
 </div>
 
+<?php if ($venues === []): ?>
+    <div class="card">
+        <div class="empty-state">
+            <div class="empty-state-title">No venues yet</div>
+            <div class="empty-state-desc">Register your first venue. It is listed publicly once the Platform Admin approves it.</div>
+            <a href="<?= url('/owner/venues/create') ?>" class="btn btn-primary" style="margin-top: 12px;">Register a Venue</a>
+        </div>
+    </div>
+<?php else: ?>
+    <div class="grid grid-cols-2 gap-6">
+        <?php foreach ($venues as $venue): ?>
+            <div class="card">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px;">
+                        <div>
+                            <h3 style="font-size: 18px; margin-bottom: 2px;"><?= e($venue['name']) ?></h3>
+                            <div class="text-xs text-muted"><?= e($venue['address']) ?>, <?= e($venue['city']) ?> · <?= e($venue['court_count']) ?> <?= $venue['court_count'] === 1 ? 'court' : 'courts' ?></div>
+                        </div>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;">
+                            <?= status_badge($venue['status']) ?>
+                            <?php if ($venue['status'] === 'approved' && !$venue['is_active']): ?>
+                                <span class="badge badge-inactive">Deactivated by you</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="text-sm text-muted" style="margin-bottom: 12px;">
+                        <?= e(implode(' · ', array_column($venue['sports'], 'name'))) ?>
+                    </div>
+                    <?php if ($venue['status'] === 'rejected'): ?>
+                        <p class="text-sm" style="color: var(--color-danger); margin-bottom: 12px;">Not approved: <?= e($venue['rejection_reason']) ?></p>
+                    <?php elseif ($venue['status'] === 'pending'): ?>
+                        <p class="text-sm text-muted" style="margin-bottom: 12px;">Waiting for Platform Admin approval.</p>
+                    <?php elseif ($venue['listed']): ?>
+                        <p class="text-sm text-muted" style="margin-bottom: 12px;">Public page: <a href="<?= url($venue['public_path']) ?>"><?= e($venue['public_path']) ?></a></p>
+                    <?php endif; ?>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--color-border); padding-top: 14px;">
+                        <a href="<?= url('/owner/venues/' . $venue['id']) ?>" class="btn btn-sm btn-outline flex-1">Overview</a>
+                        <?php if ($venue['can_edit']): ?>
+                            <a href="<?= url('/owner/venues/' . $venue['id'] . '/edit') ?>" class="btn btn-sm btn-outline flex-1"><?= $venue['status'] === 'rejected' ? 'Edit and Resubmit' : 'Edit Info' ?></a>
+                        <?php endif; ?>
+                        <?php if ($venue['can_add_court']): ?>
+                            <a href="<?= url('/owner/courts/create?venue=' . $venue['id']) ?>" class="btn btn-sm btn-primary flex-1">Add Court</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>

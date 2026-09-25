@@ -1,167 +1,127 @@
+<?php
+/** @var array $venue */
+?>
 <div class="page-header">
- <div>
- <div class="breadcrumb">
- <a href="<?= url('/admin/dashboard') ?>">Admin Portal</a>
- <span class="breadcrumb-separator">/</span>
- <a href="<?= url('/admin/venues') ?>">Venues</a>
- <span class="breadcrumb-separator">/</span>
- <span>Colombo Futsal Club</span>
- </div>
- <h1 class="page-title">Venue Inspection: Colombo Futsal Club </h1>
- <div class="page-subtitle">Inspect registered courts, owner details, review statistics, and toggle administrative status.</div>
- </div>
+    <div>
+        <div class="breadcrumb">
+            <a href="<?= url('/admin/dashboard') ?>">Admin Portal</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="<?= url('/admin/venues') ?>">Venue Approvals</a>
+            <span class="breadcrumb-separator">/</span>
+            <span><?= e($venue['name']) ?></span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <h1 class="page-title"><?= e($venue['name']) ?></h1>
+            <?= status_badge($venue['status']) ?>
+            <?php if ($venue['status'] === 'approved' && !$venue['is_active']): ?>
+                <span class="badge badge-inactive">Deactivated by owner</span>
+            <?php endif; ?>
+        </div>
+        <div class="page-subtitle">
+            Registered <?= e(format_datetime($venue['created_at'])) ?>
+            <?php if ($venue['reviewed_at'] !== null): ?>
+                · Reviewed <?= e(format_datetime($venue['reviewed_at'])) ?> by <?= e($venue['reviewer_name']) ?>
+            <?php endif; ?>
+        </div>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <?php if ($venue['can_decide']): ?>
+            <button type="button" class="btn btn-outline" style="color: var(--color-danger); border-color: var(--color-danger);" onclick="CourtPassApp.postWithReason('Reject Venue', 'A reason is required and is shown to the owner.', '/admin/venues/<?= (int) $venue['id'] ?>/reject')">Reject</button>
+            <button type="button" class="btn btn-primary" onclick="CourtPassApp.confirmPost('Approve Venue', 'Approve this venue and list it publicly?', 'Approve', '/admin/venues/<?= (int) $venue['id'] ?>/approve')">Approve</button>
+        <?php elseif ($venue['status'] === 'approved'): ?>
+            <button type="button" class="btn btn-outline" style="color: var(--color-danger); border-color: var(--color-danger);" onclick="CourtPassApp.postWithReason('Deactivate Venue', 'All future bookings and coaching sessions at this venue will be cancelled. A reason is required.', '/admin/venues/<?= (int) $venue['id'] ?>/deactivate')">Deactivate Venue</button>
+            <?php if ($venue['listed']): ?>
+                <a href="<?= url($venue['public_path']) ?>" target="_blank" class="btn btn-primary">View Public Page</a>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+</div>
 
- <div style="display: flex; gap: 10px;">
- <button class="btn btn-outline" style="color: var(--color-danger); border-color: var(--color-danger);" onclick="CourtPassApp.postWithReason('Deactivate Venue', 'All future bookings and coaching sessions at this venue will be cancelled. A reason is required.', '/admin/venues/<?= (int) $venueId ?>/deactivate')">
- Suspend Venue
- </button>
- <a href="<?= url('/venue/colombo-sports-hub') ?>" target="_blank" class="btn btn-primary">
- View Public Listing ↗
- </a>
- </div>
- </div>
+<?php if ($venue['status'] === 'rejected'): ?>
+    <div class="card" style="margin-bottom: var(--space-6); padding: var(--space-4);">
+        <strong>Rejection reason:</strong> <?= e($venue['rejection_reason']) ?>
+    </div>
+<?php endif; ?>
 
- <!-- Quick Status Banner -->
- <div class="card" style="margin-bottom: var(--space-6); background: #e6f8f0; border: 1px solid #a7f3d0;">
- <div class="card-body">
- <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
- <div style="display: flex; align-items: center; gap: 12px;">
- <span class="badge badge-confirmed" style="font-size: 13px; padding: 6px 14px;">Status: ACTIVE & VERIFIED</span>
- <span style="font-size: var(--font-size-xs); color: var(--color-text-body);">Approved on 12 Jan 2026 by Admin (ref #ADM-V-001)</span>
- </div>
- </div>
- </div>
- </div>
+<div class="grid grid-cols-3 gap-6">
+    <div style="grid-column: span 2; display: flex; flex-direction: column; gap: var(--space-6);">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Venue Details</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-2 gap-4" style="margin-bottom: var(--space-4);">
+                    <div>
+                        <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase;">Address</span>
+                        <div style="font-weight: 600; font-size: 14px; color: var(--color-text-heading);"><?= e($venue['address']) ?>, <?= e($venue['city']) ?></div>
+                    </div>
+                    <div>
+                        <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase;">Venue Phone</span>
+                        <div style="font-weight: 600; font-size: 14px; color: var(--color-text-heading);"><?= e($venue['contact_phone']) ?></div>
+                    </div>
+                </div>
+                <div style="margin-bottom: var(--space-4);">
+                    <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase;">Sports</span>
+                    <div style="margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap;">
+                        <?php foreach ($venue['sports'] as $sport): ?>
+                            <span class="badge badge-confirmed"><?= e($sport['name']) ?></span>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <?php if ($venue['description'] !== null && $venue['description'] !== ''): ?>
+                    <div>
+                        <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase;">Description</span>
+                        <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 4px; line-height: 1.5;"><?= nl2br(e($venue['description'])) ?></p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
 
- <div class="grid grid-cols-3 gap-6">
- 
- <!-- Left 2 Cols: Venue & Courts Detail -->
- <div style="grid-column: span 2; display: flex; flex-direction: column; gap: var(--space-6);">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Courts (<?= count($venue['courts']) ?>)</h3>
+            </div>
+            <?php if ($venue['courts'] === []): ?>
+                <div class="empty-state">
+                    <div class="empty-state-desc">No courts yet. Owners add courts after the venue is approved.</div>
+                </div>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Court</th>
+                                <th>Sport</th>
+                                <th>Hourly Rate</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($venue['courts'] as $court): ?>
+                                <tr>
+                                    <td><strong><?= e($court['name']) ?></strong></td>
+                                    <td><?= e($court['sport_name']) ?></td>
+                                    <td><?= e(lkr($court['hourly_rate'])) ?></td>
+                                    <td><?= $court['is_active'] ? status_badge('active') : '<span class="badge badge-inactive">Inactive</span>' ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
 
- <!-- General Details -->
- <div class="card">
- <div class="card-header">
- <h3 class="card-title">Venue Profile Information</h3>
- </div>
- <div class="card-body">
- <div class="grid grid-cols-2 gap-4" style="margin-bottom: var(--space-4);">
- <div>
- <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase;">Venue Name</span>
- <div style="font-weight: 700; font-size: 14px; color: var(--color-text-heading);">Colombo Futsal Club</div>
- </div>
- <div>
- <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase;">Location / City</span>
- <div style="font-weight: 600; font-size: 14px; color: var(--color-text-heading);">24 De Alwis Place, Dehiwala, Colombo</div>
- </div>
- </div>
-
- <div class="grid grid-cols-2 gap-4" style="margin-bottom: var(--space-4);">
- <div>
- <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase;">Sports Handled</span>
- <div style="margin-top: 4px; display: flex; gap: 6px;">
- <span class="badge badge-confirmed">Futsal</span>
- <span class="badge badge-primary">Badminton</span>
- </div>
- </div>
- <div>
- <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase;">Operating Hours</span>
- <div style="font-weight: 600; font-size: 13px; color: var(--color-text-heading); margin-top: 4px;">06:00 AM - 11:00 PM (Daily)</div>
- </div>
- </div>
-
- <div>
- <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase;">Description</span>
- <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 4px; line-height: 1.5;">
- Premier multi-sport complex in Dehiwala featuring FIFA standard synthetic turf futsal courts with stadium lighting, high-grip wooden badminton court, pro-shop, and shower facilities.
- </p>
- </div>
- </div>
- </div>
-
- <!-- Courts List -->
- <div class="card">
- <div class="card-header">
- <h3 class="card-title">Registered Courts (3)</h3>
- </div>
- <div class="table-container">
- <table class="table">
- <thead>
- <tr>
- <th>Court Name</th>
- <th>Sport</th>
- <th>Surface</th>
- <th>Hourly Rate</th>
- <th>Status</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td><strong>Turf Court 1 (Floodlit)</strong></td>
- <td><span class="badge badge-confirmed">Futsal</span></td>
- <td>Synthetic Turf (Outdoor)</td>
- <td><strong>LKR 5,000</strong></td>
- <td><span class="badge badge-confirmed">Active</span></td>
- </tr>
- <tr>
- <td><strong>Turf Court 2 (Indoor)</strong></td>
- <td><span class="badge badge-confirmed">Futsal</span></td>
- <td>Synthetic Turf (Covered)</td>
- <td><strong>LKR 4,500</strong></td>
- <td><span class="badge badge-confirmed">Active</span></td>
- </tr>
- <tr>
- <td><strong>Wooden Badminton Court A</strong></td>
- <td><span class="badge badge-primary">Badminton</span></td>
- <td>Teak Hardwood</td>
- <td><strong>LKR 2,500</strong></td>
- <td><span class="badge badge-confirmed">Active</span></td>
- </tr>
- </tbody>
- </table>
- </div>
- </div>
-
- </div>
-
- <!-- Right Column: Owner & Admin Parameters -->
- <div style="display: flex; flex-direction: column; gap: var(--space-6);">
- 
- <!-- Owner Contact Card -->
- <div class="card">
- <div class="card-header">
- <h3 class="card-title">Owner Information</h3>
- </div>
- <div class="card-body">
- <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--space-4);">
- <div class="user-avatar" style="width: 44px; height: 44px; background: #e0f2fe; color: #0284c7;">KM</div>
- <div>
- <div style="font-weight: 700; color: var(--color-text-heading);">Kusal Mendis</div>
- <div style="font-size: 11px; color: var(--color-text-subtle);">Managing Partner</div>
- </div>
- </div>
-
- <div style="font-size: var(--font-size-xs); display: flex; flex-direction: column; gap: 8px;">
- <div>
- <span style="color: var(--color-text-subtle);">Email:</span>
- <strong style="color: var(--color-text-heading);"> owner@colombofutsal.lk</strong>
- </div>
- <div>
- <span style="color: var(--color-text-subtle);">Phone:</span>
- <strong style="color: var(--color-text-heading);"> +94 11 234 5678</strong>
- </div>
- <div>
- <span style="color: var(--color-text-subtle);">Business Reg (BRN):</span>
- <strong style="color: var(--color-text-heading);"> PV-00239108</strong>
- </div>
- <div>
- <span style="color: var(--color-text-subtle);">PayHere ID:</span>
- <strong style="color: var(--color-text-heading);"> 1224890 (Active)</strong>
- </div>
- </div>
- </div>
- </div>
-
-
- </div>
-
- </div>
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Owner</h3>
+            </div>
+            <div class="card-body" style="font-size: var(--font-size-xs); display: flex; flex-direction: column; gap: 8px;">
+                <div style="font-weight: 700; font-size: 14px; color: var(--color-text-heading);"><?= e($venue['owner_name']) ?></div>
+                <div><span style="color: var(--color-text-subtle);">Email:</span> <strong><?= e($venue['owner_email']) ?></strong></div>
+                <div><span style="color: var(--color-text-subtle);">Phone:</span> <strong><?= e($venue['owner_phone'] ?? 'Not given') ?></strong></div>
+            </div>
+        </div>
+    </div>
+</div>

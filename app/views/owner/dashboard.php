@@ -98,12 +98,7 @@
  <td><span class="badge badge-unpaid">Cash on Arrival</span></td>
  <td><strong>LKR 5,000</strong></td>
  <td style="text-align: right;">
- <button type="button" class="btn btn-sm btn-primary" onclick="CourtPassApp.confirmPost('Confirm Booking', 'Confirm this booking request?', 'Confirm', '/owner/bookings/4/confirm')">
- Confirm Booking
- </button>
- <button type="button" class="btn btn-sm btn-secondary" style="color: var(--color-danger);" onclick="CourtPassApp.postWithReason('Reject Booking', 'A reason is required and is shown to the customer.', '/owner/bookings/4/reject')">
- Reject...
- </button>
+ <a href="<?= url('/owner/bookings') ?>" class="btn btn-sm btn-primary">Review in Bookings</a>
  </td>
  </tr>
  <tr>
@@ -119,12 +114,7 @@
  <td><span class="badge badge-paid">Online (PayHere)</span></td>
  <td><strong>LKR 4,500</strong></td>
  <td style="text-align: right;">
- <button type="button" class="btn btn-sm btn-primary" onclick="CourtPassApp.confirmPost('Confirm Booking', 'Confirm this booking request?', 'Confirm', '/owner/bookings/4/confirm')">
- Confirm Booking
- </button>
- <button type="button" class="btn btn-sm btn-secondary" style="color: var(--color-danger);" onclick="CourtPassApp.postWithReason('Reject Booking', 'A reason is required and is shown to the customer.', '/owner/bookings/4/reject')">
- Reject...
- </button>
+ <a href="<?= url('/owner/bookings') ?>" class="btn btn-sm btn-primary">Review in Bookings</a>
  </td>
  </tr>
  </tbody>
