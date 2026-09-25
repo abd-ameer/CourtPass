@@ -10,4 +10,26 @@ class CourtHoursModel extends Model
             [$courtId, $dayOfWeek]
         );
     }
+
+    public function forCourt(int $courtId): array
+    {
+        return $this->select(
+            'SELECT day_of_week, open_time, close_time FROM court_operating_hours WHERE court_id = ? ORDER BY day_of_week',
+            'i',
+            [$courtId]
+        );
+    }
+
+    /** Replaces the court's week; a day missing from $hours is closed. Runs in the caller's transaction. */
+    public function replaceForCourt(int $courtId, array $hours): void
+    {
+        $this->execute('DELETE FROM court_operating_hours WHERE court_id = ?', 'i', [$courtId]);
+        foreach ($hours as $day => $h) {
+            $this->insert(
+                'INSERT INTO court_operating_hours (court_id, day_of_week, open_time, close_time) VALUES (?, ?, ?, ?)',
+                'iiss',
+                [$courtId, (int) $day, $h['open'] . ':00', $h['close'] . ':00']
+            );
+        }
+    }
 }

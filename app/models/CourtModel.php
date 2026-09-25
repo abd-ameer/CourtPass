@@ -27,4 +27,34 @@ class CourtModel extends Model
     {
         return $this->selectOne('SELECT id FROM courts WHERE id = ? FOR UPDATE', 'i', [$id]) !== null;
     }
+
+    public function create(int $venueId, string $name, int $sportTypeId, float $hourlyRate): int
+    {
+        return $this->insert(
+            'INSERT INTO courts (venue_id, name, sport_type_id, hourly_rate) VALUES (?, ?, ?, ?)',
+            'isid',
+            [$venueId, $name, $sportTypeId, $hourlyRate]
+        );
+    }
+
+    /** Every court of a venue, active or not, with its sport name. */
+    public function forVenue(int $venueId): array
+    {
+        return $this->select(
+            'SELECT c.id, c.name, c.sport_type_id, s.name AS sport_name, c.hourly_rate, c.is_active
+             FROM courts c JOIN sport_types s ON s.id = c.sport_type_id
+             WHERE c.venue_id = ? ORDER BY c.id',
+            'i',
+            [$venueId]
+        );
+    }
+
+    /** Sport type ids used by any court of the venue. */
+    public function sportIdsForVenue(int $venueId): array
+    {
+        return array_map('intval', array_column(
+            $this->select('SELECT DISTINCT sport_type_id FROM courts WHERE venue_id = ?', 'i', [$venueId]),
+            'sport_type_id'
+        ));
+    }
 }

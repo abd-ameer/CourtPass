@@ -59,6 +59,7 @@ $router->get('/owner/venues/{id}/edit', [VenueController::class, 'edit'], ['owne
 $router->put('/owner/venues/{id}', [VenueController::class, 'update'], ['owner']);
 $router->get('/owner/venues/{id}/deactivate', [VenueController::class, 'confirmDeactivate'], ['owner']);
 $router->post('/owner/venues/{id}/deactivate', [VenueController::class, 'deactivate'], ['owner']);
+$router->post('/owner/venues/{id}/activate', [VenueController::class, 'activate'], ['owner']);
 
 $router->get('/admin/dashboard', [VenueController::class, 'adminDashboard'], ['admin']);
 $router->get('/admin/venues', [VenueController::class, 'adminIndex'], ['admin']);
