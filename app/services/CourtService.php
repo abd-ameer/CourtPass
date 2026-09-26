@@ -148,6 +148,33 @@ class CourtService
         });
     }
 
+    /**
+     * Blocks one slot on a court and returns the block id. Runs inside the caller's transaction:
+     * locks the court, then runs the shared slot conflict check, so a block never lands on a booking, a released
+     * booking or another block. The caller writes its own audit entry. $type is 'owner' or 'coaching'.
+     */
+    public function addBlock(int $courtId, string $date, string $time, string $type, ?string $reason, int $createdBy): int
+    {
+        if (!in_array($type, ['owner', 'coaching'], true)) {
+            throw new InvalidArgumentException("Unknown block type {$type}.");
+        }
+        $time = substr($time, 0, 5) . ':00';
+        $this->lockCourt($courtId);
+        (new BookingService())->assertSlotFree($courtId, $date, $time);
+        return (new CourtBlockModel())->create($courtId, $date, $time, $type, $reason, $createdBy);
+    }
+
+    /**
+     * Frees a blocked slot. Runs inside the caller's transaction. A coaching block must be unlinked from its
+     * session (block_id set to NULL) first, otherwise the foreign key refuses the delete.
+     */
+    public function removeBlock(int $blockId): void
+    {
+        if ((new CourtBlockModel())->delete($blockId) !== 1) {
+            throw new ValidationException(['block' => 'This slot is no longer blocked.']);
+        }
+    }
+
     /** Whole hours, close after open, close at most 24:00, at least one open day. Returns the hours sorted by day. */
     private static function validHours(array $hours): array
     {

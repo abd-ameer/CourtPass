@@ -18,4 +18,18 @@ class CourtBlockModel extends Model
             [$courtId, $date, $time]
         ) !== null;
     }
+
+    public function create(int $courtId, string $date, string $time, string $type, ?string $reason, int $createdBy): int
+    {
+        return $this->insert(
+            'INSERT INTO court_blocks (court_id, block_date, start_time, block_type, reason, created_by) VALUES (?, ?, ?, ?, ?, ?)',
+            'issssi',
+            [$courtId, $date, $time, $type, $reason, $createdBy]
+        );
+    }
+
+    public function delete(int $id): int
+    {
+        return $this->execute('DELETE FROM court_blocks WHERE id = ?', 'i', [$id]);
+    }
 }

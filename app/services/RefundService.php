@@ -12,6 +12,20 @@ class RefundService
      */
     public function refundBooking(int $bookingId, float $percentage, string $reason, ?int $actorId): ?array
     {
+        return $this->refund(fn () => (new PaymentModel())->paidForBookingForUpdate($bookingId), $percentage, $reason, $actorId);
+    }
+
+    /**
+     * Records a simulated refund of a session registration's paid payment. Runs inside the caller's transaction.
+     * Returns null when there is nothing to refund: 0%, no paid payment, or already refunded.
+     */
+    public function refundRegistration(int $registrationId, float $percentage, string $reason, ?int $actorId): ?array
+    {
+        return $this->refund(fn () => (new PaymentModel())->paidForRegistrationForUpdate($registrationId), $percentage, $reason, $actorId);
+    }
+
+    private function refund(callable $findPayment, float $percentage, string $reason, ?int $actorId): ?array
+    {
         if (!in_array($reason, self::REASONS, true)) {
             throw new InvalidArgumentException("Unknown refund reason {$reason}.");
         }
@@ -22,7 +36,7 @@ class RefundService
             throw new InvalidArgumentException('Refund percentage cannot be above 100.');
         }
 
-        $payment = (new PaymentModel())->paidForBookingForUpdate($bookingId);
+        $payment = $findPayment();
         $refunds = new RefundModel();
         if ($payment === null || $refunds->existsForPayment((int) $payment['id'])) {
             return null;
