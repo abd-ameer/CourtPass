@@ -131,6 +131,18 @@ class VenueServiceTest extends DatabaseTestCase
         $this->assertSame([3], array_column($this->service->pendingVenues(), 'id'));
     }
 
+    public function testUpdateAuditRecordsRemovedAndAddedSports(): void
+    {
+        $this->service->update(3, 3, self::input(['name' => 'Galle Racquet Club', 'sport_type_ids' => ['2', '7']]));
+
+        $details = json_decode($this->fetchValue(
+            "SELECT details FROM audit_log WHERE event_type = 'venue.updated' AND entity_id = 3"
+        ), true);
+        $this->assertSame([2, 7], $details['sport_type_ids']);
+        $this->assertSame([3], $details['removed_sport_type_ids']);
+        $this->assertSame([7], $details['added_sport_type_ids']);
+    }
+
     public function testASportUsedByACourtCannotBeRemoved(): void
     {
         try {

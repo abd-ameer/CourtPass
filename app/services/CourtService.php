@@ -132,7 +132,10 @@ class CourtService
         return $court;
     }
 
-    /** Replaces the court's weekly hours. Existing bookings are kept even if they fall outside the new hours. */
+    /**
+     * Replaces the court's weekly hours. Existing bookings are kept even if they fall outside the new hours.
+     * The audit entry keeps the old and the new week.
+     */
     public function updateHours(int $ownerId, int $courtId, array $hours): void
     {
         $hours = self::validHours($hours);
@@ -143,8 +146,17 @@ class CourtService
                 throw new ValidationException(['court' => 'Court not found.']);
             }
             $this->lockCourt($courtId);
-            (new CourtHoursModel())->replaceForCourt($courtId, $hours);
-            (new AuditService())->log($ownerId, 'court.hours_updated', 'court', $courtId, null, null, json_encode(['hours' => $hours]));
+            $model = new CourtHoursModel();
+            $oldHours = [];
+            foreach ($model->forCourt($courtId) as $row) {
+                $oldHours[(int) $row['day_of_week']] = [
+                    'open'  => substr($row['open_time'], 0, 5),
+                    'close' => substr($row['close_time'], 0, 5),
+                ];
+            }
+            $model->replaceForCourt($courtId, $hours);
+            (new AuditService())->log($ownerId, 'court.hours_updated', 'court', $courtId, null, null,
+                json_encode(['old_hours' => $oldHours, 'hours' => $hours]));
         });
     }
 
