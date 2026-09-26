@@ -54,7 +54,13 @@ class CoachController extends Controller
 
     public function dashboard(): void
     {
-        $this->view('coach/dashboard', ['title' => 'Coach Dashboard'], 'dashboard');
+        $service = new CoachSessionService();
+        $this->view('coach/dashboard', [
+            'title'     => 'Coach Dashboard',
+            'coachName' => Auth::user()['name'],
+            'upcoming'  => $service->coachSessions(Auth::id(), 'upcoming')['sessions'],
+            'hasVenues' => $service->sessionVenues(Auth::id()) !== [],
+        ], 'dashboard');
     }
 
     public function editProfile(): void
@@ -142,27 +148,22 @@ class CoachController extends Controller
 
     public function coaching(): void
     {
-        // TODO: upcoming public sessions filtered by sport, venue and date from the coach session service.
-        $sessions = [
-            [
-                'id' => 2, 'title' => 'Intermediate Rally Drills', 'sport' => 'Badminton',
-                'venue_name' => 'Colombo Sports Hub', 'court_name' => 'Badminton Court 2',
-                'coach_id' => 7, 'coach_name' => 'Ashan Weerasinghe', 'coach_verified' => true, 'coach_rating' => 4.0,
-                'starts_at' => '2026-09-29 08:00:00', 'fee' => 1800.00, 'capacity' => 4, 'registered_count' => 1,
-                'status' => 'open',
-            ],
-        ];
+        $sports = array_map(fn ($s) => ['code' => $s['code'], 'name' => $s['name']], $this->sportTypes());
+        $venues = array_map(fn ($v) => ['id' => $v['id'], 'name' => $v['name']], (new VenueService())->publicVenues());
+
+        $sport = (string) $this->request->query('sport', '');
+        $sport = in_array($sport, array_column($sports, 'code'), true) ? $sport : '';
+        $venueId = (int) $this->request->query('venue', 0);
+        $venueId = in_array($venueId, array_column($venues, 'id'), true) ? $venueId : 0;
+        $date = (string) $this->request->query('date', '');
+        $date = (new Validator(['date' => $date]))->date('date')->fails() ? '' : $date;
 
         $this->view('public/coaching', [
             'title'    => 'Coaching Sessions',
-            'sessions' => $sessions,
-            'sports'   => array_map(fn ($s) => ['code' => $s['code'], 'name' => $s['name']], $this->sportTypes()),
-            'venues'   => [['id' => 1, 'name' => 'Colombo Sports Hub'], ['id' => 2, 'name' => 'Kandy Court Zone']],
-            'filters'  => [
-                'sport' => (string) $this->request->query('sport', ''),
-                'venue' => (int) $this->request->query('venue', 0),
-                'date'  => (string) $this->request->query('date', ''),
-            ],
+            'sessions' => (new CoachSessionService())->publicSessions($sport ?: null, $venueId ?: null, $date ?: null),
+            'sports'   => $sports,
+            'venues'   => $venues,
+            'filters'  => ['sport' => $sport, 'venue' => $venueId, 'date' => $date],
         ]);
     }
 

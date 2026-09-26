@@ -125,7 +125,7 @@ INSERT INTO coach_venue_approvals (id, coach_id, venue_id, status, requested_at,
 INSERT INTO court_blocks (id, court_id, block_date, start_time, block_type, reason, created_by) VALUES
     (2, 4, DATE_SUB(CURDATE(), INTERVAL 2 DAY), '08:00:00', 'coaching', NULL, 7),
     (3, 4, DATE_ADD(CURDATE(), INTERVAL 5 DAY), '08:00:00', 'coaching', NULL, 7),
-    (4, 3, DATE_ADD(CURDATE(), INTERVAL 6 DAY), '07:00:00', 'coaching', NULL, 7);
+    (4, 3, DATE_ADD(CURDATE(), INTERVAL 6 DAY), '08:00:00', 'coaching', NULL, 7);
 
 INSERT INTO coach_sessions (id, coach_id, court_id, block_id, session_date, start_time, title,
         description, capacity, fee, visibility, access_token, status) VALUES
@@ -133,7 +133,7 @@ INSERT INTO coach_sessions (id, coach_id, court_id, block_id, session_date, star
         'Grip, footwork and basic strokes.', 6, 1500.00, 'public', NULL, 'completed'),
     (2, 7, 4, 3, DATE_ADD(CURDATE(), INTERVAL 5 DAY), '08:00:00', 'Intermediate Rally Drills',
         'Consistency and shot placement drills.', 4, 1800.00, 'public', NULL, 'open'),
-    (3, 7, 3, 4, DATE_ADD(CURDATE(), INTERVAL 6 DAY), '07:00:00', 'Private Family Session',
+    (3, 7, 3, 4, DATE_ADD(CURDATE(), INTERVAL 6 DAY), '08:00:00', 'Private Family Session',
         'Private session for one family.', 3, 2500.00, 'private', '9f2c4e6a8b0d1f3e5a7c9e1b3d5f7a90', 'open');
 
 INSERT INTO session_registrations (id, session_id, customer_id, status, amount, attendance_marked_at) VALUES

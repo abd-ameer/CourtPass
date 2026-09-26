@@ -45,7 +45,7 @@ $isFull = $session['status'] === 'full' || $spotsLeft === 0;
             </div>
             <div style="text-align: right;">
                 <div style="font-size: 11px; color: var(--color-text-muted);">Fee</div>
-                <div style="font-size: 15px; font-weight: 800; color: var(--color-primary-active);"><?= e(lkr($session['fee'])) ?></div>
+                <div style="font-size: 15px; font-weight: 800; color: var(--color-primary-active);"><?= (float) $session['fee'] > 0 ? e(lkr($session['fee'])) : 'Free' ?></div>
             </div>
         </div>
 

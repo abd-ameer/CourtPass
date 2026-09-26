@@ -5,15 +5,15 @@
  <span class="breadcrumb-separator">/</span>
  <a href="<?= url('/coach/sessions') ?>">Sessions</a>
  <span class="breadcrumb-separator">/</span>
- <a href="<?= url('/coach/sessions/2') ?>">#2</a>
+ <a href="<?= url('/coach/sessions/' . (int) $sessionId) ?>">#<?= (int) $sessionId ?></a>
  <span class="breadcrumb-separator">/</span>
  <span>Registrations</span>
  </div>
- <h1 class="page-title">Session Registrations — Badminton Fundamentals</h1>
- <div class="page-subtitle">Participant list with contact details, payment status, and attendance tracking for session #2.</div>
+ <h1 class="page-title">Session Registrations: Badminton Fundamentals</h1>
+ <div class="page-subtitle">Participant list with contact details, payment status, and attendance tracking for session #<?= (int) $sessionId ?>.</div>
  </div>
  <div style="display: flex; gap: 10px;">
- <a href="<?= url('/coach/sessions/2/attendance') ?>" class="btn btn-primary"> Mark Attendance</a>
+ <a href="<?= url('/coach/sessions/' . (int) $sessionId . '/attendance') ?>" class="btn btn-primary"> Mark Attendance</a>
  <button type="button" class="btn btn-outline" onclick="CourtPassApp.showToast('info', 'Export', 'Participant list downloaded as CSV.')"> Export CSV</button>
  </div>
  </div>

@@ -3,20 +3,30 @@ class SessionRegistrationController extends Controller
 {
     public function show(string $id): void
     {
-        $this->view('public/session-details', ['title' => 'Coaching Session', 'sessionId' => (int) $id, 'token' => null]);
+        $session = (new CoachSessionService())->publicSession((int) $id);
+        if ($session === null) {
+            $this->notFound();
+        }
+        $this->view('public/session-details', ['title' => $session['title'], 'session' => $session]);
     }
 
     public function showPrivate(string $token): void
     {
-        // TODO: look up the private session by token; an unknown token shows the not-found page.
-        $this->view('public/session-details', ['title' => 'Coaching Session', 'sessionId' => null, 'token' => $token]);
+        $session = (new CoachSessionService())->privateSession($token);
+        if ($session === null) {
+            $this->notFound();
+        }
+        $this->view('public/session-details', ['title' => $session['title'], 'session' => $session]);
     }
 
     public function store(string $id): void
     {
         $this->verifyCsrf();
+        if ((new CoachSessionService())->publicSession((int) $id) === null) {
+            $this->notFound();
+        }
         // TODO: capacity check, create the pending_payment registration and redirect to PayHere.
-        Session::flash('info', 'Session registration is not built yet.');
+        Session::flash('info', 'Registration with online payment opens when PayHere payments are connected.');
         $this->redirect('/sessions/' . (int) $id);
     }
 

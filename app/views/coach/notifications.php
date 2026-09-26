@@ -48,7 +48,7 @@
  </div>
 
  <div style="display: flex; gap: 6px; flex-shrink: 0;">
- <a href="<?= url('/coach/sessions/2') ?>" class="btn btn-sm btn-outline">View Session</a>
+ <a href="<?= url('/coach/sessions') ?>" class="btn btn-sm btn-outline">View Sessions</a>
  </div>
  </div>
  </div>
@@ -104,7 +104,7 @@
  </div>
 
  <div style="display: flex; gap: 6px; flex-shrink: 0;">
- <a href="<?= url('/coach/sessions/2') ?>" class="btn btn-sm btn-outline">View Session</a>
+ <a href="<?= url('/coach/sessions') ?>" class="btn btn-sm btn-outline">View Sessions</a>
  </div>
  </div>
  </div>
@@ -130,7 +130,7 @@
  </div>
 
  <div style="display: flex; gap: 6px; flex-shrink: 0;">
- <a href="<?= url('/coach/sessions/2') ?>" class="btn btn-sm btn-outline">View Session</a>
+ <a href="<?= url('/coach/sessions') ?>" class="btn btn-sm btn-outline">View Sessions</a>
  </div>
  </div>
  </div>
