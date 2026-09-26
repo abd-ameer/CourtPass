@@ -19,7 +19,7 @@ The CourtPass database has 24 tables that cover every in-scope feature of the Re
 | Time | `DATETIME` in Asia/Colombo, connection set to `+05:30` | Proposal fixes all times to Asia/Colombo; `DATETIME` does not shift if the server zone changes |
 | Slot times | `DATE` + `TIME` on the hour | Fixed one-hour slots |
 | Status fields | `ENUM` with locked values (section 6) | Proposal asks for locked enums shared by all members |
-| Deletes | Accounts, venues, courts and bookings are never deleted, only deactivated or cancelled | History, audit log and refunds must keep pointing at real rows |
+| Deletes | Accounts, venues, courts, bookings, coach sessions and registrations are never deleted, only deactivated or moved to another status. The few rows the app does delete are listed in DD15 | History, audit log and refunds must keep pointing at real rows |
 
 The schema was loaded and tested on MariaDB 10.11 with 38 constraint tests (section 7). It only uses features that MariaDB 10.4 and MySQL 8.0 both support: CHECK constraints, STORED generated columns and triggers. It was not run on a MySQL 8 server here, so one member should load it once on MySQL 8 as a check.
 
@@ -173,11 +173,11 @@ Every table below is in `database/schema.sql` in this order. PK = primary key, F
 | reviewed\_by, reviewed\_at | FK users, DATETIME |  | Admin who approved or rejected |
 | is\_active | TINYINT(1) |  | Owner's temporary deactivation switch |
 
-**venue\_sports** (venue\_id, sport\_type\_id) PK on both: sports entered at registration.
+**venue\_sports** (venue\_id, sport\_type\_id) PK on both: sports entered at registration. Editing the venue adds and deletes these rows (DD15).
 
 **courts**: id PK, venue\_id FK, name (UQ per venue), sport\_type\_id FK, hourly\_rate DECIMAL CK > 0, is\_active.
 
-**court\_operating\_hours** (weak): court\_id + day\_of\_week PK, day\_of\_week CK 1 to 7 (1 = Monday), open\_time and close\_time TIME, CK whole hours and close > open, close up to 24:00.
+**court\_operating\_hours** (weak): court\_id + day\_of\_week PK, day\_of\_week CK 1 to 7 (1 = Monday), open\_time and close\_time TIME, CK whole hours and close > open, close up to 24:00. Saving a court's hours replaces the whole week (DD15).
 
 **court\_blocks**
 
@@ -281,7 +281,7 @@ Every table below is in `database/schema.sql` in this order. PK = primary key, F
 | response\_text, responded\_by, responded\_at | TEXT, FK users, DATETIME | CK text and time together | One public response by owner or coach |
 | status, removed\_by, removed\_reason | ENUM active, removed | CK removed\_by when removed | Admin moderation (UC-PA-10) |
 
-**review\_flags**: id PK, review\_id FK reviews, flagged\_by FK users (the venue owner), reason VARCHAR(500), status ENUM open, dismissed, upheld, open\_lock (generated, UQ with review\_id, so one open report per review), resolved\_by FK users, resolved\_at (CK both set once the report is closed), created\_at. An owner reports a review to the admin, who removes the review (report upheld) or keeps it (report dismissed). Added on 25 Sep 2026 as an agreed addition to the proposal.
+**review\_flags**: id PK, review\_id FK reviews, flagged\_by FK users (the venue owner), reason VARCHAR(500), status ENUM open, dismissed, upheld, open\_lock (generated, UQ with review\_id, so one open report per review), resolved\_by FK users, resolved\_at (CK both set once the report is closed), created\_at. An owner reports a review to the admin, who removes the review (report upheld) or keeps it (report dismissed). Added on 25 Sep 2026 as an agreed addition to the proposal. When a customer deletes their own review, its reports are deleted with it (DD15).
 
 **announcements**: id PK, venue\_id FK, posted\_by FK users, type ENUM operational, promotional, title, body, status ENUM active, removed, removed\_by (CK when removed).
 
@@ -335,7 +335,19 @@ Each decision below lists what we chose, what we rejected, and why.
 
 **DD14. Privacy.** No NIC numbers, ID images or card data are stored anywhere. Coach verification is a flag plus who and when. Dispute evidence is text only.
 
-**DD15. Nothing is hard-deleted.** Foreign keys use the default RESTRICT with no cascades. Accounts, venues and courts are deactivated, and bookings are cancelled. This keeps refunds, reviews and the audit log valid. The only deletes the app makes are coaching blocks when a session is cancelled, and owner blocks the owner removes.
+**DD15. Core records are never deleted.** Foreign keys use the default RESTRICT with no cascades. Accounts, venues, courts, bookings, coach sessions and session registrations are never deleted: accounts, venues and courts are deactivated, and bookings, sessions and registrations change status. Payments, refunds, check-ins, disputes, announcements and the audit log are never deleted either. This keeps refunds, reviews and the audit log pointing at real rows.
+
+The app deletes rows only in the cases below. Each runs inside the owning service's transaction, and no remaining row references the deleted row.
+
+| Delete | When | Why it is safe | Where the history is kept |
+| --- | --- | --- | --- |
+| `court_blocks`, coaching block | The coach cancels the session | The same UPDATE that cancels the session sets `block_id` to NULL first; the FK refuses the delete otherwise | `coach_sessions` keeps court, date and time (DD12); `session.cancelled` keeps the block id |
+| `court_blocks`, owner block | The owner removes their own block (slot blocking) | Nothing references an owner block | The owner's audit entry for the change |
+| `venue_sports` rows | The owner removes a sport when editing the venue | Link rows; a sport still used by a court cannot be removed | `venue.updated` records the removed and added sports |
+| `court_operating_hours` rows | Saving a court's hours replaces the whole week | Weak rows; bookings and blocks keep their own date and time | `court.hours_updated` records the old and the new week |
+| `reviews` row, with its `review_flags` rows | The customer deletes their own active venue review | Reports are deleted first in the same transaction; a removed review cannot be deleted | `review.deleted` keeps rating, comment, response and report count; report reasons stay in `review.flagged` |
+
+Admin removal of a review or an announcement is a status change (`removed`), not a delete.
 
 **DD16. Seed dates are relative.** `seed.sql` uses `CURDATE()` offsets, so upcoming bookings and sessions are still upcoming whenever a member reloads it. `schema.sql` starts with `DROP DATABASE IF EXISTS courtpass`, so reloading both files always gives a clean copy.
 
@@ -455,6 +467,7 @@ All 38 tests passed on MariaDB 10.11: 33 bad writes were refused and 5 valid flo
 | Private session has a 32-hex token, public has none; capacity at least 1; cancelled session holds no block | CHECK |
 | One live registration per customer per session; one open dispute per booking and type | generated lock + unique |
 | Unique email, valid slug | unique + CHECK |
+| A coaching block still linked to its session, or a review that still has reports, cannot be deleted | FK RESTRICT |
 | Audit log cannot be edited or deleted | triggers |
 
 **Enforced by services (inside `Database::transaction()`)**
@@ -476,7 +489,7 @@ All 38 tests passed on MariaDB 10.11: 33 bad writes were refused and 5 valid flo
 
 ## 8. Table ownership
 
-Each table has one owner, who writes its model and is the only member whose service inserts or updates it. Other members read it through the owner's service, following the "call, don't copy" rule. The schema file itself is shared work, so any change to it needs agreement from all four members.
+Each table has one owner, who writes its model and is the only member whose service inserts, updates or deletes it. Other members read it through the owner's service, following the "call, don't copy" rule. The schema file itself is shared work, so any change to it needs agreement from all four members.
 
 | Table | Owner | Main users from other modules |
 | --- | --- | --- |
