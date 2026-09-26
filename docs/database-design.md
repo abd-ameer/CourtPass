@@ -4,7 +4,7 @@ Sep 22, 2026 · @Someone
 
 ## 1. Purpose and conventions
 
-The CourtPass database has 23 tables that cover every in-scope feature of the Revised Project Proposal, including the Coach Module. This document explains what each table is for, why it is shaped the way it is, and which rules the database enforces on its own. It is the reference for `database/schema.sql` and `database/seed.sql` in the repo.
+The CourtPass database has 24 tables that cover every in-scope feature of the Revised Project Proposal, including the Coach Module, plus owner reports on reviews (`review_flags`, an agreed addition). This document explains what each table is for, why it is shaped the way it is, and which rules the database enforces on its own. It is the reference for `database/schema.sql` and `database/seed.sql` in the repo.
 
 **Sources followed:** the Revised Project Proposal (overrides the original PDF and the old Coach Module Design PDF), the Coach Module Developer Guide (section 2 data model), and the team's build rules. The old prototype schema in `legacy/schema/` was used only as a reference for what to fix.
 
@@ -281,6 +281,8 @@ Every table below is in `database/schema.sql` in this order. PK = primary key, F
 | response\_text, responded\_by, responded\_at | TEXT, FK users, DATETIME | CK text and time together | One public response by owner or coach |
 | status, removed\_by, removed\_reason | ENUM active, removed | CK removed\_by when removed | Admin moderation (UC-PA-10) |
 
+**review\_flags**: id PK, review\_id FK reviews, flagged\_by FK users (the venue owner), reason VARCHAR(500), status ENUM open, dismissed, upheld, open\_lock (generated, UQ with review\_id, so one open report per review), resolved\_by FK users, resolved\_at (CK both set once the report is closed), created\_at. An owner reports a review to the admin, who removes the review (report upheld) or keeps it (report dismissed). Added on 25 Sep 2026 as an agreed addition to the proposal.
+
 **announcements**: id PK, venue\_id FK, posted\_by FK users, type ENUM operational, promotional, title, body, status ENUM active, removed, removed\_by (CK when removed).
 
 **notifications**: id PK, user\_id FK, type VARCHAR(50), title, message, link\_url, is\_read, read\_at. Index on (user\_id, is\_read, created\_at) for the unread badge.
@@ -323,7 +325,7 @@ Each decision below lists what we chose, what we rejected, and why.
 
 **DD9. One reviews table for venues and coaches.** This follows the Developer Guide ("one reviews table for both"). The EER has `REVIEW` with a disjoint, total specialisation. It is mapped to one table with nullable target pairs and a CHECK that exactly one pair is set. `venue_id` and `coach_id` are strictly derivable (through the check-in or registration), but they are stored because every public venue and coach page lists reviews by target. That is a deliberate, small denormalisation, and the service sets both columns in the same insert.
 
-**DD10. Live-row uniqueness with generated lock columns.** The same NULL trick as DD2 is used for `session_registrations.active_lock` (one live registration per customer per session, cancelled rows kept) and `disputes.open_lock` (one open dispute per booking and type). The Developer Guide said this could not be done with a simple unique key, and this is how it can.
+**DD10. Live-row uniqueness with generated lock columns.** The same NULL trick as DD2 is used for `session_registrations.active_lock` (one live registration per customer per session, cancelled rows kept) `disputes.open_lock` (one open dispute per booking and type) and `review_flags.open_lock` (one open report per review). The Developer Guide said this could not be done with a simple unique key, and this is how it can.
 
 **DD11. No stored counters where a count is cheap.** Sessions do not store `registered_count`. The capacity check counts active registrations under the session row lock, so the count can never drift. The only cache is the reliability block in `customer_profiles`, because it is read on every booking attempt and the formula is not final.
 
@@ -416,6 +418,7 @@ stateDiagram-v2
 | bookings.cancellation\_class | responsible, moderate, irresponsible |
 | disputes.dispute\_type | no\_show, resale |
 | disputes.status | open, upheld, dismissed |
+| review\_flags.status | open, dismissed, upheld |
 | coach\_venue\_approvals.status | pending, approved, declined, revoked |
 | coach\_sessions.visibility | public, private |
 | session\_registrations.cancel\_source | customer, session\_cancelled, payment\_failed, payment\_expired |
@@ -489,11 +492,12 @@ Each table has one owner, who writes its model and is the only member whose serv
 | check\_ins | D | A (no-show detection) |
 | flash\_slots | D | A (booking price) |
 | reviews | D (venue reviews), C (coach reviews) | shared table, each owner writes its own type |
+| review\_flags | D | owners report venue reviews and the admin resolves them through D's service |
 | announcements, notifications, audit\_log | D | all members write notifications and audit entries through D's services |
 
 ## 9. EER to relational mapping and normalisation
 
-The 24 entity types and 33 relationships map to 23 tables using the standard Elmasri and Navathe mapping steps.
+The 24 entity types and 33 relationships map to 23 tables using the standard Elmasri and Navathe mapping steps. `review_flags`, added later as an agreed addition, is one more strong entity with a 1:N relationship to `reviews`, which makes 24 tables.
 
 | EER construct | Mapping used | Tables |
 | --- | --- | --- |

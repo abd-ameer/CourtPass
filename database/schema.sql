@@ -475,6 +475,29 @@ CREATE TABLE reviews (
     CONSTRAINT chk_reviews_removed CHECK (status <> 'removed' OR removed_by IS NOT NULL)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- An owner reports a review to the admin. open_lock allows one open flag per review.
+CREATE TABLE review_flags (
+    id              INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+    review_id       INT UNSIGNED  NOT NULL,
+    flagged_by      INT UNSIGNED  NOT NULL,
+    reason          VARCHAR(500)  NOT NULL,
+    status          ENUM('open','dismissed','upheld') NOT NULL DEFAULT 'open',
+    open_lock       TINYINT(1) AS (CASE WHEN status = 'open' THEN 1 ELSE NULL END) STORED,
+    resolved_by     INT UNSIGNED  NULL,
+    resolved_at     DATETIME      NULL,
+    created_at      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_review_flags_open (review_id, open_lock),
+    KEY idx_review_flags_status (status),
+    CONSTRAINT fk_review_flags_review FOREIGN KEY (review_id) REFERENCES reviews (id),
+    CONSTRAINT fk_review_flags_by FOREIGN KEY (flagged_by) REFERENCES users (id),
+    CONSTRAINT fk_review_flags_resolved_by FOREIGN KEY (resolved_by) REFERENCES users (id),
+    CONSTRAINT chk_review_flags_resolved CHECK (
+        (status = 'open' AND resolved_at IS NULL AND resolved_by IS NULL)
+        OR (status <> 'open' AND resolved_at IS NOT NULL AND resolved_by IS NOT NULL)
+    )
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE announcements (
     id          INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     venue_id    INT UNSIGNED  NOT NULL,

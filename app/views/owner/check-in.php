@@ -1,142 +1,109 @@
 <?php
-/** @var string $search */
+/** @var array $desk date, search, bookings, counts, found, message */
+$search = $desk['search'];
+$postPath = fn (int $id) => '/owner/bookings/' . $id . '/check-in' . ($search === '' ? '' : '?q=' . rawurlencode($search));
 ?>
 <div class="page-header">
- <div>
- <div class="breadcrumb">
- <a href="<?= url('/owner/dashboard') ?>">Dashboard</a>
- <span class="breadcrumb-separator">/</span>
- <span>Check-in Desk</span>
- </div>
- <h1 class="page-title">Front Desk Customer Check-in (UC-VO-24)</h1>
- <div class="page-subtitle">Find a booking by booking ID or customer name, then mark the customer as arrived.</div>
- </div>
+    <div>
+        <div class="breadcrumb">
+            <a href="<?= url('/owner/dashboard') ?>">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Check-in Desk</span>
+        </div>
+        <h1 class="page-title">Customer Check-in</h1>
+        <div class="page-subtitle">Mark customers as arrived for confirmed bookings, from 1 hour before the start until the slot ends.</div>
+    </div>
 
- <div class="badge badge-confirmed" style="font-size: 13px; padding: 6px 14px;">
- Today's Total: 5 Checked-in / 3 Pending
- </div>
- </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <span class="badge badge-status-completed" style="font-size: 13px; padding: 6px 14px;">Checked in: <?= e($desk['counts']['checked_in']) ?></span>
+        <span class="badge badge-status-confirmed" style="font-size: 13px; padding: 6px 14px;">Waiting: <?= e($desk['counts']['waiting']) ?></span>
+        <span class="badge badge-secondary" style="font-size: 13px; padding: 6px 14px;">Ended without check-in: <?= e($desk['counts']['missed']) ?></span>
+    </div>
+</div>
 
- <!-- Quick Search Bar -->
- <div class="card" style="padding: 16px 20px; margin-bottom: var(--space-6);">
- <div style="display: flex; gap: 12px; align-items: center;">
- <input type="search" name="q" id="checkInSearchInput" class="form-control" placeholder="Booking number or customer name" value="<?= e($search) ?>" oninput="filterCheckIns()">
- </div>
- </div>
+<div class="card" style="padding: 16px 20px; margin-bottom: var(--space-6);">
+    <form method="GET" action="<?= url('/owner/check-in') ?>" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+        <input type="search" name="q" class="form-control" style="flex: 1; min-width: 220px;" placeholder="Booking number (e.g. 12) or customer name" value="<?= e($search) ?>" maxlength="100">
+        <button type="submit" class="btn btn-primary">Search</button>
+        <?php if ($search !== ''): ?>
+            <a href="<?= url('/owner/check-in') ?>" class="btn btn-secondary">Clear</a>
+        <?php endif; ?>
+    </form>
+</div>
 
- <!-- Today's Check-in Queue -->
- <div class="card">
- <div class="card-header">
- <h3 style="font-size: 16px; margin-bottom: 0;">Today's Court Arrivals Schedule</h3>
- <span class="text-xs text-muted">Thursday, Sept 24, 2026</span>
- </div>
- <div class="table-responsive">
- <table class="data-table">
- <thead>
- <tr>
- <th>Booking ID</th>
- <th>Customer Name & Standing</th>
- <th>Court & Time Slot</th>
- <th>Payment Mode</th>
- <th>Status</th>
- <th style="text-align: right;">Verification Action</th>
- </tr>
- </thead>
- <tbody id="checkInTableBody">
- 
- <!-- Check-in Row 1 -->
- <tr class="checkin-row" data-code="cp-78190" data-name="kasun jayawardena">
- <td>
- <strong>#3</strong>
- <div class="text-xs text-muted">#3</div>
- </td>
- <td>
- <strong>Kasun Jayawardena</strong>
- <span class="tier-badge tier-standard" style="font-size: 10px; margin-left: 4px;">88% Standard</span>
- </td>
- <td>
- <strong>Turf Court 1</strong>
- <div class="text-xs text-muted">08:00 PM - 09:00 PM</div>
- </td>
- <td><span class="badge badge-paid">Online Paid</span></td>
- <td><span class="badge badge-confirmed" id="status-9021">Confirmed</span></td>
- <td style="text-align: right;">
- <button type="button" class="btn btn-sm btn-primary" id="btn-checkin-9021" onclick="CourtPassApp.confirmPost('Confirm Check-in', 'Mark this customer as arrived for booking #3?', 'Check In', '/owner/bookings/3/check-in')">
- Mark Checked-In
- </button>
- </td>
- </tr>
+<div class="card">
+    <div class="card-header">
+        <h3 style="font-size: 16px; margin-bottom: 0;"><?= $desk['found'] !== null ? 'Booking #' . e($desk['found']['id']) : "Today's Arrivals" ?></h3>
+        <span class="text-xs text-muted"><?= e(format_datetime($desk['date'], false)) ?></span>
+    </div>
 
- <!-- Check-in Row 2 -->
- <tr class="checkin-row" data-code="cp-65201" data-name="nuwan perera">
- <td>
- <strong>#4</strong>
- <div class="text-xs text-muted">#4</div>
- </td>
- <td>
- <strong>Nuwan Perera</strong>
- <span class="tier-badge tier-standard" style="font-size: 10px; margin-left: 4px;">92% Standard</span>
- </td>
- <td>
- <strong>Turf Court 2</strong>
- <div class="text-xs text-muted">06:00 PM - 07:00 PM</div>
- </td>
- <td><span class="badge badge-unpaid">Cash on Arrival (LKR 4,500)</span></td>
- <td><span class="badge badge-completed">Checked-In</span></td>
- <td style="text-align: right;">
- <span class="text-xs" style="color: var(--color-primary); font-weight: 700;"> Checked-In & Paid</span>
- </td>
- </tr>
-
- <!-- Check-in Row 3 -->
- <tr class="checkin-row" data-code="cp-54120" data-name="shenal gunaratne">
- <td>
- <strong>#1</strong>
- <div class="text-xs text-muted">#1</div>
- </td>
- <td>
- <strong>Shenal Gunaratne</strong>
- <span class="tier-badge tier-restricted" style="font-size: 10px; margin-left: 4px;">62% Restricted</span>
- </td>
- <td>
- <strong>Wooden Badminton Court A</strong>
- <div class="text-xs text-muted">07:00 PM - 08:00 PM</div>
- </td>
- <td><span class="badge badge-paid">Online Paid</span></td>
- <td><span class="badge badge-confirmed">Confirmed</span></td>
- <td style="text-align: right;">
- <button type="button" class="btn btn-sm btn-primary" onclick="CourtPassApp.confirmPost('Confirm Check-in', 'Mark this customer as arrived for booking #1?', 'Check In', '/owner/bookings/1/check-in')">
- Mark Checked-In
- </button>
- </td>
- </tr>
-
- </tbody>
- </table>
- </div>
- </div>
-
- 
- 
-
-
-<script>
-function filterCheckIns() {
- const query = (document.getElementById('checkInSearchInput').value || '').trim().toLowerCase();
- document.querySelectorAll('#checkInTableBody .checkin-row').forEach(row => {
- const code = row.dataset.code;
- const name = row.dataset.name;
- const match = !query || code.includes(query) || name.includes(query);
- row.style.display = match ? '' : 'none';
- });
-}
-
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
- if (document.getElementById('checkInSearchInput').value) {
- filterCheckIns();
- }
-});
-</script>
+    <?php if ($desk['bookings'] === []): ?>
+        <div class="card-body" style="text-align: center; color: var(--color-text-muted);">
+            <?= e($desk['message'] ?? 'No confirmed bookings at your venues today.') ?>
+        </div>
+    <?php else: ?>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Booking</th>
+                        <th>Customer</th>
+                        <th>Venue and Court</th>
+                        <th>Time</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($desk['bookings'] as $b): ?>
+                        <tr>
+                            <td><a href="<?= url('/owner/bookings/' . $b['id']) ?>"><strong>#<?= e($b['id']) ?></strong></a></td>
+                            <td>
+                                <strong><?= e($b['customer_name']) ?></strong>
+                                <span class="tier-badge tier-<?= e($b['reliability_tier']) ?>" style="font-size: 10px; margin-left: 4px;"><?= $b['reliability_score'] === null ? '' : e(round($b['reliability_score'])) . '% ' ?><?= e(status_label($b['reliability_tier'])) ?></span>
+                            </td>
+                            <td>
+                                <strong><?= e($b['court_name']) ?></strong>
+                                <div class="text-xs text-muted"><?= e($b['venue_name']) ?></div>
+                            </td>
+                            <td>
+                                <?= e($b['start']) ?> to <?= e($b['end']) ?>
+                                <?php if ($b['slot_date'] !== $desk['date']): ?>
+                                    <div class="text-xs text-muted"><?= e(format_datetime($b['slot_date'], false)) ?></div>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if ($b['payment_method'] === 'cash_on_arrival'): ?>
+                                    <span class="badge badge-unpaid">Cash on arrival: collect <?= e(lkr($b['amount'])) ?></span>
+                                <?php else: ?>
+                                    <span class="badge badge-paid">Paid online</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if ($b['desk_state'] === 'checked_in'): ?>
+                                    <span class="badge badge-status-completed">Checked in <?= e(date('H:i', strtotime($b['checked_in_at']))) ?></span>
+                                <?php elseif ($b['desk_state'] === 'missed'): ?>
+                                    <span class="badge badge-secondary">Ended, no check-in</span>
+                                <?php else: ?>
+                                    <?= status_badge($b['status']) ?>
+                                <?php endif; ?>
+                            </td>
+                            <td style="text-align: right;">
+                                <?php if ($b['can_check_in']): ?>
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="CourtPassApp.confirmPost('Confirm Check-in', <?= e(json_encode('Mark ' . $b['customer_name'] . ' as arrived for booking #' . $b['id'] . '?')) ?>, 'Check In', <?= e(json_encode($postPath($b['id']))) ?>)">
+                                        Mark Checked-In
+                                    </button>
+                                <?php elseif ($b['desk_state'] === 'waiting'): ?>
+                                    <span class="text-xs text-muted">Opens <?= $b['slot_date'] !== $desk['date'] ? e(format_datetime($b['slot_date'], false)) . ', ' : 'at ' ?><?= e($b['check_in_opens']) ?></span>
+                                <?php elseif ($b['desk_state'] === null): ?>
+                                    <span class="text-xs text-muted">Only confirmed bookings can be checked in</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
+</div>

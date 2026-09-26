@@ -44,8 +44,9 @@ class BookingController extends Controller
     public function index(): void
     {
         $this->view('customer/bookings', [
-            'title'    => 'My Bookings',
-            'bookings' => (new BookingService())->customerBookings(Auth::id()),
+            'title'      => 'My Bookings',
+            'bookings'   => (new BookingService())->customerBookings(Auth::id()),
+            'reviewable' => (new ReviewService())->reviewableBookingIds(Auth::id()),
         ], 'dashboard');
     }
 
