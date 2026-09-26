@@ -1,5 +1,5 @@
 <?php
-/** @var array $bookings */
+/** @var array $bookings @var array $reviewable booking ids the customer can still review */
 ?>
 <div class="page-header">
  <div>
@@ -87,7 +87,7 @@
  Cancel
  </a>
  <?php endif; ?>
- <?php if ($b['status'] === 'completed'): ?>
+ <?php if (in_array($b['id'], $reviewable, true)): ?>
  <a href="<?= url('/customer/bookings/' . $b['id'] . '/review') ?>" class="btn btn-sm btn-outline">
  Write Review
  </a>

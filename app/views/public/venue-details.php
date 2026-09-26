@@ -19,7 +19,7 @@
                 </p>
                 <div style="display: flex; align-items: center; gap: 12px; font-size: 13px; flex-wrap: wrap;">
                     <span style="font-weight: 700; color: #d97706;">
-                        <?= $venue['avg_rating'] !== null ? e(number_format((float) $venue['avg_rating'], 1)) . ' (' . e($venue['review_count']) . ' reviews)' : 'No reviews yet' ?>
+                        <?= $venue['avg_rating'] !== null ? e(number_format((float) $venue['avg_rating'], 1)) . ' (' . e($venue['review_count']) . ($venue['review_count'] === 1 ? ' review)' : ' reviews)') : 'No reviews yet' ?>
                     </span>
                     <span style="color: var(--color-border-strong);">|</span>
                     <?php foreach ($venue['sports'] as $sport): ?>
@@ -27,7 +27,9 @@
                     <?php endforeach; ?>
                 </div>
             </div>
-            <a href="<?= url('/courts/' . (int) ($courts[0]['id'] ?? 0)) ?>" class="btn btn-primary">Check Slot Availability</a>
+            <?php if ($courts !== []): ?>
+                <a href="<?= url('/courts/' . (int) $courts[0]['id']) ?>" class="btn btn-primary">Check Slot Availability</a>
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -71,6 +73,9 @@
                         <span class="text-sm" style="color: var(--color-text-muted);"><?= e(count($courts)) ?> court<?= count($courts) === 1 ? '' : 's' ?></span>
                     </div>
                     <div class="card-body" style="padding: 0;">
+                        <?php if ($courts === []): ?>
+                            <p class="text-sm" style="padding: 16px 20px; margin-bottom: 0; color: var(--color-text-muted);">Courts are being set up. Check back soon.</p>
+                        <?php endif; ?>
                         <?php foreach ($courts as $court): ?>
                             <div style="padding: 16px 20px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
                                 <div>
@@ -94,7 +99,7 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card" id="reviews">
                     <div class="card-header">
                         <h3 style="font-size: 17px; margin-bottom: 0;">Reviews</h3>
                         <span class="badge badge-verified">Check-in verified only</span>
@@ -129,15 +134,15 @@
                     <div class="card-body">
                         <h3 style="font-size: 15px; margin-bottom: 10px;">Ready to play?</h3>
                         <p class="text-sm" style="color: var(--color-text-muted); margin-bottom: 14px;">
-                            Pick a court to see its one-hour slots for any day.
+                            <?= $courts === [] ? 'Courts at this venue are being set up.' : 'Pick a court to see its one-hour slots for any day.' ?>
                         </p>
                         <?php if (!Auth::check()): ?>
                             <a href="<?= url('/login') ?>" class="btn btn-primary btn-block btn-sm">Log In to Book</a>
                             <div class="text-xs text-muted" style="margin-top: 8px; text-align: center;">
                                 New here? <a href="<?= url('/register/customer') ?>">Create a customer account</a>
                             </div>
-                        <?php else: ?>
-                            <a href="<?= url('/courts/' . (int) ($courts[0]['id'] ?? 0)) ?>" class="btn btn-primary btn-block btn-sm">Check Availability</a>
+                        <?php elseif ($courts !== []): ?>
+                            <a href="<?= url('/courts/' . (int) $courts[0]['id']) ?>" class="btn btn-primary btn-block btn-sm">Check Availability</a>
                         <?php endif; ?>
                     </div>
                 </div>

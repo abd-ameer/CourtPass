@@ -143,6 +143,10 @@ $router->put('/customer/reviews/{id}', [ReviewController::class, 'update'], ['cu
 $router->delete('/customer/reviews/{id}', [ReviewController::class, 'destroy'], ['customer']);
 $router->get('/admin/reviews', [ReviewController::class, 'moderation'], ['admin']);
 $router->post('/admin/reviews/{id}/remove', [ReviewController::class, 'remove'], ['admin']);
+$router->post('/admin/reviews/{id}/dismiss-flag', [ReviewController::class, 'dismissFlag'], ['admin']);
+$router->get('/owner/reviews', [ReviewController::class, 'ownerIndex'], ['owner']);
+$router->post('/owner/reviews/{id}/response', [ReviewController::class, 'respond'], ['owner']);
+$router->post('/owner/reviews/{id}/flag', [ReviewController::class, 'flag'], ['owner']);
 
 $router->get('/owner/check-in', [CheckInController::class, 'index'], ['owner']);
 $router->post('/owner/bookings/{id}/check-in', [CheckInController::class, 'store'], ['owner']);

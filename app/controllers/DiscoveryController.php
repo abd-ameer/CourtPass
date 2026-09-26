@@ -28,48 +28,20 @@ class DiscoveryController extends Controller
 
     public function venues(): void
     {
-        // TODO: filter approved, active venues by sport, city and name in the discovery service.
-        $this->view('public/venues', [
-            'title'   => 'Browse Venues',
-            'venues'  => $this->sampleVenues(),
-            'sports'  => $this->sampleSports(),
-            'cities'  => ['Colombo', 'Kandy'],
-            'filters' => [
-                'sport' => (string) $this->request->query('sport', ''),
-                'city'  => (string) $this->request->query('city', ''),
-                'q'     => (string) $this->request->query('q', ''),
-            ],
-        ]);
+        $this->view('public/venues', ['title' => 'Browse Venues'] + (new DiscoveryService())->browse(
+            $this->text('sport'),
+            $this->text('city'),
+            $this->text('q')
+        ));
     }
 
     public function venue(string $slug): void
     {
-        // TODO: load the approved venue by slug (404 otherwise) with its courts, active announcements and reviews.
-        $venue = [
-            'id' => 1, 'slug' => $slug, 'name' => 'Colombo Sports Hub', 'city' => 'Colombo',
-            'address' => '45 Galle Road, Colombo 03', 'contact_phone' => '0112345678',
-            'description' => 'Indoor futsal, badminton and table tennis courts. Air-conditioned, open 7 days.',
-            'sports' => ['Futsal', 'Badminton', 'Table Tennis'], 'avg_rating' => 5.0, 'review_count' => 1,
-        ];
-        $courts = [
-            ['id' => 1, 'name' => 'Futsal Court A', 'sport' => 'Futsal', 'hourly_rate' => 5000.00, 'has_flash' => true],
-            ['id' => 2, 'name' => 'Futsal Court B', 'sport' => 'Futsal', 'hourly_rate' => 5000.00, 'has_flash' => false],
-            ['id' => 3, 'name' => 'Badminton Court 1', 'sport' => 'Badminton', 'hourly_rate' => 2000.00, 'has_flash' => false],
-        ];
-        $announcements = [
-            ['type' => 'operational', 'title' => 'New LED lighting on the badminton courts', 'body' => 'All badminton courts now have glare-free overhead lighting.', 'posted_at' => '2026-09-20 09:00:00'],
-        ];
-        $reviews = [
-            ['author' => 'Saman Kumara', 'rating' => 5, 'comment' => 'Great courts and easy check-in.', 'created_at' => '2026-09-19 20:00:00',
-             'response' => 'Thanks Saman, see you next week!'],
-        ];
-        $this->view('public/venue-details', [
-            'title'         => $venue['name'],
-            'venue'         => $venue,
-            'courts'        => $courts,
-            'announcements' => $announcements,
-            'reviews'       => $reviews,
-        ]);
+        $page = (new DiscoveryService())->venuePage($slug);
+        if ($page === null) {
+            $this->notFound();
+        }
+        $this->view('public/venue-details', ['title' => $page['venue']['name']] + $page);
     }
 
     public function help(): void
@@ -106,5 +78,12 @@ class DiscoveryController extends Controller
                 'has_flash' => false, 'first_court_id' => 6,
             ],
         ];
+    }
+
+    /** A text query or form field; anything that is not a string counts as empty. */
+    private function text(string $key, bool $fromQuery = true): string
+    {
+        $value = $fromQuery ? $this->request->query($key, '') : $this->request->input($key, '');
+        return is_string($value) ? $value : '';
     }
 }

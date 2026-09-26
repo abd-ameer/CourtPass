@@ -4,6 +4,7 @@
  * @var int|null $bookingId venue review of this booking
  * @var int|null $registrationId coach review of this registration
  * @var int|null $reviewId editing an existing review
+ * Optional (venue reviews): string $subject, int $rating, string $comment, ?string $reviewUntil, array $errors
  */
 $isEdit = $reviewId !== null;
 if ($isEdit) {
@@ -13,10 +14,13 @@ if ($isEdit) {
 } else {
     $action = '/customer/bookings/' . $bookingId . '/review';
 }
-// TODO: the subject, date and current rating/comment come from the review, booking or registration.
-$subject = $target === 'coach' ? 'Coach Ashan Weerasinghe (Beginner Badminton Basics)' : 'Colombo Sports Hub (Badminton Court 1)';
-$rating = 5;
-$comment = '';
+// TODO: the coach review subject, rating and comment come from the registration (coach reviews).
+$subject ??= $target === 'coach' ? 'Coach Ashan Weerasinghe (Beginner Badminton Basics)' : 'Colombo Sports Hub (Badminton Court 1)';
+$rating ??= 5;
+$comment ??= '';
+$reviewUntil ??= null;
+$errors ??= [];
+$invalid = fn (string $f) => isset($errors[$f]) ? ' is-invalid' : '';
 ?>
 <div class="page-header">
     <div>
@@ -38,6 +42,9 @@ $comment = '';
         <?= $target === 'coach'
             ? 'you can review a coach once per session you were marked Attended for, within 7 days of the session.'
             : 'you can review a venue once per checked-in booking, within 7 days of the check-in.' ?>
+        <?php if ($reviewUntil !== null): ?>
+            <br>This booking can be reviewed until <?= e(format_datetime($reviewUntil)) ?>.
+        <?php endif; ?>
     </div>
 
     <form id="reviewForm" method="POST" action="<?= url($action) ?>" novalidate>
@@ -54,12 +61,15 @@ $comment = '';
                 <?php endfor; ?>
             </div>
             <input type="hidden" name="rating" id="selectedRating" value="<?= e($rating) ?>">
+            <?php if (isset($errors['rating'])): ?>
+                <span class="form-feedback invalid" style="display: block;"><?= e($errors['rating']) ?></span>
+            <?php endif; ?>
         </div>
 
         <div class="form-group">
             <label class="form-label" for="reviewComment">Comment <span class="required-star">*</span></label>
-            <textarea name="comment" id="reviewComment" class="form-control" rows="4" maxlength="2000" required><?= e($comment) ?></textarea>
-            <span class="form-feedback invalid"></span>
+            <textarea name="comment" id="reviewComment" class="form-control<?= $invalid('comment') ?>" rows="4" maxlength="2000" required><?= e($comment) ?></textarea>
+            <span class="form-feedback invalid"><?= e($errors['comment'] ?? '') ?></span>
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: var(--space-6);">
