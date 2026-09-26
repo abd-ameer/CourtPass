@@ -65,7 +65,7 @@ class VenueService
 
     /**
      * Updates details and sports. A rejected venue goes back to pending (resubmitted); other statuses are kept.
-     * Returns true when the venue was resubmitted.
+     * Returns true when the venue was resubmitted. The audit entry lists the removed and added sports.
      */
     public function update(int $ownerId, int $venueId, array $data): bool
     {
@@ -86,13 +86,19 @@ class VenueService
             }
 
             $this->venues->updateDetails($venueId, $data['name'], $data['description'] ?? null, $data['address'], $data['city'], $data['contact_phone']);
+            $added = array_values(array_diff($sportIds, $current));
             $this->venueSports->removeAll($venueId, $removed);
-            $this->venueSports->addAll($venueId, array_values(array_diff($sportIds, $current)));
+            $this->venueSports->addAll($venueId, $added);
 
             $resubmitted = $venue['status'] === 'rejected' && $this->venues->resubmit($venueId) === 1;
             (new AuditService())->log($ownerId, 'venue.updated', 'venue', $venueId, $venue['status'],
                 $resubmitted ? 'pending' : $venue['status'],
-                json_encode(['resubmitted' => $resubmitted, 'sport_type_ids' => $sportIds]));
+                json_encode([
+                    'resubmitted'            => $resubmitted,
+                    'sport_type_ids'         => $sportIds,
+                    'removed_sport_type_ids' => array_map('intval', $removed),
+                    'added_sport_type_ids'   => array_map('intval', $added),
+                ]));
             return $resubmitted;
         });
     }

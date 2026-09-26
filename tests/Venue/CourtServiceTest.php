@@ -115,6 +115,19 @@ class CourtServiceTest extends DatabaseTestCase
         $this->assertSame('court.hours_updated', $this->fetchValue("SELECT event_type FROM audit_log WHERE entity_type = 'court' AND entity_id = 3"));
     }
 
+    public function testHoursAuditKeepsTheOldAndNewWeek(): void
+    {
+        $this->service->updateHours(2, 3, [1 => ['open' => '10:00', 'close' => '24:00']]);
+
+        $details = json_decode($this->fetchValue(
+            "SELECT details FROM audit_log WHERE event_type = 'court.hours_updated' AND entity_id = 3"
+        ), true);
+        $this->assertCount(7, $details['old_hours']);
+        $this->assertSame(['open' => '06:00', 'close' => '22:00'], $details['old_hours']['1']);
+        $this->assertSame(['open' => '08:00', 'close' => '23:00'], $details['old_hours']['7']);
+        $this->assertSame(['1' => ['open' => '10:00', 'close' => '24:00']], $details['hours']);
+    }
+
     public function testOnlyTheOwnerCanUpdateHoursAndBadHoursChangeNothing(): void
     {
         foreach ([[3, 3, self::week()], [2, 3, self::week('09:00', '09:00')]] as [$owner, $court, $hours]) {
