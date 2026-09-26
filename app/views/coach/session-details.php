@@ -1,160 +1,162 @@
+<?php
+/** @var array $session */
+$s = $session;
+$shareUrl = url($s['share_path']);
+?>
 <div class="page-header">
- <div>
- <div class="breadcrumb">
- <span>Coach Portal</span>
- <span class="breadcrumb-separator">/</span>
- <a href="<?= url('/coach/sessions') ?>">Sessions</a>
- <span class="breadcrumb-separator">/</span>
- <span>#2</span>
- </div>
- <h1 class="page-title">Badminton Fundamentals</h1>
- <div class="page-subtitle">Session #2 · Public coaching session at CR&FC Badminton Complex</div>
- </div>
- <div style="display: flex; gap: 10px;">
- <a href="<?= url('/coach/sessions/2/edit') ?>" class="btn btn-outline">️ Edit Session</a>
- <a href="<?= url('/coach/sessions/2/attendance') ?>" class="btn btn-primary"> Mark Attendance</a>
- </div>
- </div>
-
- <div class="grid grid-cols-3 gap-6">
- 
- <!-- Left: Session Info -->
- <div style="grid-column: span 2;">
-
- <!-- Session Overview Card -->
- <div class="card" style="margin-bottom: var(--space-6);">
- <div class="card-header">
- <h3 style="font-size: 15px; margin-bottom: 0;">Session Overview</h3>
- <span class="badge badge-confirmed">Upcoming</span>
- </div>
- <div class="card-body">
- <div class="grid grid-cols-2 gap-4" style="margin-bottom: var(--space-4);">
- <div>
- <div class="text-xs text-muted" style="margin-bottom: 2px;">Venue</div>
- <div style="font-weight: 600;">CR&FC Badminton Complex</div>
- <div class="text-xs text-muted">Longdon Place, Colombo 07</div>
- </div>
- <div>
- <div class="text-xs text-muted" style="margin-bottom: 2px;">Court</div>
- <div style="font-weight: 600;">Court 2 (Wooden)</div>
- </div>
- <div>
- <div class="text-xs text-muted" style="margin-bottom: 2px;">Date & Time</div>
- <div style="font-weight: 600;">September 22, 2026</div>
- <div class="text-xs text-muted">05:00 PM - 06:00 PM (1 Hour)</div>
- </div>
- <div>
- <div class="text-xs text-muted" style="margin-bottom: 2px;">Sport & Level</div>
- <div style="font-weight: 600;"> Badminton — Intermediate</div>
- </div>
- </div>
- <div>
- <div class="text-xs text-muted" style="margin-bottom: 4px;">Description</div>
- <p style="font-size: 14px; line-height: 1.7; color: var(--color-text-body);">
- Learn the essential badminton fundamentals including proper grip techniques, forehand and backhand drives, 
- basic footwork patterns, and serving rules. This session is designed for intermediate players looking to 
- refine their foundations. Bring your own racket and wear non-marking shoes.
- </p>
- </div>
- </div>
- </div>
-
- <!-- Registered Students -->
- <div class="card" style="margin-bottom: var(--space-6);">
- <div class="card-header">
- <h3 style="font-size: 15px; margin-bottom: 0;">Registered Students (6 / 8)</h3>
- <a href="<?= url('/coach/sessions/2/registrations') ?>" style="font-size: 12px; font-weight: 600;">Full List &rarr;</a>
- </div>
- <div class="card-body" style="padding: 0;">
- <?php
- $students = [
- ['initials' => 'NK', 'name' => 'Nuwan Karunanayake', 'time' => '2 hrs ago', 'bg' => '#dbeafe', 'color' => '#1d4ed8'],
- ['initials' => 'RP', 'name' => 'Ruwan Perera', 'time' => 'Yesterday', 'bg' => '#d1fae5', 'color' => '#065f46'],
- ['initials' => 'KD', 'name' => 'Kasun De Silva', 'time' => '2 days ago', 'bg' => '#fef3c7', 'color' => '#92400e'],
- ['initials' => 'MA', 'name' => 'Malini Amarasinghe', 'time' => '3 days ago', 'bg' => '#fce7f3', 'color' => '#be185d'],
- ['initials' => 'TF', 'name' => 'Tharindu Fernando', 'time' => '4 days ago', 'bg' => '#ede9fe', 'color' => '#6d28d9'],
- ['initials' => 'DS', 'name' => 'Dhanushi Senanayake', 'time' => '5 days ago', 'bg' => '#fef3c7', 'color' => '#92400e'],
- ];
- foreach ($students as $i => $s):
- $border = ($i < count($students) - 1) ? 'border-bottom: 1px solid var(--color-border);' : '';
- ?>
- <div style="padding: 12px 16px; display: flex; align-items: center; gap: 12px; <?php echo $border; ?>">
- <div style="width: 36px; height: 36px; background: <?php echo $s['bg']; ?>; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: <?php echo $s['color']; ?>; font-size: 13px;"><?php echo $s['initials']; ?></div>
- <div style="flex: 1;">
- <div style="font-weight: 600; font-size: 13px;"><?php echo $s['name']; ?></div>
- <div class="text-xs text-muted">Registered <?php echo $s['time']; ?></div>
- </div>
- <span class="badge badge-paid">Paid LKR 1,500</span>
- </div>
- <?php endforeach; ?>
- </div>
- </div>
-
- </div>
-
- <!-- Right: Summary & Actions -->
- <div>
- <!-- Financial Summary -->
- <div class="card" style="margin-bottom: var(--space-6);">
- <div class="card-header" style="background: #f0fdf4;">
- <h3 style="font-size: 15px; margin-bottom: 0; color: #166534;"> Revenue Summary</h3>
- </div>
- <div class="card-body">
- <div style="font-size: 13px;">
- <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--color-border-light);">
- <span class="text-muted">Fee / Person</span>
- <strong>LKR 1,500</strong>
- </div>
- <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--color-border-light);">
- <span class="text-muted">Registrations</span>
- <strong>6 / 8</strong>
- </div>
- </div>
- <div style="margin-top: var(--space-3); padding-top: var(--space-3); border-top: 2px solid var(--color-primary);">
- <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700;">
- <span>Fees Collected</span>
- <span style="color: var(--color-primary);">LKR 9,000</span>
- </div>
- </div>
- </div>
- </div>
-
- <!-- Session Type -->
- <div class="card" style="margin-bottom: var(--space-6);">
- <div class="card-header">
- <h3 style="font-size: 15px; margin-bottom: 0;">Visibility</h3>
- </div>
- <div class="card-body">
- <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
- <span class="badge badge-confirmed" style="font-size: 13px;"> Public Session</span>
- </div>
- <div class="text-xs text-muted">
- This session is visible on the public coaching directory. Any logged-in customer can register.
- </div>
- </div>
- </div>
-
- <!-- Quick Actions -->
- <div class="card">
- <div class="card-header">
- <h3 style="font-size: 15px; margin-bottom: 0;">Quick Actions</h3>
- </div>
- <div class="card-body" style="display: flex; flex-direction: column; gap: 8px;">
- <a href="<?= url('/coach/sessions/2/attendance') ?>" class="btn btn-primary" style="text-align: center;">
- Mark Attendance
- </a>
- <a href="<?= url('/coach/sessions/2/edit') ?>" class="btn btn-outline" style="text-align: center;">
- ️ Edit Session
- </a>
- <a href="<?= url('/coach/sessions/2/registrations') ?>" class="btn btn-outline" style="text-align: center;">
- View All Registrations
- </a>
- <a href="<?= url('/coach/sessions/2/cancel') ?>" class="btn btn-secondary" style="text-align: center; color: var(--color-danger);">
- Cancel Session
- </a>
- </div>
- </div>
-
- </div>
+    <div>
+        <div class="breadcrumb">
+            <a href="<?= url('/coach/dashboard') ?>">Coach Portal</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="<?= url('/coach/sessions') ?>">Sessions</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>#<?= (int) $s['id'] ?></span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <h1 class="page-title"><?= e($s['title']) ?></h1>
+            <?= status_badge($s['status']) ?>
+            <span class="badge <?= $s['visibility'] === 'private' ? 'badge-warning' : 'badge-confirmed' ?>"><?= $s['visibility'] === 'private' ? 'Private' : 'Public' ?></span>
+        </div>
+        <div class="page-subtitle">Session #<?= (int) $s['id'] ?> at <?= e($s['venue_name']) ?>, <?= e($s['court_name']) ?></div>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <?php if ($s['can_edit']): ?>
+            <a href="<?= url('/coach/sessions/' . $s['id'] . '/edit') ?>" class="btn btn-outline">Edit Session</a>
+        <?php endif; ?>
+        <?php if ($s['status'] === 'completed'): ?>
+            <a href="<?= url('/coach/sessions/' . $s['id'] . '/attendance') ?>" class="btn btn-primary">Mark Attendance</a>
+        <?php endif; ?>
+    </div>
 </div>
 
+<div class="grid grid-cols-3 gap-6">
+    <div style="grid-column: span 2;">
+        <div class="card" style="margin-bottom: var(--space-6);">
+            <div class="card-header">
+                <h3 style="font-size: 15px; margin-bottom: 0;">Session Overview</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-2 gap-4" style="margin-bottom: var(--space-4);">
+                    <div>
+                        <div class="text-xs text-muted">Venue</div>
+                        <div style="font-weight: 600;"><?= e($s['venue_name']) ?></div>
+                        <div class="text-xs text-muted"><?= e($s['venue_address']) ?>, <?= e($s['venue_city']) ?></div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-muted">Court</div>
+                        <div style="font-weight: 600;"><?= e($s['court_name']) ?></div>
+                        <div class="text-xs text-muted"><?= e($s['sport_name']) ?></div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-muted">Date and Time</div>
+                        <div style="font-weight: 600;"><?= e(format_datetime($s['session_date'], false)) ?></div>
+                        <div class="text-xs text-muted"><?= e($s['start']) ?> to <?= e($s['end']) ?> (1 hour)</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-muted">Fee and Capacity</div>
+                        <div style="font-weight: 600;"><?= e($s['fee_label']) ?><?= $s['fee'] > 0 ? ' per person' : '' ?></div>
+                        <div class="text-xs text-muted"><?= (int) $s['registration_count'] ?> of <?= (int) $s['capacity'] ?> places taken</div>
+                    </div>
+                </div>
+                <div class="text-xs text-muted" style="margin-bottom: 4px;">Description</div>
+                <p style="font-size: 14px; line-height: 1.7; margin-bottom: 0;"><?= nl2br(e($s['description'] ?? '')) ?></p>
+            </div>
+        </div>
+
+        <?php if ($s['status'] === 'cancelled'): ?>
+            <div class="card" style="margin-bottom: var(--space-6); padding: var(--space-4); border: 1px solid var(--color-danger-border);">
+                <strong>Cancelled <?= e(format_datetime($s['cancelled_at'])) ?>.</strong> Reason: <?= e($s['cancel_reason'] ?? '') ?>
+            </div>
+        <?php endif; ?>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 style="font-size: 15px; margin-bottom: 0;">Registrations (<?= (int) $s['registration_count'] ?> / <?= (int) $s['capacity'] ?>)</h3>
+                <a href="<?= url('/coach/sessions/' . $s['id'] . '/registrations') ?>" style="font-size: 12px; font-weight: 600;">Full list &rarr;</a>
+            </div>
+            <?php if ($s['registrations'] === []): ?>
+                <div class="empty-state">
+                    <div class="empty-state-desc">No one has registered yet.</div>
+                </div>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Registered</th>
+                                <th>Paid</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($s['registrations'] as $r): ?>
+                                <tr>
+                                    <td>
+                                        <strong><?= e($r['customer_name']) ?></strong>
+                                        <div class="text-xs text-muted"><?= e($r['customer_email']) ?></div>
+                                    </td>
+                                    <td><?= e(format_datetime($r['created_at'])) ?></td>
+                                    <td>
+                                        <?= $r['paid_amount'] !== null ? e(lkr($r['paid_amount'])) : '<span class="text-muted">Not paid</span>' ?>
+                                        <?php if ($r['refund_amount'] !== null): ?>
+                                            <div class="text-xs text-muted">Refunded <?= e(lkr($r['refund_amount'])) ?></div>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?= status_badge($r['status']) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div>
+        <div class="card" style="margin-bottom: var(--space-6);">
+            <div class="card-header">
+                <h3 style="font-size: 15px; margin-bottom: 0;"><?= $s['visibility'] === 'private' ? 'Private Link' : 'Share Link' ?></h3>
+            </div>
+            <div class="card-body">
+                <p class="text-xs text-muted" style="margin-bottom: 8px;">
+                    <?= $s['visibility'] === 'private'
+                        ? 'Only people with this link can open and join the session.'
+                        : 'This session is listed on the Coaching page. Share this link to send people straight to it.' ?>
+                </p>
+                <input type="text" id="shareLink" class="form-control" value="<?= e($shareUrl) ?>" readonly>
+                <button type="button" class="btn btn-sm btn-outline" style="margin-top: 8px; width: 100%;" onclick="copyShareLink()">Copy Link</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 style="font-size: 15px; margin-bottom: 0;">Actions</h3>
+            </div>
+            <div class="card-body" style="display: flex; flex-direction: column; gap: 8px;">
+                <?php if ($s['can_edit']): ?>
+                    <a href="<?= url('/coach/sessions/' . $s['id'] . '/edit') ?>" class="btn btn-outline" style="text-align: center;">Edit Details</a>
+                <?php endif; ?>
+                <a href="<?= url('/coach/sessions/' . $s['id'] . '/registrations') ?>" class="btn btn-outline" style="text-align: center;">View Registrations</a>
+                <?php if ($s['status'] === 'completed'): ?>
+                    <a href="<?= url('/coach/sessions/' . $s['id'] . '/attendance') ?>" class="btn btn-primary" style="text-align: center;">Mark Attendance</a>
+                <?php endif; ?>
+                <?php if ($s['can_cancel']): ?>
+                    <a href="<?= url('/coach/sessions/' . $s['id'] . '/cancel') ?>" class="btn btn-secondary" style="text-align: center; color: var(--color-danger);">Cancel Session</a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('shareLink').value = new URL(document.getElementById('shareLink').value, window.location.origin).href;
+
+function copyShareLink() {
+    const input = document.getElementById('shareLink');
+    const link = new URL(input.value, window.location.origin).href;
+    (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject())
+        .then(() => CourtPassApp.showToast('success', 'Copied', 'The session link is on your clipboard.'))
+        .catch(() => { input.value = link; input.select(); });
+}
+</script>

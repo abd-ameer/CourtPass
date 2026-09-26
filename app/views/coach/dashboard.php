@@ -1,3 +1,6 @@
+<?php
+/** @var string $coachName @var array $upcoming upcoming sessions, soonest first @var bool $hasVenues */
+?>
 <div class="page-header">
  <div>
  <div class="breadcrumb">
@@ -5,7 +8,7 @@
  <span class="breadcrumb-separator">/</span>
  <span>Dashboard</span>
  </div>
- <h1 class="page-title">Welcome back, Coach Dilshan </h1>
+ <h1 class="page-title">Welcome back, <?= e($coachName) ?></h1>
  <div class="page-subtitle">Track your coaching sessions, earnings, and student engagement at a glance.</div>
  </div>
 
@@ -27,8 +30,8 @@
  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
  </div>
  <div>
- <div class="stat-value">8</div>
- <div class="stat-label">Active Sessions This Month</div>
+ <div class="stat-value"><?= count($upcoming) ?></div>
+ <div class="stat-label">Upcoming Sessions</div>
  </div>
  </div>
 
@@ -64,76 +67,65 @@
 
  </div>
 
- <!-- Upcoming Sessions Today -->
- <div class="card" style="margin-bottom: var(--space-6); border: 2px solid #bbf7d0;">
- <div class="card-header" style="background: #f0fdf4;">
- <div style="display: flex; align-items: center; gap: 8px;">
- <span style="font-size: 16px;"></span>
- <h3 style="font-size: 15px; color: #166534; margin-bottom: 0;">Today's Sessions — September 22, 2026</h3>
- </div>
- <span class="badge badge-confirmed">2 Sessions</span>
- </div>
- <div class="table-responsive">
- <table class="data-table">
- <thead>
- <tr>
- <th>Session</th>
- <th>Venue & Court</th>
- <th>Time</th>
- <th>Registrations</th>
- <th>Type</th>
- <th style="text-align: right;">Actions</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td>
- <strong>Badminton Fundamentals</strong>
- <div class="text-xs text-muted">Session #2 · 1 Hour</div>
- </td>
- <td>
- <strong>CR&FC Badminton Complex</strong>
- <div class="text-xs text-muted">Court 2 (Wooden)</div>
- </td>
- <td>
- <span class="badge badge-info">05:00 PM - 06:00 PM</span>
- </td>
- <td>
- <strong>6 / 8</strong>
- <div class="text-xs text-muted">2 spots available</div>
- </td>
- <td><span class="badge badge-confirmed">Public</span></td>
- <td style="text-align: right;">
- <a href="<?= url('/coach/sessions/2') ?>" class="btn btn-sm btn-outline">View</a>
- <a href="<?= url('/coach/sessions/2/attendance') ?>" class="btn btn-sm btn-primary">Mark Attendance</a>
- </td>
- </tr>
- <tr>
- <td>
- <strong>Advanced Doubles Strategy</strong>
- <div class="text-xs text-muted">Session #1 · 1 Hour</div>
- </td>
- <td>
- <strong>Royal College Sports Complex</strong>
- <div class="text-xs text-muted">Court 1 (Synthetic)</div>
- </td>
- <td>
- <span class="badge badge-info">07:00 PM - 08:00 PM</span>
- </td>
- <td>
- <strong>4 / 4</strong>
- <div class="text-xs" style="color: var(--color-danger);">Full — No vacancies</div>
- </td>
- <td><span class="badge badge-warning">Private</span></td>
- <td style="text-align: right;">
- <a href="<?= url('/coach/sessions/1') ?>" class="btn btn-sm btn-outline">View</a>
- <a href="<?= url('/coach/sessions/1/attendance') ?>" class="btn btn-sm btn-primary">Mark Attendance</a>
- </td>
- </tr>
- </tbody>
- </table>
- </div>
- </div>
+<!-- Upcoming Sessions -->
+<div class="card" style="margin-bottom: var(--space-6);">
+    <div class="card-header">
+        <h3 style="font-size: 15px; margin-bottom: 0;">Upcoming Sessions</h3>
+        <a href="<?= url('/coach/sessions?status=upcoming') ?>" style="font-size: 12px; font-weight: 600;">All upcoming &rarr;</a>
+    </div>
+    <?php if ($upcoming === []): ?>
+        <div class="empty-state">
+            <?php if ($hasVenues): ?>
+                <div class="empty-state-title">No upcoming sessions</div>
+                <div class="empty-state-desc">Create a one-hour session on a court at one of your approved venues.</div>
+                <a href="<?= url('/coach/sessions/create') ?>" class="btn btn-primary" style="margin-top: 12px;">Create a Session</a>
+            <?php else: ?>
+                <div class="empty-state-title">No approved venues yet</div>
+                <div class="empty-state-desc">You can create sessions once a venue owner approves your request.</div>
+                <a href="<?= url('/coach/venues') ?>" class="btn btn-primary" style="margin-top: 12px;">Go to Venue Approvals</a>
+            <?php endif; ?>
+        </div>
+    <?php else: ?>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Session</th>
+                        <th>Venue &amp; Court</th>
+                        <th>Date &amp; Time</th>
+                        <th>Registrations</th>
+                        <th>Type</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach (array_slice($upcoming, 0, 5) as $s): ?>
+                        <tr>
+                            <td>
+                                <strong><?= e($s['title']) ?></strong>
+                                <div class="text-xs text-muted">#<?= (int) $s['id'] ?> · <?= e($s['fee_label']) ?></div>
+                            </td>
+                            <td>
+                                <strong><?= e($s['venue_name']) ?></strong>
+                                <div class="text-xs text-muted"><?= e($s['court_name']) ?></div>
+                            </td>
+                            <td>
+                                <strong><?= e(format_datetime($s['session_date'], false)) ?></strong>
+                                <div class="text-xs text-muted"><?= e($s['start']) ?> to <?= e($s['end']) ?></div>
+                            </td>
+                            <td><strong><?= (int) $s['registration_count'] ?> / <?= (int) $s['capacity'] ?></strong></td>
+                            <td><span class="badge <?= $s['visibility'] === 'private' ? 'badge-warning' : 'badge-confirmed' ?>"><?= $s['visibility'] === 'private' ? 'Private' : 'Public' ?></span></td>
+                            <td style="text-align: right;">
+                                <a href="<?= url('/coach/sessions/' . $s['id']) ?>" class="btn btn-sm btn-outline">View</a>
+                                <a href="<?= url('/coach/sessions/' . $s['id'] . '/edit') ?>" class="btn btn-sm btn-outline">Edit</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
+</div>
 
  <!-- Recent Student Registrations + Earnings Chart -->
  <div class="grid grid-cols-2 gap-6" style="margin-bottom: var(--space-6);">

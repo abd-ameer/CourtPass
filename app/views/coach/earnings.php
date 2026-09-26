@@ -124,7 +124,7 @@
  <td style="font-weight: 800; color: var(--color-primary-active);">LKR 26,600</td>
  <td><?= status_badge('open') ?></td>
  <td>
- <a href="<?= url('/coach/sessions/2') ?>" class="btn btn-sm btn-outline">Details</a>
+ <a href="<?= url('/coach/sessions') ?>" class="btn btn-sm btn-outline">My Sessions</a>
  </td>
  </tr>
 
@@ -143,7 +143,7 @@
  <td style="font-weight: 800; color: var(--color-primary-active);">LKR 19,950</td>
  <td><?= status_badge('completed') ?></td>
  <td>
- <a href="<?= url('/coach/sessions/3') ?>" class="btn btn-sm btn-outline">Details</a>
+ <a href="<?= url('/coach/sessions') ?>" class="btn btn-sm btn-outline">My Sessions</a>
  </td>
  </tr>
 
@@ -162,7 +162,7 @@
  <td style="font-weight: 800; color: var(--color-primary-active);">LKR 17,100</td>
  <td><?= status_badge('completed') ?></td>
  <td>
- <a href="<?= url('/coach/sessions/1') ?>" class="btn btn-sm btn-outline">Details</a>
+ <a href="<?= url('/coach/sessions') ?>" class="btn btn-sm btn-outline">My Sessions</a>
  </td>
  </tr>
 
@@ -181,7 +181,7 @@
  <td style="font-weight: 800; color: var(--color-primary-active);">LKR 23,750</td>
  <td><?= status_badge('completed') ?></td>
  <td>
- <a href="<?= url('/coach/sessions/2') ?>" class="btn btn-sm btn-outline">Details</a>
+ <a href="<?= url('/coach/sessions') ?>" class="btn btn-sm btn-outline">My Sessions</a>
  </td>
  </tr>
  </tbody>
