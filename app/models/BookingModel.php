@@ -139,6 +139,15 @@ class BookingModel extends Model
         );
     }
 
+    public function complete(int $id): int
+    {
+        return $this->execute(
+            "UPDATE bookings SET status = 'completed' WHERE id = ? AND status = 'confirmed'",
+            'i',
+            [$id]
+        );
+    }
+
     public function cancel(int $id, string $fromStatus, int $cancelledBy, string $now, ?string $reason, ?string $cancellationClass): int
     {
         return $this->execute(
