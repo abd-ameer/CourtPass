@@ -3,6 +3,7 @@ class BookingService
 {
     public const HOLD_MINUTES = 10;
     public const DAYS_AHEAD = 6;
+    public const CHECK_IN_OPENS_MINUTES = 60;
 
     private BookingModel $bookings;
     private CourtService $courts;
@@ -323,6 +324,44 @@ class BookingService
     }
 
     /**
+     * Completes a confirmed booking when the owner checks the customer in, and returns it in the ownerBooking() format.
+     * Runs inside the caller's transaction and never opens its own. Locks the court, then the booking.
+     * Check-in opens CHECK_IN_OPENS_MINUTES before the start, but not before the slot date, and closes when the slot ends.
+     */
+    public function completeByCheckIn(int $ownerId, int $bookingId): array
+    {
+        $booking = $this->bookings->find($bookingId);
+        if ($booking === null || (int) $booking['owner_id'] !== $ownerId) {
+            throw new ValidationException(['booking' => 'Booking not found.']);
+        }
+
+        $this->courts->lockCourt((int) $booking['court_id']);
+        $row = $this->bookings->lockForUpdate($bookingId);
+        $id = (int) $row['id'];
+        if ($row['status'] !== 'confirmed') {
+            throw new ValidationException(['booking' => "Booking #{$id} is " . strtolower(status_label($row['status'])) . ', so it cannot be checked in.']);
+        }
+        [$opensAt, $endsAt] = self::checkInWindow($row['slot_date'], $row['start_time']);
+        $now = now();
+        if ($now < $opensAt) {
+            throw new ValidationException(['booking' => "Check-in for booking #{$id} opens at " . format_datetime($opensAt) . '.']);
+        }
+        if ($now >= $endsAt) {
+            throw new ValidationException(['booking' => "Booking #{$id} ended at " . format_datetime($endsAt) . ', so it can no longer be checked in.']);
+        }
+        if ($this->bookings->complete($id) !== 1) {
+            throw new ValidationException(['booking' => "Booking #{$id} has already been checked in."]);
+        }
+
+        $b = $this->present(array_merge($booking, $row, ['status' => 'completed']));
+        (new AuditService())->log($ownerId, 'booking.completed', 'booking', $id, 'confirmed', 'completed', json_encode(['via' => 'check_in']));
+        (new NotificationService())->notify($b['customer_id'], 'booking_completed', 'Checked in',
+            "You were checked in at {$b['venue_name']} for " . self::slotText($b) . '. You can review your visit within 7 days.',
+            "/customer/bookings/{$id}");
+        return $b;
+    }
+
+    /**
      * Shared conflict check for coaching sessions and owner blocks.
      * Call inside the caller's transaction after CourtService::lockCourt(); it never opens a transaction.
      * Coaching sessions are covered by their linked court block. A released booking still holds the slot here.
@@ -464,7 +503,21 @@ class BookingService
         $b['can_decide'] = $upcoming && $b['status'] === 'pending';
         $b['can_owner_cancel'] = $upcoming && $b['status'] === 'confirmed';
         $b['cancellation'] = $b['can_cancel'] ? self::cancellationTerms($startsAt, $cash, (float) $b['amount']) : null;
+        [$opensAt, $endsAt] = self::checkInWindow($b['slot_date'], $b['start_time']);
+        $now = now();
+        $b['can_check_in'] = $b['status'] === 'confirmed' && $now >= $opensAt && $now < $endsAt;
+        $b['check_in_opens'] = substr($opensAt, 11, 5);
         return $b;
+    }
+
+    /** [opens, ends] as DATETIME strings: from CHECK_IN_OPENS_MINUTES before the start (not before the slot date) to the slot end. */
+    private static function checkInWindow(string $date, string $startTime): array
+    {
+        $start = strtotime("{$date} {$startTime}");
+        return [
+            date('Y-m-d H:i:s', max($start - self::CHECK_IN_OPENS_MINUTES * 60, strtotime("{$date} 00:00:00"))),
+            date('Y-m-d H:i:s', $start + 3600),
+        ];
     }
 
     /**
