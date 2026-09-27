@@ -8,12 +8,12 @@ CourtPass is a web platform for the Sri Lankan indoor sports market (futsal, bad
 ## Features
 
 - **Venues and courts:** venue registration with admin approval, courts with operating hours and fixed one-hour slots
-- **Booking:** slot availability grid, conflict-free booking, owner confirmation and a tiered cancellation policy
+- **Booking:** slot availability grid, conflict-free booking, online bookings confirmed on payment, cash-on-arrival bookings confirmed by the owner, a tiered cancellation policy and check-in at the venue
 - **Reliability and trust:** reliability score and tiers, cash-on-arrival for reliable customers, no-show tracking
 - **Payments:** online payments through PayHere Sandbox
 - **Resale and flash deals:** release a booking back into the booking grid and get a 90% refund when another customer books it, plus discounted last-minute slots
 - **Coaching:** coach profiles, venue approval, public and private sessions with paid registration and attendance
-- **Reviews and announcements:** verified reviews for venues and coaches, venue announcements
+- **Reviews and announcements:** verified reviews for venues and coaches with owner responses and review reporting, venue announcements
 - **Owner insights:** revenue tracking, court utilisation heatmap and customer profiles
 - **Administration:** venue approval, coach verification, user management and dispute handling
 - **Notifications:** in-app notifications for key events
@@ -24,7 +24,7 @@ HTML, CSS and vanilla JavaScript on the frontend, PHP (no framework) on the back
 
 ## Requirements
 
-- [XAMPP](https://www.apachefriends.org) with PHP 8.1 or newer (includes Apache and MySQL)
+- [XAMPP](https://www.apachefriends.org) with PHP 8.2 or newer (includes Apache and MySQL)
 - [Git](https://git-scm.com/downloads)
 - A modern web browser
 
@@ -56,7 +56,7 @@ Get-Content database\seed.sql | C:\xampp\mysql\bin\mysql -u root
 ```
 You can also import `database/schema.sql` and then `database/seed.sql` through phpMyAdmin at http://localhost/phpmyadmin.
 
-Running `schema.sql` deletes and recreates the `courtpass` database, so run both files again whenever you want a fresh copy of the sample data. The database design is explained in [docs/database-design.md](docs/database-design.md).
+Running `schema.sql` deletes and recreates the `courtpass` database, so run both files again whenever you want a fresh copy of the sample data. The database design is explained in [docs/database-design.md](docs/database-design.md) and the code structure in [docs/architecture.md](docs/architecture.md).
 
 **Sample accounts** (created by `seed.sql`)
 
@@ -81,12 +81,30 @@ To run without Apache, use PHP's built-in server and open http://localhost:8000:
 C:\xampp\php\php.exe -S localhost:8000 -t public public/index.php
 ```
 
+## Running the tests
+
+The tests use PHPUnit 11. Download it once into the project folder (the file is ignored by Git):
+```powershell
+cd C:\xampp\htdocs\courtpass
+Invoke-WebRequest -Uri https://phar.phpunit.de/phpunit-11.phar -OutFile phpunit.phar
+```
+
+Then run all suites, or one suite (`booking`, `venue`, `coach-session` or `review`):
+```powershell
+C:\xampp\php\php.exe phpunit.phar
+C:\xampp\php\php.exe phpunit.phar --testsuite venue
+```
+
+XAMPP's MySQL must be running. The tests build and use a separate `courtpass_test` database and never touch `courtpass`.
+
 ## Important notes
 
 - **Folder name:** the project must sit at `C:\xampp\htdocs\courtpass` for the URLs above to work. Apache's `mod_rewrite` must be enabled (it is by default in XAMPP).
 - **Config file:** `config/config.php` holds your local database and PayHere settings. It is ignored by Git and must never be committed.
 - **Port 3306:** XAMPP's MySQL can't start if another MySQL server is already running on port 3306. Stop the other server first.
 - **Payments are simulated:** PayHere runs in sandbox mode, so no real money is charged or refunded.
+- **Sample dates are relative:** `seed.sql` sets booking and session dates from the day it is loaded. Load `schema.sql` and `seed.sql` again before a demo so the sample bookings and sessions are still upcoming.
+- **Reload after schema changes:** after pulling a change to `database/schema.sql`, run `schema.sql` and `seed.sql` again. Pages fail if your local database is missing a new table.
 - **Timezone:** all dates and times use Asia/Colombo (UTC+05:30).
 - **No background jobs:** automatic updates such as no-show detection and slot expiry happen when a user performs an action (for example logging in or making a booking), not on a schedule.
 - **Legacy folder:** `legacy/` contains an early prototype kept for reference. It is not part of the running system and can't be opened in the browser.
