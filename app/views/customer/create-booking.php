@@ -83,7 +83,7 @@ $scoreText = $draft['score'] === null ? 'Not rated yet' : round($draft['score'])
                     <input type="radio" name="payment_method" value="online" <?= $cash ? '' : 'checked' ?> style="margin-top: 3px;" onchange="updatePaymentRules('online')">
                     <div style="flex: 1;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <strong style="color: var(--color-text-title); font-size: 14px;">Online Payment via PayHere Sandbox</strong>
+                            <strong style="color: var(--color-text-title); font-size: 14px;">Online Payment via PayHere</strong>
                             <span class="badge badge-paid">Recommended</span>
                         </div>
                         <div class="text-xs" style="color: var(--color-text-main); margin-top: 4px;">

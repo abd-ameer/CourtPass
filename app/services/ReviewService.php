@@ -160,7 +160,7 @@ class ReviewService
                 (int) $review['reviewer_id'],
                 'review_removed',
                 'Review removed',
-                "Your review of {$review['venue_name']} was removed by the Platform Admin. Reason: {$reason}",
+                "Your review of {$review['venue_name']} was removed by the Platform Admin. Reason: " . with_full_stop($reason),
                 '/customer/reviews'
             );
         });

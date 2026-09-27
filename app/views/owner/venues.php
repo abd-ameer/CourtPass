@@ -30,7 +30,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px;">
                         <div>
                             <h3 style="font-size: 18px; margin-bottom: 2px;"><?= e($venue['name']) ?></h3>
-                            <div class="text-xs text-muted"><?= e($venue['address']) ?>, <?= e($venue['city']) ?> · <?= e($venue['court_count']) ?> <?= $venue['court_count'] === 1 ? 'court' : 'courts' ?></div>
+                            <div class="text-xs text-muted"><?= e($venue['address'] . (stripos($venue['address'], $venue['city']) === false ? ', ' . $venue['city'] : '')) ?> · <?= e($venue['court_count']) ?> <?= $venue['court_count'] === 1 ? 'court' : 'courts' ?></div>
                         </div>
                         <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;">
                             <?= status_badge($venue['status']) ?>

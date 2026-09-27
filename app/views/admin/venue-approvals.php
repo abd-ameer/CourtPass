@@ -35,7 +35,7 @@
                             <span class="badge badge-confirmed"><?= e(implode(' · ', array_column($venue['sports'], 'name'))) ?></span>
                         </div>
                         <div class="card-subtitle">
-                            <?= e($venue['address']) ?>, <?= e($venue['city']) ?> · Submitted <?= e(format_datetime($venue['created_at'])) ?>
+                            <?= e($venue['address'] . (stripos($venue['address'], $venue['city']) === false ? ', ' . $venue['city'] : '')) ?> · Submitted <?= e(format_datetime($venue['created_at'])) ?>
                             by <strong><?= e($venue['owner_name']) ?></strong> (<?= e($venue['contact_phone']) ?>)
                         </div>
                     </div>

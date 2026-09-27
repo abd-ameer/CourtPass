@@ -86,15 +86,8 @@ $percent = $s['capacity'] > 0 ? min(100, round($s['registration_count'] / $s['ca
             <?php elseif (!$open): ?>
                 <button type="button" class="btn btn-secondary btn-block" disabled>Session Full</button>
             <?php elseif (Auth::hasRole('customer')): ?>
-                <?php if ($private): ?>
-                    <button type="button" class="btn btn-secondary btn-block" disabled>Registration Opens Soon</button>
-                    <div class="text-xs text-muted" style="margin-top: 8px; text-align: center;">Registration with online payment opens when PayHere payments are connected.</div>
-                <?php else: ?>
-                    <form method="POST" action="<?= url('/sessions/' . $s['id'] . '/register') ?>">
-                        <?= csrf_field() ?>
-                        <button type="submit" class="btn btn-primary btn-block btn-lg"><?= $s['fee'] > 0 ? 'Register and Pay Online' : 'Register (Free)' ?></button>
-                    </form>
-                <?php endif; ?>
+                <button type="button" class="btn btn-secondary btn-block" disabled>Registration Opens Soon</button>
+                <div class="text-xs text-muted" style="margin-top: 8px; text-align: center;">Registration with online payment opens when PayHere payments are connected.</div>
             <?php elseif (!Auth::check()): ?>
                 <a href="<?= url('/login') ?>" class="btn btn-primary btn-block btn-lg">Log In to Register</a>
                 <div class="text-xs text-muted" style="margin-top: 8px; text-align: center;">New here? <a href="<?= url('/register/customer') ?>">Create a customer account</a></div>

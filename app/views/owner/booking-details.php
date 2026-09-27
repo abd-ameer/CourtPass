@@ -88,7 +88,7 @@ $cash = $b['payment_method'] === 'cash_on_arrival';
  </div>
  <div style="display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--color-border-subtle); padding-bottom: 8px;">
  <span class="text-muted">Payment Method:</span>
- <strong><?= $cash ? 'Cash on Arrival (pay at the counter)' : 'Online via PayHere Sandbox' ?></strong>
+ <strong><?= $cash ? 'Cash on Arrival (pay at the counter)' : 'Online via PayHere' ?></strong>
  </div>
  <?php if (!$cash): ?>
  <div style="display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--color-border-subtle); padding-bottom: 8px;">

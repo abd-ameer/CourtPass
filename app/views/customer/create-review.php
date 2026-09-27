@@ -41,7 +41,7 @@ $invalid = fn (string $f) => isset($errors[$f]) ? ' is-invalid' : '';
         <strong>Verified reviews only:</strong>
         <?= $target === 'coach'
             ? 'you can review a coach once per session you were marked Attended for, within 7 days of the session.'
-            : 'you can review a venue once per checked-in booking, within 7 days of the check-in.' ?>
+            : 'you can review a venue once per checked-in booking, within ' . ReviewService::WINDOW_DAYS . ' days of the check-in.' ?>
         <?php if ($reviewUntil !== null): ?>
             <br>This booking can be reviewed until <?= e(format_datetime($reviewUntil)) ?>.
         <?php endif; ?>

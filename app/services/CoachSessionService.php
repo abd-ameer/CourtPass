@@ -151,8 +151,7 @@ class CoachSessionService
                 $audit->log($coachId, 'registration.cancelled', 'session_registration', (int) $reg['id'], $reg['status'], 'cancelled', json_encode([
                     'cancel_source' => 'session_cancelled', 'session_id' => (int) $row['id'], 'refund_amount' => $refund['amount'] ?? null,
                 ]));
-                $message = "{$session['coach_name']} cancelled \"{$session['title']}\" on {$when}. Reason: {$reason}"
-                    . (preg_match('/[.!?]$/', $reason) ? '' : '.');
+                $message = "{$session['coach_name']} cancelled \"{$session['title']}\" on {$when}. Reason: " . with_full_stop($reason);
                 if ($refund !== null) {
                     $message .= ' You receive a full refund of ' . lkr($refund['amount']) . '.';
                 }

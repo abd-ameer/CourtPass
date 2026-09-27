@@ -40,7 +40,7 @@ $shareUrl = url($s['share_path']);
                     <div>
                         <div class="text-xs text-muted">Venue</div>
                         <div style="font-weight: 600;"><?= e($s['venue_name']) ?></div>
-                        <div class="text-xs text-muted"><?= e($s['venue_address']) ?>, <?= e($s['venue_city']) ?></div>
+                        <div class="text-xs text-muted"><?= e($s['venue_address'] . (stripos($s['venue_address'], $s['venue_city']) === false ? ', ' . $s['venue_city'] : '')) ?></div>
                     </div>
                     <div>
                         <div class="text-xs text-muted">Court</div>

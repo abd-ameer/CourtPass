@@ -76,10 +76,6 @@
  <span>Blocked (owner or coaching session)</span>
  </div>
  <div class="legend-item">
- <div class="legend-swatch flash"></div>
- <span> Flash Deal (Discounted)</span>
- </div>
- <div class="legend-item">
  <div class="legend-swatch unavailable"></div>
  <span>Unavailable / Past</span>
  </div>

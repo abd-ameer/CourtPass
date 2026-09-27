@@ -295,7 +295,7 @@ class BookingService
             $this->bookings->reject($b['id'], $reason);
             (new AuditService())->log($ownerId, 'booking.rejected', 'booking', $b['id'], 'pending', 'rejected', json_encode(['reason' => $reason]));
             (new NotificationService())->notify($b['customer_id'], 'booking_rejected', 'Booking rejected',
-                "{$b['venue_name']} could not accept your booking for " . self::slotText($b) . ". Reason: {$reason}",
+                "{$b['venue_name']} could not accept your booking for " . self::slotText($b) . ". Reason: " . with_full_stop($reason),
                 "/customer/bookings/{$b['id']}");
         });
     }
@@ -315,7 +315,7 @@ class BookingService
                 'reason'        => $reason,
                 'refund_amount' => $refund['amount'] ?? null,
             ]));
-            $message = "{$b['venue_name']} cancelled your booking for " . self::slotText($b) . ". Reason: {$reason}";
+            $message = "{$b['venue_name']} cancelled your booking for " . self::slotText($b) . ". Reason: " . with_full_stop($reason);
             if ($refund !== null) {
                 $message .= ' You receive a full refund of ' . lkr($refund['amount']) . '.';
             }

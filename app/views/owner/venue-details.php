@@ -54,7 +54,7 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 13px;">
                 <div>
                     <span class="text-muted">Address</span>
-                    <div style="font-weight: 600;"><?= e($venue['address']) ?>, <?= e($venue['city']) ?></div>
+                    <div style="font-weight: 600;"><?= e($venue['address'] . (stripos($venue['address'], $venue['city']) === false ? ', ' . $venue['city'] : '')) ?></div>
                 </div>
                 <div>
                     <span class="text-muted">Contact Phone</span>

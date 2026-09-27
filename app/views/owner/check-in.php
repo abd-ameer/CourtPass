@@ -11,7 +11,7 @@ $postPath = fn (int $id) => '/owner/bookings/' . $id . '/check-in' . ($search ==
             <span>Check-in Desk</span>
         </div>
         <h1 class="page-title">Customer Check-in</h1>
-        <div class="page-subtitle">Mark customers as arrived for confirmed bookings, from 1 hour before the start until the slot ends.</div>
+        <div class="page-subtitle">Mark customers as arrived for confirmed bookings, from <?= (int) (BookingService::CHECK_IN_OPENS_MINUTES / 60) ?> hour before the start until the slot ends.</div>
     </div>
 
     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
