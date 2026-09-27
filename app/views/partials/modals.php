@@ -1,4 +1,4 @@
-<!-- Mandatory Rejection / Cancellation Reason Modal -->
+<!-- Shared reason modal (reject, cancel, remove, report) -->
 <div id="mandatoryReasonModal" class="modal-backdrop">
     <div class="modal-dialog">
         <div class="modal-header">
@@ -7,11 +7,11 @@
         </div>
         <div class="modal-body">
             <p id="reasonModalSubtitle" style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 12px;">
-                Please state the mandatory reason for this operational action.
+                Give a reason for this decision.
             </p>
             <div class="form-group">
-                <label class="form-label">Mandatory Explanation <span class="required-star">*</span></label>
-                <textarea id="mandatoryReasonText" class="form-control" rows="3" maxlength="500" placeholder="e.g., Unforeseen maintenance or invalid documentation..."></textarea>
+                <label class="form-label">Reason <span class="required-star">*</span></label>
+                <textarea id="mandatoryReasonText" class="form-control" rows="3" maxlength="500" placeholder="Write the reason here (up to 500 characters)."></textarea>
             </div>
         </div>
         <div class="modal-footer">
