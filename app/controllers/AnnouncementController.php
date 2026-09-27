@@ -3,7 +3,19 @@ class AnnouncementController extends Controller
 {
     public function index(): void
     {
-        $this->view('owner/announcements', ['title' => 'Announcements'], 'dashboard');
+        $venues = array_values(array_filter((new VenueService())->ownerVenues(Auth::id()), fn (array $v) => $v['status'] === 'approved'));
+        $announcements = [];
+        foreach ($venues as $venue) {
+            foreach ((new DiscoveryService())->venuePage($venue['slug'])['announcements'] ?? [] as $a) {
+                $announcements[] = $a + ['venue_name' => $venue['name']];
+            }
+        }
+        usort($announcements, fn (array $x, array $y) => strcmp($y['posted_at'], $x['posted_at']));
+        $this->view('owner/announcements', [
+            'title'         => 'Announcements',
+            'venues'        => $venues,
+            'announcements' => $announcements,
+        ], 'dashboard');
     }
 
     public function store(): void

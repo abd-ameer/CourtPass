@@ -3,9 +3,15 @@ class CourtController extends Controller
 {
     public function index(): void
     {
+        $service = new VenueService();
+        $venues = [];
+        foreach ($service->ownerVenues(Auth::id()) as $venue) {
+            $venues[] = $service->ownerVenue(Auth::id(), $venue['id']);
+        }
         $this->view('owner/courts', [
             'title'   => 'Courts',
             'venueId' => (int) $this->request->query('venue', 0),
+            'venues'  => $venues,
         ], 'dashboard');
     }
 
@@ -93,9 +99,21 @@ class CourtController extends Controller
 
     public function slots(): void
     {
+        $service = new VenueService();
+        $courts = [];
+        foreach ($service->ownerVenues(Auth::id()) as $venue) {
+            foreach ($service->ownerVenue(Auth::id(), $venue['id'])['courts'] as $court) {
+                $courts[] = ['id' => $court['id'], 'name' => $court['name'], 'venue' => $venue['name']];
+            }
+        }
+        $courtId = (int) $this->request->query('court', 0);
+        if (!in_array($courtId, array_column($courts, 'id'), true)) {
+            $courtId = $courts[0]['id'] ?? 0;
+        }
         $this->view('owner/slot-management', [
             'title'   => 'Slot Management',
-            'courtId' => (int) $this->request->query('court', 0),
+            'courts'  => $courts,
+            'courtId' => $courtId,
             'date'    => (string) $this->request->query('date', date('Y-m-d')),
         ], 'dashboard');
     }

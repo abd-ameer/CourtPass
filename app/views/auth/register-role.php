@@ -43,7 +43,7 @@
  <div style="font-size: 40px; margin-bottom: 12px;"></div>
  <h3 style="font-size: 18px; margin-bottom: 8px;">Independent Coach</h3>
  <p class="text-sm" style="color: var(--color-text-muted); margin-bottom: 20px; line-height: 1.5;">
- Get approved at premier venues, host public or private clinics, collect PayHere fees, and build verified ratings.
+ Get approved at premier venues, run public or private sessions, take payment through PayHere, and build verified ratings.
  </p>
  <div style="margin-top: auto;">
  <a href="<?= url('/register/coach') ?>" class="btn btn-secondary btn-block">

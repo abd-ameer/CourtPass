@@ -1,118 +1,112 @@
+<?php
+// Sample rows matching the seed approvals of the demo owner until coach venue approval is built.
+$pending = [
+    ['id' => 2, 'name' => 'Dilani Rathnayake', 'email' => 'dilani@coach.lk', 'phone' => '0778901234', 'sports' => 'Futsal',
+     'level' => 'Intermediate', 'certs' => 'None listed', 'verified' => false, 'venue' => 'Colombo Sports Hub', 'requested' => relative_date(-1)],
+];
+$approved = [
+    ['id' => 1, 'name' => 'Ashan Weerasinghe', 'certs' => 'BWF Level 1 Coach', 'sports' => 'Badminton, Pickleball', 'verified' => true,
+     'venue' => 'Colombo Sports Hub', 'upcoming' => 2, 'next' => relative_date(5, '08:00:00')],
+];
+?>
 <div class="page-header">
- <div>
- <div class="breadcrumb">
- <a href="<?= url('/owner/dashboard') ?>">Dashboard</a>
- <span class="breadcrumb-separator">/</span>
- <span>Coach Management</span>
- </div>
- <h1 class="page-title">Coach Venue Operating Requests (UC-VO-20, UC-VO-21)</h1>
- <div class="page-subtitle">Review independent coaches requesting permission to conduct paid sessions at Colombo Futsal Club.</div>
- </div>
- </div>
+    <div>
+        <div class="breadcrumb">
+            <a href="<?= url('/owner/dashboard') ?>">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Coach Management</span>
+        </div>
+        <h1 class="page-title">Coach Requests</h1>
+        <div class="page-subtitle">Coaches ask each venue for approval before they can run paid one-hour sessions on its courts.</div>
+    </div>
+</div>
 
- <!-- Pending Coach Requests Table -->
- <div class="card" style="margin-bottom: var(--space-8); border: 1.5px solid #fde68a;">
- <div class="card-header" style="background: #fffbeb;">
- <h3 style="font-size: 15px; color: #92400e; margin-bottom: 0;">Pending Coach Approval Requests (1)</h3>
- <span class="badge badge-warning">Review Pending</span>
- </div>
- <div class="table-responsive">
- <table class="data-table">
- <thead>
- <tr>
- <th>Coach Profile</th>
- <th>Sport & Specialty</th>
- <th>Accreditation & Experience</th>
- <th>Requested Courts</th>
- <th style="text-align: right;">Owner Decision</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td>
- <strong>Coach Chaminda Silva</strong>
- <div class="text-xs text-muted">Email: chaminda@coach.lk · +94 77 998 1234</div>
- </td>
- <td>
- <span class="badge badge-confirmed"> Badminton</span>
- <div class="text-xs text-muted" style="margin-top: 4px;">Footwork & Stamina Drills</div>
- </td>
- <td>
- <strong>WSF Level 1 Coach</strong>
- <div class="text-xs text-muted">7 Years competitive coaching</div>
- </td>
- <td>
- <strong>Wooden Badminton Court A</strong>
- </td>
- <td style="text-align: right;">
- <button type="button" class="btn btn-sm btn-primary" onclick="CourtPassApp.confirmPost('Approve Coach', 'Allow this coach to create sessions at your venue?', 'Approve', '/owner/coach-requests/2/approve')">
- Approve Coach
- </button>
- <button type="button" class="btn btn-sm btn-secondary" style="color: var(--color-danger);" onclick="CourtPassApp.postWithReason('Decline Coach Request', 'A reason is required and is shown to the coach.', '/owner/coach-requests/2/decline')">
- Decline...
- </button>
- </td>
- </tr>
- </tbody>
- </table>
- </div>
- </div>
+<!-- Pending requests -->
+<div class="card" style="margin-bottom: var(--space-8); border: 1.5px solid #fde68a;">
+    <div class="card-header" style="background: #fffbeb;">
+        <h3 style="font-size: 15px; color: #92400e; margin-bottom: 0;">Pending Requests (<?= count($pending) ?>)</h3>
+        <span class="badge badge-warning">Review Pending</span>
+    </div>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Coach</th>
+                    <th>Sports</th>
+                    <th>Experience & Certifications</th>
+                    <th>Venue</th>
+                    <th style="text-align: right;">Decision</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($pending as $c): ?>
+                    <tr>
+                        <td>
+                            <strong><?= e($c['name']) ?></strong>
+                            <?php if (!$c['verified']): ?><span class="badge badge-secondary" style="font-size: 10px; margin-left: 4px;">Not verified yet</span><?php endif; ?>
+                            <div class="text-xs text-muted"><?= e($c['email']) ?> · <?= e($c['phone']) ?></div>
+                        </td>
+                        <td><span class="badge badge-confirmed"><?= e($c['sports']) ?></span></td>
+                        <td>
+                            <strong><?= e($c['level']) ?></strong>
+                            <div class="text-xs text-muted"><?= e($c['certs']) ?></div>
+                        </td>
+                        <td>
+                            <strong><?= e($c['venue']) ?></strong>
+                            <div class="text-xs text-muted">Requested <?= e(format_datetime($c['requested'], false)) ?></div>
+                        </td>
+                        <td style="text-align: right;">
+                            <button type="button" class="btn btn-sm btn-primary" onclick="CourtPassApp.confirmPost('Approve Coach', 'Allow this coach to create sessions at your venue?', 'Approve', '/owner/coach-requests/<?= (int) $c['id'] ?>/approve')">
+                                Approve Coach
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary" style="color: var(--color-danger);" onclick="CourtPassApp.postWithReason('Decline Coach Request', 'A reason is required and is shown to the coach.', '/owner/coach-requests/<?= (int) $c['id'] ?>/decline')">
+                                Decline...
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
 
- <!-- Currently Approved Active Coaches (UC-VO-21, UC-VO-22) -->
- <div class="card">
- <div class="card-header">
- <h3 style="font-size: 15px; margin-bottom: 0;">Approved Coaches at this Venue (2)</h3>
- <span class="text-xs text-muted">Coaches authorized to schedule 1-hour sessions</span>
- </div>
- <div class="table-responsive">
- <table class="data-table">
- <thead>
- <tr>
- <th>Coach Name</th>
- <th>Sport Discipline</th>
- <th>Admin Verification</th>
- <th>Active Sessions</th>
- <th>Approval Status</th>
- <th style="text-align: right;">Action</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td>
- <strong>Coach Dilshan Perera</strong>
- <div class="text-xs text-muted">BWF Level 2 Senior Coach</div>
- </td>
- <td> Badminton</td>
- <td><span class="badge badge-verified">Verified Badge</span></td>
- <td><strong>1 Session</strong> (Sept 24, 07:00 PM)</td>
- <td><span class="badge badge-approved">Approved</span></td>
- <td style="text-align: right;">
- <button type="button" class="btn btn-sm btn-secondary" style="color: var(--color-danger);" onclick="CourtPassApp.confirmPost('Revoke Approval', 'The coach keeps existing sessions but cannot create new ones here.', 'Revoke', '/owner/coach-requests/1/revoke')">
- Revoke Approval...
- </button>
- </td>
- </tr>
- <tr>
- <td>
- <strong>Coach Shanilka Fernando</strong>
- <div class="text-xs text-muted">AFC "C" License Futsal Trainer</div>
- </td>
- <td> Futsal</td>
- <td><span class="badge badge-verified">Verified Badge</span></td>
- <td><strong>1 Session</strong> (Sept 25, 08:00 PM)</td>
- <td><span class="badge badge-approved">Approved</span></td>
- <td style="text-align: right;">
- <button type="button" class="btn btn-sm btn-secondary" style="color: var(--color-danger);" onclick="CourtPassApp.confirmPost('Revoke Approval', 'The coach keeps existing sessions but cannot create new ones here.', 'Revoke', '/owner/coach-requests/1/revoke')">
- Revoke Approval...
- </button>
- </td>
- </tr>
- </tbody>
- </table>
- </div>
- </div>
-
- 
- 
-
-
+<!-- Approved coaches -->
+<div class="card">
+    <div class="card-header">
+        <h3 style="font-size: 15px; margin-bottom: 0;">Approved Coaches (<?= count($approved) ?>)</h3>
+        <span class="text-xs text-muted">Coaches allowed to schedule one-hour sessions</span>
+    </div>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Coach</th>
+                    <th>Sports</th>
+                    <th>Verification</th>
+                    <th>Venue</th>
+                    <th>Upcoming Sessions</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($approved as $c): ?>
+                    <tr>
+                        <td>
+                            <strong><?= e($c['name']) ?></strong>
+                            <div class="text-xs text-muted"><?= e($c['certs']) ?></div>
+                        </td>
+                        <td><?= e($c['sports']) ?></td>
+                        <td><span class="badge badge-verified"><?= $c['verified'] ? 'Verified' : 'Not verified' ?></span></td>
+                        <td><?= e($c['venue']) ?></td>
+                        <td><strong><?= (int) $c['upcoming'] ?></strong> <span class="text-xs text-muted">(next <?= e(format_datetime($c['next'])) ?>)</span></td>
+                        <td style="text-align: right;">
+                            <button type="button" class="btn btn-sm btn-secondary" style="color: var(--color-danger);" onclick="CourtPassApp.confirmPost('Revoke Approval', 'The coach keeps existing sessions but cannot create new ones here.', 'Revoke', '/owner/coach-requests/<?= (int) $c['id'] ?>/revoke')">
+                                Revoke Approval...
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>

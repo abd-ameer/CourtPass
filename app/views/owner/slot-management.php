@@ -1,3 +1,6 @@
+<?php
+/** @var array $courts the owner's courts (id, name, venue) @var int $courtId selected court, 0 when there are none @var string $date */
+?>
 <div class="page-header">
  <div>
  <div class="breadcrumb">
@@ -5,7 +8,7 @@
  <span class="breadcrumb-separator">/</span>
  <span>Slot Management</span>
  </div>
- <h1 class="page-title">Court Slot Schedule & Override Grid (UC-VO-18, UC-VO-14)</h1>
+ <h1 class="page-title">Court Slot Schedule</h1>
  <div class="page-subtitle">Block slots for walk-ins/maintenance, release blocks, or mark unsold slots as Flash Deals.</div>
  </div>
 
@@ -14,15 +17,23 @@
  </a>
  </div>
 
- <!-- Court Switcher Tabs -->
- <div class="court-tabs-nav">
-<?php $activeCourt = $courtId ?: 1; ?>
- <a href="<?= url('/owner/slots?court=1') ?>" class="court-tab-btn <?= $activeCourt === 1 ? 'active' : '' ?>">Futsal Court A</a>
- <a href="<?= url('/owner/slots?court=2') ?>" class="court-tab-btn <?= $activeCourt === 2 ? 'active' : '' ?>">Futsal Court B</a>
- <a href="<?= url('/owner/slots?court=3') ?>" class="court-tab-btn <?= $activeCourt === 3 ? 'active' : '' ?>">Badminton Court 1</a>
- </div>
+ <?php if ($courts === []): ?>
+    <div class="card">
+        <div class="empty-state">
+            <div class="empty-state-title">No courts yet</div>
+            <div class="empty-state-desc">Slots appear here once you add a court to an approved venue.</div>
+            <a href="<?= url('/owner/courts') ?>" class="btn btn-primary" style="margin-top: 12px;">Go to Courts</a>
+        </div>
+    </div>
+<?php else: ?>
+<!-- Court Switcher Tabs -->
+<div class="court-tabs-nav">
+    <?php foreach ($courts as $c): ?>
+        <a href="<?= url('/owner/slots?court=' . $c['id']) ?>" class="court-tab-btn <?= $courtId === $c['id'] ? 'active' : '' ?>"><?= e($c['name']) ?><span class="text-xs text-muted"> · <?= e($c['venue']) ?></span></a>
+    <?php endforeach; ?>
+</div>
 
- <!-- Availability Grid Container -->
+<!-- Availability Grid Container -->
  <div class="availability-container">
  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); flex-wrap: wrap; gap: 8px;">
  <h3 style="font-size: 16px; margin-bottom: 0;">Click any slot to Block, Unblock, or Convert to Flash Deal</h3>
@@ -37,11 +48,11 @@
 
  <!-- Legend -->
  <div class="availability-legend">
- <div class="legend-item"><div class="legend-swatch available"></div><span>Open Bookable</span></div>
- <div class="legend-item"><div class="legend-swatch booked"></div><span>Customer Booked</span></div>
- <div class="legend-item"><div class="legend-swatch coaching"></div><span>Coaching Clinic (Locked)</span></div>
- <div class="legend-item"><div class="legend-swatch blocked"></div><span>Owner Blocked / Walk-in</span></div>
- <div class="legend-item"><div class="legend-swatch flash"></div><span>Flash Deal (Discounted)</span></div>
+            <div class="legend-item"><div class="legend-swatch available"></div><span>Available</span></div>
+            <div class="legend-item"><div class="legend-swatch booked"></div><span>Booked</span></div>
+            <div class="legend-item"><div class="legend-swatch blocked"></div><span>Blocked (owner or coaching session)</span></div>
+            <div class="legend-item"><div class="legend-swatch unavailable"></div><span>Unavailable / Past</span></div>
+        </div>
  </div>
  </div>
 
@@ -66,7 +77,7 @@
  <button type="button" class="btn btn-outline" style="justify-content: flex-start; text-align: left; padding: 12px;" onclick="executeSlotAction('block')">
  <div style="font-size: 20px; width: 32px;"></div>
  <div>
- <strong>Block Slot for Walk-ins or Maintenance (UC-VO-18)</strong>
+ <strong>Block Slot for Walk-ins or Maintenance</strong>
  <div class="text-xs text-muted">Prevents customers and coaches from reserving this slot.</div>
  </div>
  </button>
@@ -74,8 +85,8 @@
  <button type="button" class="btn btn-outline" style="justify-content: flex-start; text-align: left; padding: 12px; border-color: #fdba74;" onclick="executeSlotAction('flash')">
  <div style="font-size: 20px; width: 32px;"></div>
  <div>
- <strong>Convert to Flash Deal (UC-VO-14)</strong>
- <div class="text-xs text-muted">Publish discounted last-minute rate in Available Now section.</div>
+ <strong>Convert to Flash Deal</strong>
+ <div class="text-xs text-muted">Offer the slot at a discount until it starts.</div>
  </div>
  </button>
 
@@ -96,7 +107,7 @@
 let currentSlot = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    CourtPassAvailability.init({ courtId: <?= (int) ($courtId ?: 1) ?>, isGuest: false });
+    CourtPassAvailability.init({ courtId: <?= (int) $courtId ?>, isGuest: false });
 
     // Owner mode: clicking any slot opens the action modal instead of selecting it.
     CourtPassAvailability.handleSlotClick = function (slot) {
@@ -125,3 +136,4 @@ function executeSlotAction(action) {
     }
 }
 </script>
+<?php endif; ?>

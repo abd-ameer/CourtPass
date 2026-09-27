@@ -11,7 +11,18 @@ class AdminUserController extends Controller
 
     public function show(string $id): void
     {
-        $this->view('admin/user-details', ['title' => 'User Details', 'userId' => (int) $id], 'dashboard');
+        try {
+            $user = (new AccountService())->details((int) $id);
+        } catch (RuntimeException) {
+            $this->notFound();
+        }
+        $history = match ($user['role']) {
+            'customer' => (new BookingService())->customerBookings((int) $id),
+            'owner'    => (new VenueService())->ownerVenues((int) $id),
+            'coach'    => (new CoachSessionService())->coachSessions((int) $id)['sessions'],
+            default    => [],
+        };
+        $this->view('admin/user-details', ['title' => 'User Details', 'userId' => (int) $id, 'user' => $user, 'history' => $history], 'dashboard');
     }
 
     public function deactivate(string $id): void

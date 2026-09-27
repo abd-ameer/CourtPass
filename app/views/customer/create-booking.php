@@ -43,7 +43,7 @@ $scoreText = $draft['score'] === null ? 'Not rated yet' : round($draft['score'])
             </div>
         </div>
 
-        <!-- Reliability tier check for cash on arrival (UC-CU-07) -->
+        <!-- Reliability tier check for cash on arrival -->
         <?php if ($draft['tier'] === 'standard'): ?>
             <div class="card" style="margin-bottom: var(--space-6); border: 1.5px solid #86efac; background: #f0fdf4;">
                 <div class="card-body">

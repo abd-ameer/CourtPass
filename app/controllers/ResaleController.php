@@ -3,7 +3,11 @@ class ResaleController extends Controller
 {
     public function index(): void
     {
-        $this->view('customer/released-bookings', ['title' => 'Released Bookings'], 'dashboard');
+        $bookings = (new BookingService())->customerBookings(Auth::id());
+        $this->view('customer/released-bookings', [
+            'title'    => 'Released Bookings',
+            'released' => array_values(array_filter($bookings, fn (array $b) => in_array($b['status'], ['released', 'resold'], true))),
+        ], 'dashboard');
     }
 
     public function release(string $id): void
