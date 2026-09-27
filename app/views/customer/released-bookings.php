@@ -1,3 +1,6 @@
+<?php
+/** @var array $released the customer's released and resold bookings */
+?>
 <div class="page-header">
     <div>
         <div class="breadcrumb">
@@ -21,7 +24,7 @@
             ℹ️
         </div>
         <div>
-            <h3 style="font-size: 15px; font-weight: 700; color: #14532d; margin-bottom: 6px;">How the Ticket Resale Process Works</h3>
+            <h3 style="font-size: 15px; font-weight: 700; color: #14532d; margin-bottom: 6px;">How Slot Resale Works</h3>
             <div style="font-size: 13px; color: #166534; line-height: 1.6; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 8px;">
                 <div style="background: white; padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid #bbf7d0;">
                     <strong>1. Re-enters Standard Booking:</strong> Your released slot immediately becomes available for other customers through the regular venue booking flow at standard rates.
@@ -48,93 +51,52 @@
     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <h3 style="font-size: 16px; margin-bottom: 0;">Released Bookings</h3>
-            <span class="text-xs text-muted">Slots are sold to other customers at standard court pricing through normal booking</span>
+            <span class="text-xs text-muted">Released slots are booked by other customers at the normal court price.</span>
         </div>
-        
     </div>
-    <div class="table-responsive">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Request Ref</th>
-                    <th>Booking ID</th>
-                    <th>Venue &amp; Slot</th>
-                    <th>Original Amount</th>
-                    <th>Potential 90% Refund</th>
-                    <th>10% Resale Fee</th>
-                    <th>Status</th>
-                    <th style="text-align: right;">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Active Listing Live in Standard Booking Pool -->
-                <tr>
-                    <td><strong>#5</strong></td>
-                    <td>#1</td>
-                    <td>
-                        <strong>Colombo Futsal Club</strong>
-                        <div class="text-xs text-muted">Turf Court 2 · Sept 24, 09:00 PM - 10:00 PM</div>
-                    </td>
-                    <td>LKR 4,500</td>
-                    <td>
-                        <strong style="color: #166534;">LKR 4,050</strong>
-                        <span class="badge badge-flash" style="font-size: 10px; margin-left: 4px;">90%</span>
-                    </td>
-                    <td class="text-xs text-muted">LKR 450</td>
-                    <td>
-                        <?= status_badge('released') ?>
-                    </td>
-                    <td style="text-align: right;">
-                        <form method="POST" action="<?= url('/customer/bookings/5/take-back') ?>" class="inline-form">
-                            <?= csrf_field() ?>
-                            <button type="submit" class="btn btn-sm btn-secondary">Take Back</button>
-                        </form>
-                    </td>
-                </tr>
-
-                <!-- Past Resold & 90% Refunded -->
-                <tr>
-                    <td><strong>#2</strong></td>
-                    <td>#1</td>
-                    <td>
-                        <strong>CR&amp;FC Badminton Complex</strong>
-                        <div class="text-xs text-muted">Court 1 · Sept 20, 06:00 PM - 07:00 PM</div>
-                    </td>
-                    <td>LKR 2,800</td>
-                    <td>
-                        <strong style="color: #166534;">LKR 2,520</strong>
-                    </td>
-                    <td class="text-xs text-muted">LKR 280</td>
-                    <td>
-                        <?= status_badge('resold') ?>
-                    </td>
-                    <td style="text-align: right;">
-                        <span class="text-xs text-muted">Refunded to PayHere</span>
-                    </td>
-                </tr>
-
-                <!-- Past Expired Unsold -->
-                <tr>
-                    <td><strong>#1</strong></td>
-                    <td>#1</td>
-                    <td>
-                        <strong>ProPickle Arena Colombo</strong>
-                        <div class="text-xs text-muted">Pickleball Court 2 · Sept 18, 05:00 PM - 06:00 PM</div>
-                    </td>
-                    <td>LKR 3,000</td>
-                    <td>
-                        <span class="text-muted">LKR 0 (Unsold)</span>
-                    </td>
-                    <td class="text-xs text-muted">LKR 0</td>
-                    <td>
-                        <?= status_badge('completed_unattended') ?>
-                    </td>
-                    <td style="text-align: right;">
-                        <span class="text-xs text-muted">No Refund Issued</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <?php if ($released === []): ?>
+        <div class="empty-state">
+            <div class="empty-state-title">No released bookings</div>
+            <div class="empty-state-desc">Online-paid bookings you release for resale appear here.</div>
+        </div>
+    <?php else: ?>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Booking</th>
+                        <th>Venue &amp; Slot</th>
+                        <th>Paid</th>
+                        <th>Refund</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($released as $b): ?>
+                        <tr>
+                            <td><strong>#<?= (int) $b['id'] ?></strong></td>
+                            <td>
+                                <strong><?= e($b['venue_name']) ?></strong>
+                                <div class="text-xs text-muted"><?= e($b['court_name']) ?> · <?= e(format_datetime($b['slot_date'], false)) ?> · <?= e($b['start']) ?> - <?= e($b['end']) ?></div>
+                            </td>
+                            <td><?= e(lkr($b['amount'])) ?></td>
+                            <td class="text-sm"><?= $b['status'] === 'resold' && $b['refund_amount'] !== null ? e(lkr($b['refund_amount'])) . ' refunded' : '90% if another customer books it' ?></td>
+                            <td><?= status_badge($b['status']) ?></td>
+                            <td style="text-align: right;">
+                                <?php if ($b['status'] === 'released' && $b['group'] === 'upcoming'): ?>
+                                    <form method="POST" action="<?= url('/customer/bookings/' . $b['id'] . '/take-back') ?>" class="inline-form">
+                                        <?= csrf_field() ?>
+                                        <button type="submit" class="btn btn-sm btn-secondary">Take Back</button>
+                                    </form>
+                                <?php else: ?>
+                                    <a href="<?= url('/customer/bookings/' . $b['id']) ?>" class="btn btn-sm btn-outline">View</a>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
 </div>
-

@@ -1,153 +1,109 @@
+<?php
+// Sample figures matching the seed bookings of the demo owner (last 30 days) until revenue analytics is built.
+$online = 9000;
+$cash = 33300;
+$byCourt = [
+    ['Futsal Court A', 'Colombo Sports Hub', 'Futsal', 2, 10000],
+    ['Futsal Court B', 'Colombo Sports Hub', 'Futsal', 2, 10000],
+    ['Badminton Court 1', 'Colombo Sports Hub', 'Badminton', 4, 8000],
+    ['Squash Court 1', 'Kandy Court Zone', 'Squash', 2, 6000],
+    ['Badminton Court 2', 'Colombo Sports Hub', 'Badminton', 2, 4000],
+    ['Table Tennis Room', 'Colombo Sports Hub', 'Table Tennis', 2, 2000],
+    ['Billiards Table 1', 'Kandy Court Zone', 'Billiards', 1, 1500],
+    ['Carrom Lounge', 'Kandy Court Zone', 'Carrom', 1, 800],
+];
+$bySport = [];
+foreach ($byCourt as [, , $sport, $n, $amount]) {
+    $bySport[$sport] = ($bySport[$sport] ?? 0) + $amount;
+}
+arsort($bySport);
+$total = $online + $cash;
+$bookings = array_sum(array_column($byCourt, 3));
+?>
 <div class="page-header">
- <div>
- <div class="breadcrumb">
- <a href="<?= url('/owner/dashboard') ?>">Owner Portal</a>
- <span class="breadcrumb-separator">/</span>
- <span>Revenue Analytics</span>
- </div>
- <h1 class="page-title">Revenue Analytics </h1>
- <div class="page-subtitle">Detailed financial reporting and channel split (Online PayHere vs Cash-on-Arrival).</div>
- </div>
+    <div>
+        <div class="breadcrumb">
+            <a href="<?= url('/owner/dashboard') ?>">Owner Portal</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Revenue Analytics</span>
+        </div>
+        <h1 class="page-title">Revenue Analytics</h1>
+        <div class="page-subtitle">Court booking revenue for the last 30 days, split by online payment and Cash on Arrival. Coaching fees are not included.</div>
+    </div>
+</div>
 
- <div style="display: flex; gap: 10px;">
- <button class="btn btn-outline" onclick="CourtPassApp.showToast('info', 'Note', 'Exporting Revenue Report (CSV)...')">
- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
- Export CSV
- </button>
- <button class="btn btn-primary" onclick="CourtPassApp.showToast('success', 'Done', 'Generating Monthly Tax Invoice...')">
- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
- Download PDF Report
- </button>
- </div>
- </div>
+<div class="grid grid-cols-4 gap-6" style="margin-bottom: var(--space-6);">
+    <div class="stat-card">
+        <div class="stat-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+        <div>
+            <div class="stat-value"><?= e(lkr($total)) ?></div>
+            <div class="stat-label">Total Revenue (30 Days)</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></div>
+        <div>
+            <div class="stat-value"><?= e(lkr($online)) ?></div>
+            <div class="stat-label">Online Payments (<?= e(round($online / $total * 100)) ?>%)</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon amber"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></div>
+        <div>
+            <div class="stat-value"><?= e(lkr($cash)) ?></div>
+            <div class="stat-label">Cash on Arrival (<?= e(round($cash / $total * 100)) ?>%)</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+        <div>
+            <div class="stat-value"><?= (int) $bookings ?></div>
+            <div class="stat-label">Paid or Played Bookings</div>
+        </div>
+    </div>
+</div>
 
- <!-- KPI Stats -->
- <div class="grid grid-cols-4 gap-6" style="margin-bottom: var(--space-6);">
- <div class="stat-card">
- <div class="stat-icon green">
- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
- </div>
- <div>
- <div class="stat-value">LKR 404,000</div>
- <div class="stat-label">Total Revenue MTD (Sep)</div>
- </div>
- </div>
+<div class="grid grid-cols-2 gap-6">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Revenue by Court</h3>
+        </div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Court</th><th>Venue</th><th>Bookings</th><th>Revenue</th></tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($byCourt as [$court, $venue, $sport, $n, $amount]): ?>
+                        <tr>
+                            <td><strong><?= e($court) ?></strong><div class="text-xs text-muted"><?= e($sport) ?></div></td>
+                            <td><?= e($venue) ?></td>
+                            <td><?= (int) $n ?></td>
+                            <td><strong><?= e(lkr($amount)) ?></strong></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
- <div class="stat-card">
- <div class="stat-icon blue">
- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
- </div>
- <div>
- <div class="stat-value">LKR 342,000</div>
- <div class="stat-label">Online Payments (84.6%)</div>
- </div>
- </div>
-
- <div class="stat-card">
- <div class="stat-icon orange">
- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
- </div>
- <div>
- <div class="stat-value">LKR 62,000</div>
- <div class="stat-label">Cash on Arrival (15.4%)</div>
- </div>
- </div>
-
- <div class="stat-card">
- <div class="stat-icon purple">
- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
- </div>
- <div>
- <div class="stat-value">LKR 4,850</div>
- <div class="stat-label">Avg Rate / Slot</div>
- </div>
- </div>
- </div>
-
- <!-- Main Revenue Chart -->
- <div class="card" style="margin-bottom: var(--space-6);">
- <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
- <div>
- <h3 class="card-title">Monthly Revenue Trends (Online vs Cash)</h3>
- <div class="card-subtitle">Court bookings only. Coaching session fees are not included.</div>
- </div>
- <div style="display: flex; gap: 8px;">
- <button class="btn btn-sm btn-primary">Monthly</button>
- <button class="btn btn-sm btn-outline">Weekly</button>
- <button class="btn btn-sm btn-outline">Daily</button>
- </div>
- </div>
- <div class="card-body">
- <div class="table-responsive"><table class="data-table"><thead><tr><th>Month</th><th>Online (PayHere)</th><th>Cash on Arrival</th><th>Total</th></tr></thead><tbody><tr><td>May</td><td>LKR 180,000</td><td>LKR 45,000</td><td>LKR 225,000</td></tr><tr><td>Jun</td><td>LKR 245,000</td><td>LKR 60,000</td><td>LKR 305,000</td></tr><tr><td>Jul</td><td>LKR 310,000</td><td>LKR 85,000</td><td>LKR 395,000</td></tr><tr><td>Aug</td><td>LKR 395,000</td><td>LKR 78,000</td><td>LKR 473,000</td></tr><tr><td>Sep (to date)</td><td>LKR 342,000</td><td>LKR 62,000</td><td>LKR 404,000</td></tr></tbody></table></div>
- </div>
- </div>
-
- <!-- Breakdown by Court & Sport -->
- <div class="grid grid-cols-2 gap-6" style="margin-bottom: var(--space-6);">
- <!-- Court Revenue Table -->
- <div class="card">
- <div class="card-header">
- <h3 class="card-title">Revenue by Court</h3>
- </div>
- <div class="table-container">
- <table class="table">
- <thead>
- <tr>
- <th>Court Name</th>
- <th>Sport</th>
- <th>Booked Hours</th>
- <th>Revenue (LKR)</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td><strong>Turf Court 1 (Floodlit)</strong></td>
- <td><span class="badge badge-confirmed">Futsal</span></td>
- <td>48 hrs</td>
- <td style="font-weight: 700; color: var(--color-primary-active);">LKR 240,000</td>
- </tr>
- <tr>
- <td><strong>Turf Court 2 (Indoor)</strong></td>
- <td><span class="badge badge-confirmed">Futsal</span></td>
- <td>26 hrs</td>
- <td style="font-weight: 700; color: var(--color-primary-active);">LKR 117,000</td>
- </tr>
- <tr>
- <td><strong>Wooden Badminton Court A</strong></td>
- <td><span class="badge badge-primary">Badminton</span></td>
- <td>19 hrs</td>
- <td style="font-weight: 700; color: var(--color-primary-active);">LKR 47,000</td>
- </tr>
- </tbody>
- </table>
- </div>
- </div>
-
- <!-- Payments by Method -->
- <div class="card">
- <div class="card-header">
- <h3 class="card-title">Payments by Method (Sep)</h3>
- </div>
- <div class="card-body">
- <div style="font-size: var(--font-size-xs); color: var(--color-text-body); line-height: 1.6;">
- <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
- <span>Online (PayHere Sandbox):</span>
- <strong>LKR 342,000</strong>
- </div>
- <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
- <span>Cash on Arrival (collected at the venue):</span>
- <strong>LKR 62,000</strong>
- </div>
- <div style="display: flex; justify-content: space-between; padding-top: 6px; border-top: 1px solid var(--color-border);">
- <span>Total:</span>
- <strong>LKR 404,000</strong>
- </div>
- </div>
- </div>
- </div>
- </div>
-
- 
- 
-
-
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Revenue by Sport</h3>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 12px;">
+            <?php foreach ($bySport as $sport => $amount): ?>
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                        <strong><?= e($sport) ?></strong>
+                        <span><?= e(lkr($amount)) ?> (<?= e(round($amount / $total * 100)) ?>%)</span>
+                    </div>
+                    <div style="height: 8px; background: var(--color-bg-subtle); border-radius: 4px; overflow: hidden;">
+                        <div style="height: 100%; width: <?= e(round($amount / $total * 100)) ?>%; background: var(--color-primary);"></div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+            <p class="text-xs text-muted" style="margin: 8px 0 0;">Online revenue counts verified PayHere payments. Cash on Arrival counts bookings the venue checked in.</p>
+        </div>
+    </div>
+</div>

@@ -3,7 +3,14 @@ class FlashSlotController extends Controller
 {
     public function index(): void
     {
-        $this->view('owner/flash-slots', ['title' => 'Flash Deals'], 'dashboard');
+        $service = new VenueService();
+        $courts = [];
+        foreach ($service->ownerVenues(Auth::id()) as $venue) {
+            foreach ($service->ownerVenue(Auth::id(), $venue['id'])['courts'] as $court) {
+                $courts[] = $court + ['venue_name' => $venue['name']];
+            }
+        }
+        $this->view('owner/flash-slots', ['title' => 'Flash Deals', 'courts' => $courts], 'dashboard');
     }
 
     public function store(): void

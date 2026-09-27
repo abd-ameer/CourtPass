@@ -76,6 +76,8 @@ class CoachController extends Controller
         ];
         $this->view('coach/profile', [
             'title'            => 'Coach Profile',
+            'account'          => (new AccountService())->details(Auth::id()),
+            'sessions'         => (new CoachSessionService())->coachSessions(Auth::id())['sessions'],
             'profile'          => $profile,
             'sportTypes'       => $this->sportTypes(),
             'experienceLevels' => self::EXPERIENCE_LEVELS,
@@ -92,7 +94,16 @@ class CoachController extends Controller
 
     public function earnings(): void
     {
-        $this->view('coach/earnings', ['title' => 'Earnings'], 'dashboard');
+        $service = new CoachSessionService();
+        $rows = [];
+        foreach ($service->coachSessions(Auth::id())['sessions'] as $session) {
+            $regs = $service->coachSession(Auth::id(), $session['id'])['registrations'];
+            $rows[] = $session + [
+                'paid'     => array_sum(array_map(fn (array $r) => (float) ($r['paid_amount'] ?? 0), $regs)),
+                'refunded' => array_sum(array_map(fn (array $r) => (float) ($r['refund_amount'] ?? 0), $regs)),
+            ];
+        }
+        $this->view('coach/earnings', ['title' => 'Earnings', 'rows' => $rows], 'dashboard');
     }
 
     public function reviews(): void
@@ -110,7 +121,13 @@ class CoachController extends Controller
 
     public function venues(): void
     {
-        $this->view('coach/venues', ['title' => 'Venue Approvals'], 'dashboard');
+        $approved = (new CoachSessionService())->sessionVenues(Auth::id());
+        $approvedIds = array_column($approved, 'id');
+        $this->view('coach/venues', [
+            'title'       => 'Venue Approvals',
+            'approved'    => $approved,
+            'requestable' => array_values(array_filter((new VenueService())->publicVenues(), fn (array $v) => !in_array((int) $v['id'], $approvedIds, true))),
+        ], 'dashboard');
     }
 
     public function requestVenue(): void
@@ -173,7 +190,8 @@ class CoachController extends Controller
 
     public function publicProfile(string $id): void
     {
-        $this->view('public/coach-profile', ['title' => 'Coach Profile', 'coachId' => (int) $id]);
+        $sessions = array_values(array_filter((new CoachSessionService())->publicSessions(), fn (array $s) => (int) $s['coach_id'] === (int) $id));
+        $this->view('public/coach-profile', ['title' => 'Coach Profile', 'coachId' => (int) $id, 'sessions' => $sessions]);
     }
 
     public function adminIndex(): void

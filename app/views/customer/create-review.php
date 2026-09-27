@@ -16,8 +16,8 @@ if ($isEdit) {
 }
 // TODO: the coach review subject, rating and comment come from the registration (coach reviews).
 $subject ??= $target === 'coach' ? 'Coach Ashan Weerasinghe (Beginner Badminton Basics)' : 'Colombo Sports Hub (Badminton Court 1)';
-$rating ??= 5;
-$comment ??= '';
+$rating ??= $target === 'coach' ? 4 : 5;
+$comment ??= $target === 'coach' ? 'Very clear explanations, good for beginners.' : '';
 $reviewUntil ??= null;
 $errors ??= [];
 $invalid = fn (string $f) => isset($errors[$f]) ? ' is-invalid' : '';

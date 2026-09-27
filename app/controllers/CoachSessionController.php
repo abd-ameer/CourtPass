@@ -137,14 +137,18 @@ class CoachSessionController extends Controller
     public function registrations(string $id): void
     {
         $session = $this->ownSession((int) $id);
-        // TODO: registration list and payment status from the registration service (sample rows for the interim).
-        $this->view('coach/session-registrations', ['title' => 'Registrations', 'sessionId' => $session['id']], 'dashboard');
+        $this->view('coach/session-registrations', ['title' => 'Registrations', 'sessionId' => $session['id'], 'session' => $session], 'dashboard');
     }
 
     public function attendance(string $id): void
     {
         $session = $this->ownSession((int) $id);
-        $this->view('coach/attendance', ['title' => 'Attendance', 'sessionId' => $session['id']], 'dashboard');
+        $this->view('coach/attendance', [
+            'title'     => 'Attendance',
+            'sessionId' => $session['id'],
+            'session'   => $session,
+            'sessions'  => (new CoachSessionService())->coachSessions(Auth::id())['sessions'],
+        ], 'dashboard');
     }
 
     public function saveAttendance(string $id): void
