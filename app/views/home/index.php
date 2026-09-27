@@ -30,14 +30,10 @@
                         <label class="form-label" style="font-size: 12px; font-weight: 600; color: var(--color-navy);">City</label>
                         <select name="city" class="form-select">
                             <option value="">All Cities</option>
-                            <option value="Colombo">Colombo</option>
-                            <option value="Kandy">Kandy</option>
+                            <?php foreach ($cities as $city): ?>
+                                <option value="<?= e($city) ?>"><?= e($city) ?></option>
+                            <?php endforeach; ?>
                         </select>
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label class="form-label" style="font-size: 12px; font-weight: 600; color: var(--color-navy);">Date</label>
-                        <input type="date" name="date" class="form-control" value="<?= date('Y-m-d') ?>">
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-block" style="height: 42px;">
@@ -99,6 +95,9 @@
             <?php foreach ($featuredVenues as $venue): ?>
                 <?php View::partial('venue-card', ['venue' => $venue]) ?>
             <?php endforeach; ?>
+            <?php if ($featuredVenues === []): ?>
+                <p class="text-sm text-muted">No venues are listed yet.</p>
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -110,15 +109,18 @@
             <div>
                 <div class="badge" style="background: var(--color-primary-light); color: var(--color-navy); border: 1px solid var(--color-primary-border); margin-bottom: 6px;">Coaching Module</div>
                 <h2 style="font-size: var(--font-size-xl); color: var(--color-navy);">Train with Verified Independent Coaches</h2>
-                <p class="text-sm" style="margin-bottom: 0; color: var(--color-text-muted);">1-hour targeted group clinics on real court slots with verified reviews</p>
+                <p class="text-sm" style="margin-bottom: 0; color: var(--color-text-muted);">One-hour group sessions on real court slots, with verified reviews</p>
             </div>
-            <a href="<?= url('/coaching') ?>" class="btn btn-outline">All Coaching Clinics &rarr;</a>
+            <a href="<?= url('/coaching') ?>" class="btn btn-outline">All Coaching Sessions &rarr;</a>
         </div>
 
         <div class="grid grid-cols-3 gap-6">
             <?php foreach ($coachingSessions as $session): ?>
                 <?php View::partial('session-card', ['session' => $session]) ?>
             <?php endforeach; ?>
+            <?php if ($coachingSessions === []): ?>
+                <p class="text-sm text-muted">No upcoming public sessions right now.</p>
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -174,7 +176,7 @@
             <div class="card" style="padding: var(--space-6); display: flex; flex-direction: column;">
                 <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--color-navy);">For Sports Players</h3>
                 <p class="text-sm" style="color: var(--color-text-muted); margin-bottom: 20px; line-height: 1.5;">
-                    Find open courts, join coaching masterclasses, and play with friends across Sri Lanka.
+                    Find open courts, join coaching sessions, and play with friends across Sri Lanka.
                 </p>
                 <div style="margin-top: auto;">
                     <a href="<?= url('/register/customer') ?>" class="btn btn-primary btn-block">Sign Up as Player</a>

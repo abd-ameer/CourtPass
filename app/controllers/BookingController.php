@@ -10,7 +10,20 @@ class BookingController extends Controller
 
     public function dashboard(): void
     {
-        $this->view('customer/dashboard', ['title' => 'Customer Dashboard'], 'dashboard');
+        $bookings = (new BookingService())->customerBookings(Auth::id());
+        $upcoming = array_values(array_filter($bookings, fn (array $b) => $b['group'] === 'upcoming'));
+        usort($upcoming, fn (array $x, array $y) => strcmp($x['starts_at'], $y['starts_at']));
+
+        // Every booking row carries the customer's profile; with no bookings the profile still has its sign-up defaults.
+        $profile = $bookings[0] ?? ['reliability_score' => null, 'reliability_tier' => 'new_member', 'completed_count' => 0, 'no_show_count' => 0];
+
+        $this->view('customer/dashboard', [
+            'title'    => 'Customer Dashboard',
+            'name'     => Auth::user()['name'],
+            'upcoming' => $upcoming,
+            'released' => array_values(array_filter($bookings, fn (array $b) => $b['status'] === 'released')),
+            'profile'  => $profile,
+        ], 'dashboard');
     }
 
     /** Slot grid for one court. Guests see it read-only. */
