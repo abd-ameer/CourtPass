@@ -41,7 +41,7 @@ $terms = $b['cancellation'];
                     <span class="badge badge-paid">100% Refund</span>
                 </div>
                 <p class="text-xs" style="color: #065f46; margin-bottom: 0; line-height: 1.5;">
-                    Cancelling now issues a full refund of <strong><?= e(lkr($terms['refund_amount'])) ?></strong> via PayHere Sandbox (simulated).
+                    Cancelling now issues a full refund of <strong><?= e(lkr($terms['refund_amount'])) ?></strong> to your original payment method.
                 </p>
             </div>
         <?php elseif ($terms['bracket'] === '12_to_48'): ?>
@@ -51,7 +51,7 @@ $terms = $b['cancellation'];
                     <span class="badge" style="background: #fef3c7; color: #92400e;">50% Instant Refund</span>
                 </div>
                 <p class="text-xs" style="color: #78350f; margin-bottom: 12px; line-height: 1.5;">
-                    Cancelling directly between 12 and 48 hours before match start issues an instant 50% refund (<strong><?= e(lkr($terms['refund_amount'])) ?></strong>) via PayHere Sandbox (simulated).
+                    Cancelling directly between 12 and 48 hours before match start issues an instant 50% refund (<strong><?= e(lkr($terms['refund_amount'])) ?></strong>) to your original payment method.
                 </p>
 
                 <div style="background: white; padding: 12px; border-radius: var(--radius-md); border: 1px dashed #f59e0b; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">

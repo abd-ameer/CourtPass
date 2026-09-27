@@ -104,7 +104,7 @@ $terms = $b['cancellation'];
                     <div style="padding: 14px 18px; background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius-lg); font-size: 13px; color: #991b1b;">
                         <strong><?= (int) $b['cancelled_by'] === $b['customer_id'] ? 'You cancelled this booking' : 'The venue cancelled this booking' ?></strong>
                         on <?= e(format_datetime($b['cancelled_at'])) ?>.
-                        <?php if ($b['cancel_reason'] !== null): ?>Reason: <?= e($b['cancel_reason']) ?>.<?php endif; ?>
+                        <?php if ($b['cancel_reason'] !== null): ?>Reason: <?= e(with_full_stop($b['cancel_reason'])) ?><?php endif; ?>
                         <?php if ($b['refund_amount'] !== null): ?>
                             <br>Refund: <?= e(round($b['refund_percent'])) ?>% (<?= e(lkr($b['refund_amount'])) ?>) returned to your payment method.
                         <?php elseif (!$cash): ?>
@@ -202,7 +202,7 @@ $terms = $b['cancellation'];
                     </div>
                 <?php else: ?>
                     <div style="padding: 8px; background: #ecfdf5; border-radius: var(--radius-md); border-left: 3px solid var(--color-primary);">
-                        <strong>&gt; 48 Hours Before:</strong> 100% Full Simulated Refund.
+                        <strong>&gt; 48 Hours Before:</strong> 100% Full Refund.
                     </div>
                     <div style="padding: 8px; background: #fffbeb; border-radius: var(--radius-md); border-left: 3px solid #f59e0b;">
                         <strong>12 to 48 Hours Before:</strong> 50% Instant Refund or Release for Resale (90% if rebooked).

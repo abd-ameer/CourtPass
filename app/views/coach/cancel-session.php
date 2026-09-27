@@ -31,7 +31,7 @@ $isOther = $old['reason_choice'] === 'other';
                     <?php if ($live === []): ?>
                         Nobody is registered yet. The session is cancelled and its court slot is released.
                     <?php else: ?>
-                        <?= count($live) ?> registration(s) will be cancelled. Paid registrations are refunded in full (simulated),
+                        <?= count($live) ?> registration(s) will be cancelled. Paid registrations are refunded in full,
                         everyone gets an in-app notification with your reason, and the court slot is released.
                     <?php endif; ?>
                 </p>

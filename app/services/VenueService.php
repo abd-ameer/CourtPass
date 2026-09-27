@@ -184,7 +184,7 @@ class VenueService
         $id = (int) $venue['id'];
         $message = $status === 'approved'
             ? "{$venue['name']} is approved. Add its courts and operating hours to start taking bookings."
-            : "{$venue['name']} was not approved. Reason: {$reason} Edit the venue to submit it again.";
+            : "{$venue['name']} was not approved. Reason: " . with_full_stop($reason) . ' Edit the venue to submit it again.';
         (new NotificationService())->notify((int) $venue['owner_id'], 'venue_' . $status,
             $status === 'approved' ? 'Venue approved' : 'Venue not approved', $message, "/owner/venues/{$id}");
     }

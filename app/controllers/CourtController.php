@@ -118,15 +118,20 @@ class CourtController extends Controller
 
     private function courtForm(array $court, int $venueId, array $hours, array $errors): void
     {
+        $venueSports = [];
+        foreach ((new VenueService())->ownerVenues(Auth::id()) as $venue) {
+            $venueSports[$venue['id']] = array_map(fn (array $s) => (int) $s['id'], $venue['sports']);
+        }
         $this->view('owner/edit-court', [
             'title'      => 'Add Court',
             'courtId'    => null,
             'venueId'    => $venueId,
             'court'      => $court,
             'hours'      => self::displayHours($hours),
-            'venues'     => (new CourtService())->ownerCourtVenues(Auth::id()),
-            'sportTypes' => $this->sportTypes(),
-            'errors'     => $errors,
+            'venues'      => (new CourtService())->ownerCourtVenues(Auth::id()),
+            'venueSports' => $venueSports,
+            'sportTypes'  => $this->sportTypes(),
+            'errors'      => $errors,
         ], 'dashboard');
     }
 

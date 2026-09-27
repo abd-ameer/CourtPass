@@ -8,7 +8,7 @@
  <span class="breadcrumb-separator">/</span>
  <span>Bookings</span>
  </div>
- <h1 class="page-title">Venue Bookings Table (UC-VO-06, 07, 09, 11)</h1>
+ <h1 class="page-title">Venue Bookings</h1>
  <div class="page-subtitle">Manage customer reservations, process approvals/rejections, and monitor payment statuses.</div>
  </div>
 

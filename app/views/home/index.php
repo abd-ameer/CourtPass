@@ -148,7 +148,7 @@
                 </div>
                 <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 8px; color: var(--color-navy);">Pay Online or On Arrival</h3>
                 <p class="text-sm" style="color: var(--color-text-muted); line-height: 1.5;">
-                    Seamless PayHere Sandbox checkout. Standard tier members unlock flexible Cash-on-Arrival booking privileges.
+                    Pay online through PayHere. Standard tier members unlock flexible Cash-on-Arrival booking privileges.
                 </p>
             </div>
 

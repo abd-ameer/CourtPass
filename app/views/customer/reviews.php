@@ -18,7 +18,7 @@ $stars = fn (int $n) => str_repeat('&#9733;', $n) . '<span style="color: #d1d5db
     <div class="card" style="margin-bottom: var(--space-6); border-left: 4px solid var(--color-primary);">
         <div class="card-header">
             <h3 style="font-size: 16px; margin-bottom: 0;">Waiting for your review</h3>
-            <span class="text-xs text-muted">Within 7 days of the check-in</span>
+            <span class="text-xs text-muted">Within <?= (int) ReviewService::WINDOW_DAYS ?> days of the check-in</span>
         </div>
         <div class="card-body" style="display: flex; flex-direction: column; gap: 12px;">
             <?php foreach ($to_review as $b): ?>
@@ -39,7 +39,7 @@ $stars = fn (int $n) => str_repeat('&#9733;', $n) . '<span style="color: #d1d5db
 
 <?php if ($reviews === []): ?>
     <div class="card" style="padding: var(--space-8); text-align: center; color: var(--color-text-muted);">
-        You have not written any reviews yet. After a venue checks you in, you can review your visit here for 7 days.
+        You have not written any reviews yet. After a venue checks you in, you can review your visit here for <?= (int) ReviewService::WINDOW_DAYS ?> days.
     </div>
 <?php else: ?>
     <div style="display: flex; flex-direction: column; gap: 16px;">
@@ -83,7 +83,7 @@ $stars = fn (int $n) => str_repeat('&#9733;', $n) . '<span style="color: #d1d5db
 
                     <?php if ($r['status'] === 'removed'): ?>
                         <div style="background: var(--color-danger-bg); border-left: 3px solid var(--color-danger); padding: 10px 14px; border-radius: var(--radius-md); font-size: 12px; margin-bottom: 12px;">
-                            Removed by the Platform Admin: <?= e($r['removed_reason'] ?? 'Policy violation') ?>. It is no longer shown on the venue page.
+                            Removed by the Platform Admin: <?= e(with_full_stop($r['removed_reason'] ?? 'Policy violation')) ?> It is no longer shown on the venue page.
                         </div>
                     <?php endif; ?>
 

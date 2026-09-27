@@ -17,7 +17,7 @@
         <div class="card" style="margin-bottom: var(--space-6);">
             <h3 style="font-size: 18px; margin-bottom: 12px; color: var(--color-navy);">How do court bookings and slot locks work?</h3>
             <p class="text-sm" style="color: var(--color-text-main); line-height: 1.6;">
-                When you click to reserve an available 1-hour slot, CourtPass creates a real-time lock to prevent conflicting double-bookings. You have 10 minutes to complete payment via PayHere Sandbox, or choose Cash on Arrival if you are in the Standard reliability tier.
+                When you click to reserve an available 1-hour slot, CourtPass creates a real-time lock to prevent conflicting double-bookings. You have <?= (int) BookingService::HOLD_MINUTES ?> minutes to complete payment through PayHere, or choose Cash on Arrival if you are in the Standard reliability tier.
             </p>
         </div>
 

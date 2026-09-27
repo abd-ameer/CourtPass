@@ -53,7 +53,7 @@
                 <div class="grid grid-cols-2 gap-4" style="margin-bottom: var(--space-4);">
                     <div>
                         <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase;">Address</span>
-                        <div style="font-weight: 600; font-size: 14px; color: var(--color-text-heading);"><?= e($venue['address']) ?>, <?= e($venue['city']) ?></div>
+                        <div style="font-weight: 600; font-size: 14px; color: var(--color-text-heading);"><?= e($venue['address'] . (stripos($venue['address'], $venue['city']) === false ? ', ' . $venue['city'] : '')) ?></div>
                     </div>
                     <div>
                         <span style="font-size: 11px; color: var(--color-text-subtle); text-transform: uppercase;">Venue Phone</span>

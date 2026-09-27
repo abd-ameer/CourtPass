@@ -1,5 +1,5 @@
 <?php
-/** @var int|null $courtId null when adding @var int $venueId @var array $court @var array $hours @var array $venues @var array $sportTypes @var array $errors */
+/** @var int|null $courtId null when adding @var int $venueId @var array $court @var array $hours @var array $venues @var array $venueSports venue id => sport type ids @var array $sportTypes @var array $errors */
 $isEdit = $courtId !== null;
 $invalid = fn (string $f) => isset($errors[$f]) ? ' is-invalid' : '';
 $backUrl = $venueId > 0 ? '/owner/venues/' . $venueId : '/owner/venues';
@@ -14,7 +14,9 @@ $backUrl = $venueId > 0 ? '/owner/venues/' . $venueId : '/owner/venues';
             <span><?= $isEdit ? 'Edit Court' : 'Add Court' ?></span>
         </div>
         <h1 class="page-title"><?= $isEdit ? 'Edit Court' : 'Add a Court' ?></h1>
-        <div class="page-subtitle">Courts can be added to approved venues, for one of the sports the venue offers. Every slot is exactly one hour; a closing time of 00:00 means midnight.</div>
+        <div class="page-subtitle"><?= $isEdit
+            ? 'Change the court name, sport, hourly rate or active state. Operating hours have their own page.'
+            : 'Courts can be added to approved venues, for one of the sports the venue offers. Every slot is exactly one hour; a closing time of 00:00 means midnight.' ?></div>
     </div>
 </div>
 
@@ -38,7 +40,7 @@ $backUrl = $venueId > 0 ? '/owner/venues/' . $venueId : '/owner/venues';
                     <select name="venue_id" id="courtVenue" class="form-select<?= $invalid('venue_id') ?>" required>
                         <option value="">Choose a venue</option>
                         <?php foreach ($venues as $venue): ?>
-                            <option value="<?= e($venue['id']) ?>" <?= $venueId === (int) $venue['id'] ? 'selected' : '' ?>><?= e($venue['name']) ?></option>
+                            <option value="<?= e($venue['id']) ?>" data-sports="<?= e(implode(',', $venueSports[$venue['id']] ?? [])) ?>" <?= $venueId === (int) $venue['id'] ? 'selected' : '' ?>><?= e($venue['name']) ?></option>
                         <?php endforeach; ?>
                     </select>
                     <span class="form-feedback invalid"><?= e($errors['venue_id'] ?? '') ?></span>
@@ -94,5 +96,24 @@ $backUrl = $venueId > 0 ? '/owner/venues/' . $venueId : '/owner/venues';
 
     <script>
     CourtPassApp.setupFormValidation('courtForm');
+    (() => {
+        const venue = document.getElementById('courtVenue');
+        const sport = document.getElementById('courtSport');
+        if (!venue || !sport) return;
+        // Offer only the sports of the chosen venue; the server checks this again.
+        const filterSports = () => {
+            const option = venue.options[venue.selectedIndex];
+            const allowed = option && option.dataset.sports ? option.dataset.sports.split(',') : null;
+            Array.from(sport.options).forEach((o) => {
+                if (o.value === '') return;
+                const show = allowed === null || allowed.includes(o.value);
+                o.hidden = !show;
+                o.disabled = !show;
+            });
+            if (sport.selectedOptions[0] && sport.selectedOptions[0].disabled) sport.value = '';
+        };
+        venue.addEventListener('change', filterSports);
+        filterSports();
+    })();
     </script>
 <?php endif; ?>

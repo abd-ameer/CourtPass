@@ -43,7 +43,7 @@ $query = $venue_id === null ? '' : '?venue=' . $venue_id;
 
 <?php if ($reviews === []): ?>
     <div class="card" style="padding: var(--space-8); text-align: center; color: var(--color-text-muted);">
-        No reviews yet. Customers can review a booking for 7 days after you check them in.
+        No reviews yet. Customers can review a booking for <?= (int) ReviewService::WINDOW_DAYS ?> days after you check them in.
     </div>
 <?php else: ?>
     <div style="display: flex; flex-direction: column; gap: 16px;">
