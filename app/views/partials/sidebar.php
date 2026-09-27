@@ -206,7 +206,7 @@ $currentPath = Request::current()?->path() ?? '';
 
     <div class="sidebar-footer">
         <div style="font-size: 11px; color: var(--color-text-subtle); display: flex; align-items: center; justify-content: space-between;">
-            <span>CourtPass v2.0</span>
+            <span><?= e(APP_NAME) ?></span>
             <span>UCSC Group 40</span>
         </div>
     </div>

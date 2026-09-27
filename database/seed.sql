@@ -99,23 +99,72 @@ INSERT INTO flash_slots (id, court_id, slot_date, start_time, original_price, di
 
 -- Bookings and check-in
 INSERT INTO bookings (id, customer_id, court_id, slot_date, start_time, amount, payment_method,
-        status, confirmed_at, released_at, cancelled_by, cancelled_at, cancel_reason, cancellation_class) VALUES
+        status, confirmed_at, released_at, cancelled_by, cancelled_at, cancel_reason, cancellation_class, created_at) VALUES
     (1, 4, 3, DATE_SUB(CURDATE(), INTERVAL 3 DAY), '17:00:00', 2000.00, 'online',
-        'completed', DATE_SUB(NOW(), INTERVAL 5 DAY), NULL, NULL, NULL, NULL, NULL),
+        'completed', DATE_SUB(NOW(), INTERVAL 5 DAY), NULL, NULL, NULL, NULL, NULL, DATE_SUB(NOW(), INTERVAL 5 DAY)),
     (2, 6, 1, DATE_SUB(CURDATE(), INTERVAL 2 DAY), '19:00:00', 5000.00, 'cash_on_arrival',
-        'no_show', DATE_SUB(NOW(), INTERVAL 4 DAY), NULL, NULL, NULL, NULL, NULL),
+        'no_show', DATE_SUB(NOW(), INTERVAL 4 DAY), NULL, NULL, NULL, NULL, NULL, DATE_SUB(NOW(), INTERVAL 5 DAY)),
     (3, 4, 1, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '19:00:00', 5000.00, 'online',
-        'confirmed', NOW(), NULL, NULL, NULL, NULL, NULL),
+        'confirmed', NOW(), NULL, NULL, NULL, NULL, NULL, NOW()),
     (4, 4, 6, DATE_ADD(CURDATE(), INTERVAL 4 DAY), '10:00:00', 3000.00, 'cash_on_arrival',
-        'pending', NULL, NULL, NULL, NULL, NULL, NULL),
+        'pending', NULL, NULL, NULL, NULL, NULL, NULL, NOW()),
     (5, 5, 3, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '20:00:00', 2000.00, 'online',
-        'released', DATE_SUB(NOW(), INTERVAL 1 DAY), NOW(), NULL, NULL, NULL, NULL),
+        'released', DATE_SUB(NOW(), INTERVAL 1 DAY), NOW(), NULL, NULL, NULL, NULL, DATE_SUB(NOW(), INTERVAL 1 DAY)),
     (6, 6, 5, DATE_SUB(CURDATE(), INTERVAL 1 DAY), '16:00:00', 1000.00, 'cash_on_arrival',
         'cancelled', DATE_SUB(NOW(), INTERVAL 3 DAY), NULL, 6, DATE_SUB(NOW(), INTERVAL 1 DAY),
-        'Could not make it', 'irresponsible');
+        'Could not make it', 'irresponsible', DATE_SUB(NOW(), INTERVAL 4 DAY));
+
+-- Past bookings behind the customer_profiles counters (all over 7 days ago, so none can be reviewed)
+INSERT INTO bookings (id, customer_id, court_id, slot_date, start_time, amount, payment_method,
+        status, confirmed_at, released_at, cancelled_by, cancelled_at, cancel_reason, cancellation_class, created_at) VALUES
+    (7, 4, 3, DATE_SUB(CURDATE(), INTERVAL 12 DAY), '18:00:00', 2000.00, 'cash_on_arrival',
+        'completed', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 14 DAY), '10:00:00'), NULL, NULL, NULL, NULL, NULL, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 15 DAY), '09:00:00')),
+    (8, 4, 4, DATE_SUB(CURDATE(), INTERVAL 15 DAY), '18:00:00', 2000.00, 'cash_on_arrival',
+        'completed', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 17 DAY), '10:00:00'), NULL, NULL, NULL, NULL, NULL, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 18 DAY), '09:00:00')),
+    (9, 4, 1, DATE_SUB(CURDATE(), INTERVAL 18 DAY), '19:00:00', 5000.00, 'cash_on_arrival',
+        'completed', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 20 DAY), '10:00:00'), NULL, NULL, NULL, NULL, NULL, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 21 DAY), '09:00:00')),
+    (10, 4, 3, DATE_SUB(CURDATE(), INTERVAL 21 DAY), '17:00:00', 2000.00, 'cash_on_arrival',
+        'completed', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 23 DAY), '10:00:00'), NULL, NULL, NULL, NULL, NULL, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 24 DAY), '09:00:00')),
+    (11, 4, 5, DATE_SUB(CURDATE(), INTERVAL 24 DAY), '16:00:00', 1000.00, 'cash_on_arrival',
+        'completed', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 26 DAY), '10:00:00'), NULL, NULL, NULL, NULL, NULL, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 27 DAY), '09:00:00')),
+    (12, 4, 4, DATE_SUB(CURDATE(), INTERVAL 27 DAY), '18:00:00', 2000.00, 'cash_on_arrival',
+        'completed', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 29 DAY), '10:00:00'), NULL, NULL, NULL, NULL, NULL, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 30 DAY), '09:00:00')),
+    (13, 5, 6, DATE_SUB(CURDATE(), INTERVAL 14 DAY), '10:00:00', 3000.00, 'cash_on_arrival',
+        'completed', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 16 DAY), '10:00:00'), NULL, NULL, NULL, NULL, NULL, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 17 DAY), '09:00:00')),
+    (14, 6, 2, DATE_SUB(CURDATE(), INTERVAL 11 DAY), '19:00:00', 5000.00, 'cash_on_arrival',
+        'completed', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 13 DAY), '10:00:00'), NULL, NULL, NULL, NULL, NULL, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 14 DAY), '09:00:00')),
+    (15, 6, 7, DATE_SUB(CURDATE(), INTERVAL 13 DAY), '17:00:00', 1500.00, 'cash_on_arrival',
+        'completed', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 15 DAY), '10:00:00'), NULL, NULL, NULL, NULL, NULL, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 16 DAY), '09:00:00')),
+    (16, 6, 8, DATE_SUB(CURDATE(), INTERVAL 16 DAY), '18:00:00', 800.00, 'cash_on_arrival',
+        'completed', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 18 DAY), '10:00:00'), NULL, NULL, NULL, NULL, NULL, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 19 DAY), '09:00:00')),
+    (17, 6, 2, DATE_SUB(CURDATE(), INTERVAL 19 DAY), '20:00:00', 5000.00, 'cash_on_arrival',
+        'completed', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 21 DAY), '10:00:00'), NULL, NULL, NULL, NULL, NULL, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 22 DAY), '09:00:00')),
+    (18, 6, 6, DATE_SUB(CURDATE(), INTERVAL 22 DAY), '10:00:00', 3000.00, 'cash_on_arrival',
+        'completed', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 24 DAY), '10:00:00'), NULL, NULL, NULL, NULL, NULL, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 25 DAY), '09:00:00')),
+    (19, 6, 5, DATE_SUB(CURDATE(), INTERVAL 25 DAY), '15:00:00', 1000.00, 'cash_on_arrival',
+        'completed', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 27 DAY), '10:00:00'), NULL, NULL, NULL, NULL, NULL, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 28 DAY), '09:00:00')),
+    (20, 6, 1, DATE_SUB(CURDATE(), INTERVAL 20 DAY), '19:00:00', 5000.00, 'cash_on_arrival',
+        'no_show', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 22 DAY), '10:00:00'), NULL, NULL, NULL, NULL, NULL, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 23 DAY), '09:00:00')),
+    (21, 6, 5, DATE_SUB(CURDATE(), INTERVAL 30 DAY), '16:00:00', 1000.00, 'cash_on_arrival',
+        'cancelled', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 32 DAY), '10:00:00'), NULL, 6, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 31 DAY), '09:00:00'), 'Plans changed', 'moderate', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 33 DAY), '09:00:00')),
+    (22, 4, 3, DATE_SUB(CURDATE(), INTERVAL 9 DAY), '18:00:00', 2000.00, 'cash_on_arrival',
+        'cancelled', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 11 DAY), '10:00:00'), NULL, 4, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 12 DAY), '09:00:00'), 'Plans changed', 'responsible', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 12 DAY), '09:00:00'));
 
 INSERT INTO check_ins (booking_id, checked_in_by, checked_in_at) VALUES
-    (1, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 3 DAY), '16:55:00'));
+    (1, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 3 DAY), '16:55:00')),
+    (7, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 12 DAY), '17:55:00')),
+    (8, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 15 DAY), '17:55:00')),
+    (9, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 18 DAY), '18:55:00')),
+    (10, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 21 DAY), '16:55:00')),
+    (11, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 24 DAY), '15:55:00')),
+    (12, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 27 DAY), '17:55:00')),
+    (13, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 14 DAY), '09:55:00')),
+    (14, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 11 DAY), '18:55:00')),
+    (15, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 13 DAY), '16:55:00')),
+    (16, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 16 DAY), '17:55:00')),
+    (17, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 19 DAY), '19:55:00')),
+    (18, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 22 DAY), '09:55:00')),
+    (19, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 25 DAY), '14:55:00'));
 
 -- Coach module
 INSERT INTO coach_venue_approvals (id, coach_id, venue_id, status, requested_at, decided_by, decided_at) VALUES
@@ -163,15 +212,12 @@ INSERT INTO announcements (id, venue_id, posted_by, type, title, body) VALUES
     (2, 1, 2, 'promotional', 'Weekday morning discount', 'Book before 10 am on weekdays and look out for flash deals.');
 
 INSERT INTO notifications (user_id, type, title, message, link_url) VALUES
-    (4, 'booking_confirmed', 'Booking confirmed', 'Your Futsal Court A booking is confirmed.', '/bookings/3'),
-    (7, 'review_posted',     'New review',        'You received a new 4-star review.',       '/coach/dashboard'),
+    (4, 'booking_confirmed', 'Booking confirmed', 'Your Futsal Court A booking is confirmed.', '/customer/bookings/3'),
+    (7, 'review_posted',     'New review',        'You received a new 4-star review.',       '/coach/reviews'),
     (2, 'review_posted',     'New review',        'Colombo Sports Hub received a 5-star review.', '/owner/reviews');
 
 INSERT INTO audit_log (actor_id, event_type, entity_type, entity_id, old_status, new_status) VALUES
-    (1, 'VENUE_APPROVED',    'venue',   1, 'pending',   'approved'),
-    (1, 'VENUE_APPROVED',    'venue',   2, 'pending',   'approved'),
-    (4, 'BOOKING_CREATED',   'booking', 3, NULL,        'pending_payment'),
-    (NULL, 'BOOKING_CONFIRMED', 'booking', 3, 'pending_payment', 'confirmed'),
-    (2, 'CHECK_IN_RECORDED', 'booking', 1, 'confirmed', 'completed'),
-    (NULL, 'NO_SHOW_DETECTED', 'booking', 2, 'confirmed', 'no_show'),
-    (5, 'BOOKING_RELEASED',  'booking', 5, 'confirmed', 'released');
+    (1, 'venue.approved',    'venue',   1, 'pending',   'approved'),
+    (1, 'venue.approved',    'venue',   2, 'pending',   'approved'),
+    (4, 'booking.created',   'booking', 3, NULL,        'pending_payment'),
+    (NULL, 'booking.confirmed', 'booking', 3, 'pending_payment', 'confirmed');

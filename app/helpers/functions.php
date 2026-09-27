@@ -76,3 +76,17 @@ function status_badge(string $status): string
     $class = preg_replace('/[^a-z_]/', '', $status);
     return '<span class="badge badge-status-' . $class . '">' . e(status_label($status)) . '</span>';
 }
+
+/** Reason text as a sentence: adds a full stop unless it already ends with . ! or ? */
+function with_full_stop(string $text): string
+{
+    $text = rtrim($text);
+    return $text === '' || preg_match('/[.!?]$/u', $text) ? $text : $text . '.';
+}
+
+/** Date $days from today, optionally with a time, for sample rows that follow the seed's relative dates. */
+function relative_date(int $days, ?string $time = null): string
+{
+    $date = date('Y-m-d', strtotime(($days >= 0 ? '+' : '') . $days . ' days'));
+    return $time === null ? $date : $date . ' ' . $time;
+}

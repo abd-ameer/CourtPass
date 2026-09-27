@@ -8,7 +8,7 @@
                     <img src="<?= asset('img/courtpasslogo.png') ?>" alt="<?= e(APP_NAME) ?>" style="height: 36px; width: auto; object-fit: contain;">
                 </div>
                 <p style="font-size: var(--font-size-sm); color: var(--color-text-muted); line-height: 1.5;">
-                    Sri Lanka's trusted sports venue booking and community ecosystem. Empowering players, venue owners, and certified coaches across Colombo and islandwide.
+                    Sri Lanka's trusted sports venue booking and community ecosystem. Connecting players, venue owners and verified coaches across Sri Lanka.
                 </p>
             </div>
 
@@ -17,24 +17,27 @@
                 <h4 style="margin-bottom: var(--space-3); font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-title);">Sports Covered</h4>
                 <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: var(--font-size-sm);">
                     <li><a href="<?= url('/venues?sport=badminton') ?>" style="color: var(--color-text-muted);">Badminton Courts</a></li>
-                    <li><a href="<?= url('/venues?sport=futsal') ?>" style="color: var(--color-text-muted);">Futsal Turfs</a></li>
-                    <li><a href="<?= url('/venues?sport=pickleball') ?>" style="color: var(--color-text-muted);">Pickleball Arenas</a></li>
+                    <li><a href="<?= url('/venues?sport=futsal') ?>" style="color: var(--color-text-muted);">Futsal Courts</a></li>
+                    <li><a href="<?= url('/venues?sport=pickleball') ?>" style="color: var(--color-text-muted);">Pickleball Courts</a></li>
                     <li><a href="<?= url('/venues?sport=squash') ?>" style="color: var(--color-text-muted);">Squash Courts</a></li>
-                    <li><a href="<?= url('/venues?sport=billiards') ?>" style="color: var(--color-text-muted);">Billiards &amp; Snooker</a></li>
+                    <li><a href="<?= url('/venues?sport=billiards') ?>" style="color: var(--color-text-muted);">Billiards</a></li>
+                    <li><a href="<?= url('/venues?sport=carrom') ?>" style="color: var(--color-text-muted);">Carrom</a></li>
                     <li><a href="<?= url('/venues?sport=table_tennis') ?>" style="color: var(--color-text-muted);">Table Tennis</a></li>
                 </ul>
             </div>
 
             <!-- Quick Portals -->
             <div>
-                <h4 style="margin-bottom: var(--space-3); font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-title);">Platform Portals</h4>
+                <h4 style="margin-bottom: var(--space-3); font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-title);">Your Account</h4>
                 <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: var(--font-size-sm);">
-                    <li><a href="<?= url('/customer/dashboard') ?>" style="color: var(--color-text-muted);">Customer Portal</a></li>
-                    <li><a href="<?= url('/owner/dashboard') ?>" style="color: var(--color-text-muted);">Venue Owner Dashboard</a></li>
-                    <li><a href="<?= url('/coach/dashboard') ?>" style="color: var(--color-text-muted);">Coach Operations &amp; Sessions</a></li>
-                    <li><a href="<?= url('/admin/dashboard') ?>" style="color: var(--color-text-muted);">Platform Administration</a></li>
+                    <?php if (Auth::check()): ?>
+                        <li><a href="<?= url(Auth::homeUrl()) ?>" style="color: var(--color-text-muted);">My Dashboard</a></li>
+                        <li><a href="<?= url('/account') ?>" style="color: var(--color-text-muted);">Account Settings</a></li>
+                    <?php else: ?>
+                        <li><a href="<?= url('/login') ?>" style="color: var(--color-text-muted);">Log In</a></li>
+                        <li><a href="<?= url('/register') ?>" style="color: var(--color-text-muted);">Sign Up as a Player, Venue Owner or Coach</a></li>
+                    <?php endif; ?>
                     <li><a href="<?= url('/help') ?>" style="color: var(--color-text-muted);">Cancellation &amp; Resale Policy</a></li>
-                    <li><a href="<?= url('/register') ?>" style="color: var(--color-text-muted);">Join as Partner / Coach</a></li>
                 </ul>
             </div>
 
