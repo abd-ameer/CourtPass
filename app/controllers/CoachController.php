@@ -55,11 +55,15 @@ class CoachController extends Controller
     public function dashboard(): void
     {
         $service = new CoachSessionService();
+        $sessions = $service->coachSessions(Auth::id(), 'upcoming');
+        $venues = $service->sessionVenues(Auth::id());
         $this->view('coach/dashboard', [
-            'title'     => 'Coach Dashboard',
-            'coachName' => Auth::user()['name'],
-            'upcoming'  => $service->coachSessions(Auth::id(), 'upcoming')['sessions'],
-            'hasVenues' => $service->sessionVenues(Auth::id()) !== [],
+            'title'          => 'Coach Dashboard',
+            'coachName'      => Auth::user()['name'],
+            'upcoming'       => $sessions['sessions'],
+            'completedCount' => $sessions['counts']['completed'],
+            'venues'         => $venues,
+            'hasVenues'      => $venues !== [],
         ], 'dashboard');
     }
 

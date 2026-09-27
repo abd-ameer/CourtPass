@@ -36,7 +36,18 @@ class VenueController extends Controller
 
     public function dashboard(): void
     {
-        $this->view('owner/dashboard', ['title' => 'Owner Dashboard'], 'dashboard');
+        $bookings = (new BookingService())->ownerBookings(Auth::id());
+        $pending = array_values(array_filter($bookings, fn (array $b) => $b['status'] === 'pending'));
+        usort($pending, fn (array $x, array $y) => strcmp($x['starts_at'], $y['starts_at']));
+
+        $this->view('owner/dashboard', [
+            'title'     => 'Owner Dashboard',
+            'name'      => Auth::user()['name'],
+            'venues'    => (new VenueService())->ownerVenues(Auth::id()),
+            'pending'   => $pending,
+            'confirmed' => count(array_filter($bookings, fn (array $b) => $b['status'] === 'confirmed' && $b['group'] === 'upcoming')),
+            'today'     => (new CheckInService())->desk(Auth::id())['counts'],
+        ], 'dashboard');
     }
 
     public function index(): void
@@ -140,7 +151,14 @@ class VenueController extends Controller
 
     public function adminDashboard(): void
     {
-        $this->view('admin/dashboard', ['title' => 'Admin Dashboard'], 'dashboard');
+        $listed = (new VenueService())->publicVenues();
+        $this->view('admin/dashboard', [
+            'title'         => 'Admin Dashboard',
+            'pendingVenues' => (new VenueService())->pendingVenues(),
+            'listedVenues'  => count($listed),
+            'listedCourts'  => array_sum(array_column($listed, 'court_count')),
+            'reviewCounts'  => (new ReviewService())->moderation('active')['counts'],
+        ], 'dashboard');
     }
 
     public function adminIndex(): void
