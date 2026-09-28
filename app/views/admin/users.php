@@ -1,16 +1,6 @@
 <?php
-/** @var string $role */
-// Sample rows matching the seed accounts until the user list is built.
-$users = [
-    [1, 'System Admin', 'admin', 'admin@courtpass.lk', '0771234567', 'Platform administrator'],
-    [2, 'Kamal Perera', 'owner', 'kamal@sportshub.lk', '0772345678', '2 approved venues'],
-    [3, 'Nimal Silva', 'owner', 'nimal@courtzone.lk', '0773456789', '1 pending venue'],
-    [4, 'Saman Fernando', 'customer', 'saman@gmail.com', '0774567890', '92% Standard'],
-    [5, 'Ruwan Jayasinghe', 'customer', 'ruwan@gmail.com', '0775678901', 'New Member'],
-    [6, 'Dinesh Kumara', 'customer', 'dinesh@gmail.com', '0776789012', '55% Restricted'],
-    [7, 'Ashan Weerasinghe', 'coach', 'ashan@coach.lk', '0777890123', 'Verified coach'],
-    [8, 'Dilani Rathnayake', 'coach', 'dilani@coach.lk', '0778901234', 'Not verified yet'],
-];
+/** @var string $role @var array $users from AccountService::allUsers() */
+$users = array_map(fn (array $u) => [$u['id'], $u['name'], $u['role'], $u['email'], (string) $u['phone'], $u['standing']], $users);
 $roleNames = ['admin' => 'Admin', 'owner' => 'Venue Owner', 'customer' => 'Customer', 'coach' => 'Coach'];
 $count = fn (string $r) => count(array_filter($users, fn (array $u) => $u[2] === $r));
 ?>

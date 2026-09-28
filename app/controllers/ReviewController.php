@@ -76,8 +76,17 @@ class ReviewController extends Controller
 
     public function moderation(): void
     {
-        $this->view('admin/review-moderation', ['title' => 'Review Moderation']
-            + (new ReviewService())->moderation($this->text('status')), 'dashboard');
+        $service = new ReviewService();
+        $this->view('admin/review-moderation', ['title' => 'Review Moderation', 'coachReviews' => $service->coachModeration()]
+            + $service->moderation($this->text('status')), 'dashboard');
+    }
+
+    public function removeCoachReview(string $id): void
+    {
+        $this->verifyCsrf();
+        // TODO: remove a coach review with a reason (UC-PA-10); same rules as removing a venue review.
+        Session::flash('info', 'Removing coach reviews is not available yet.');
+        $this->redirect('/admin/reviews');
     }
 
     public function remove(string $id): void

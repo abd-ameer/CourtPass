@@ -28,6 +28,14 @@ class DiscoveryController extends Controller
         ));
     }
 
+    public function availableNow(): void
+    {
+        $this->view('public/available-now', [
+            'title' => 'Available Now: Flash Deals',
+            'deals' => (new DiscoveryService())->availableNow(),
+        ]);
+    }
+
     public function venue(string $slug): void
     {
         $page = (new DiscoveryService())->venuePage($slug);

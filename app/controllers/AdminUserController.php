@@ -6,6 +6,7 @@ class AdminUserController extends Controller
         $this->view('admin/users', [
             'title' => 'User Management',
             'role'  => (string) $this->request->query('role', ''),
+            'users' => (new AccountService())->allUsers(),
         ], 'dashboard');
     }
 
