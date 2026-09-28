@@ -27,13 +27,17 @@ $invalid = fn (string $f) => isset($errors[$f]) ? ' is-invalid' : '';
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
     <div class="form-group">
         <label class="form-label" for="regPassword">Password <span class="required-star">*</span></label>
-        <input type="password" name="password" id="regPassword" class="form-control<?= $invalid('password') ?>" placeholder="At least 8 characters" minlength="8" maxlength="72" autocomplete="new-password" required>
+        <div class="password-field">
+            <input type="password" name="password" id="regPassword" class="form-control<?= $invalid('password') ?>" placeholder="At least 8 characters" minlength="8" maxlength="72" autocomplete="new-password" required>
+        </div>
         <div class="password-meter"><div class="password-meter-fill"></div></div>
         <span class="form-feedback invalid"><?= e($errors['password'] ?? '') ?></span>
     </div>
     <div class="form-group">
         <label class="form-label" for="regConfirm">Confirm Password <span class="required-star">*</span></label>
-        <input type="password" name="confirm_password" id="regConfirm" class="form-control<?= $invalid('confirm_password') ?>" autocomplete="new-password" required>
+        <div class="password-field">
+            <input type="password" name="confirm_password" id="regConfirm" class="form-control<?= $invalid('confirm_password') ?>" autocomplete="new-password" required>
+        </div>
         <span class="form-feedback invalid"><?= e($errors['confirm_password'] ?? '') ?></span>
     </div>
 </div>

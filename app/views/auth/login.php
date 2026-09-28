@@ -26,7 +26,9 @@ $invalid = fn (string $f) => isset($errors[$f]) ? ' is-invalid' : '';
 
                 <div class="form-group">
                     <label class="form-label" for="loginPassword">Password <span class="required-star">*</span></label>
-                    <input type="password" name="password" id="loginPassword" class="form-control<?= $invalid('password') ?>" autocomplete="current-password" required>
+                    <div class="password-field">
+                        <input type="password" name="password" id="loginPassword" class="form-control<?= $invalid('password') ?>" autocomplete="current-password" required>
+                    </div>
                     <span class="form-feedback invalid"><?= e($errors['password'] ?? '') ?></span>
                 </div>
 

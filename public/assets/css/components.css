@@ -390,6 +390,42 @@
   color: var(--color-success);
 }
 
+/* Password show / hide toggle */
+.password-field {
+  position: relative;
+}
+
+.password-field .form-control {
+  padding-right: 44px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  color: var(--color-text-main);
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
 /* Password strength bar */
 .password-meter {
   height: 4px;
