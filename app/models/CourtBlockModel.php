@@ -10,6 +10,20 @@ class CourtBlockModel extends Model
         );
     }
 
+    /** Blocks on one date with who or what holds them: the coach and session for a coaching block, the reason for an owner block. */
+    public function labelsOn(int $courtId, string $date): array
+    {
+        return $this->select(
+            "SELECT b.start_time, b.block_type, b.reason, s.title AS session_title, u.name AS coach_name
+             FROM court_blocks b
+             LEFT JOIN coach_sessions s ON s.block_id = b.id
+             LEFT JOIN users u ON u.id = s.coach_id
+             WHERE b.court_id = ? AND b.block_date = ?",
+            'is',
+            [$courtId, $date]
+        );
+    }
+
     public function existsAt(int $courtId, string $date, string $time): bool
     {
         return $this->selectOne(

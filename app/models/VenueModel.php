@@ -31,6 +31,20 @@ class VenueModel extends Model
         return $this->select(self::DETAIL_SELECT . ' WHERE v.owner_id = ? ORDER BY v.created_at DESC, v.id DESC', 'i', [$ownerId]);
     }
 
+    /** Every venue for the admin, optionally one group: listed, off (switched off by the owner), pending, rejected or deactivated. */
+    public function adminList(?string $filter): array
+    {
+        $where = match ($filter) {
+            'listed'      => " WHERE v.status = 'approved' AND v.is_active = 1",
+            'off'         => " WHERE v.status = 'approved' AND v.is_active = 0",
+            'pending'     => " WHERE v.status = 'pending'",
+            'rejected'    => " WHERE v.status = 'rejected'",
+            'deactivated' => " WHERE v.status = 'deactivated'",
+            default       => '',
+        };
+        return $this->select(self::DETAIL_SELECT . $where . ' ORDER BY v.name, v.id');
+    }
+
     public function pending(): array
     {
         return $this->select(self::DETAIL_SELECT . " WHERE v.status = 'pending' ORDER BY v.created_at, v.id");

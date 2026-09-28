@@ -120,6 +120,15 @@ class VenueService
         return $this->withSports(array_map(fn (array $v) => $this->present($v), $this->venues->pending()));
     }
 
+    public const ADMIN_FILTERS = ['listed', 'off', 'pending', 'rejected', 'deactivated'];
+
+    /** Every venue for the admin's venue list, optionally one ADMIN_FILTERS group. */
+    public function adminVenues(?string $filter = null): array
+    {
+        $filter = in_array($filter, self::ADMIN_FILTERS, true) ? $filter : null;
+        return $this->withSports(array_map(fn (array $v) => $this->present($v), $this->venues->adminList($filter)));
+    }
+
     /** Any venue with owner details, sports and courts, for the admin. */
     public function adminVenue(int $venueId): ?array
     {

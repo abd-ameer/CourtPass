@@ -77,7 +77,12 @@ $terms = $b['cancellation'];
                 <!-- Status notice -->
                 <?php if ($b['status'] === 'pending_payment'): ?>
                     <div style="padding: 14px 18px; background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-lg); font-size: 13px; color: #92400e;">
-                        <strong>Awaiting online payment.</strong> This slot is held for you until <?= e(date('H:i', strtotime($b['pending_expires_at']))) ?>. The booking is confirmed automatically once PayHere verifies the payment; if it is not paid by then, the hold ends and the slot is released.
+                        <strong>Awaiting online payment.</strong> This slot is held for you until <?= e(date('H:i', strtotime($b['pending_expires_at']))) ?>. The booking is confirmed as soon as the payment is verified; if it is not paid by then, the hold ends and the slot is released.
+                        <?php if ($b['can_pay']): ?>
+                            <div style="margin-top: 12px;">
+                                <button type="button" class="btn btn-primary btn-sm" onclick="CourtPassApp.openModal('payOnlineModal')">Pay <?= e(lkr($b['amount'])) ?> Now &rarr;</button>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 <?php elseif ($b['status'] === 'pending'): ?>
                     <div style="padding: 14px 18px; background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-lg); font-size: 13px; color: #92400e;">
@@ -217,3 +222,28 @@ $terms = $b['cancellation'];
     </div>
 
 </div>
+
+<?php if ($b['can_pay']): ?>
+<div class="modal-backdrop" id="payOnlineModal">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h3 class="modal-title">Pay Online</h3>
+            <button type="button" class="modal-close" onclick="CourtPassApp.closeModal('payOnlineModal')">&times;</button>
+        </div>
+        <form method="POST" action="<?= url('/customer/bookings/' . (int) $b['id'] . '/pay') ?>">
+            <?= csrf_field() ?>
+            <div class="modal-body">
+                <p style="font-size: 15px; color: var(--color-text-main); margin-bottom: 12px;">Booking #<?= (int) $b['id'] ?> · <?= e($b['court_name']) ?>, <?= e($b['venue_name']) ?> · <?= e(format_datetime($b['starts_at'])) ?></p>
+                <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 16px; padding: 12px 0; border-top: 1px solid var(--color-border);">
+                    <span>Amount</span><span><?= e(lkr($b['amount'])) ?></span>
+                </div>
+                <p class="text-xs text-muted">Your booking is confirmed as soon as the payment is verified.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="CourtPassApp.closeModal('payOnlineModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Pay <?= e(lkr($b['amount'])) ?></button>
+            </div>
+        </form>
+    </div>
+</div>
+<?php endif; ?>

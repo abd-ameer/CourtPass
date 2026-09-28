@@ -1,6 +1,17 @@
 <?php
 class PaymentModel extends Model
 {
+    /** A payment already verified as paid. $gatewayRef fills payhere_payment_id (a SIM- reference for simulated payments). */
+    public function createPaid(string $purpose, ?int $bookingId, ?int $registrationId, string $orderId, float $amount, string $gatewayRef, string $paidAt): int
+    {
+        return $this->insert(
+            "INSERT INTO payments (purpose, booking_id, registration_id, order_id, amount, status, payhere_payment_id, payhere_method, paid_at)
+             VALUES (?, ?, ?, ?, ?, 'paid', ?, 'SIMULATED', ?)",
+            'siisdss',
+            [$purpose, $bookingId, $registrationId, $orderId, $amount, $gatewayRef, $paidAt]
+        );
+    }
+
     /** The paid payment behind a booking (booking or cash-to-online conversion), locked for the caller's transaction. */
     public function paidForBookingForUpdate(int $bookingId): ?array
     {

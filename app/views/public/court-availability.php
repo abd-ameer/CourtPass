@@ -109,7 +109,8 @@
 document.addEventListener('DOMContentLoaded', () => {
  CourtPassAvailability.init({
  courtId: <?= (int) $court['id'] ?>,
- isGuest: <?= $isGuest ? 'true' : 'false' ?>
+ isGuest: <?= $isGuest ? 'true' : 'false' ?>,
+ signedInRole: <?= json_encode(Auth::check() && $isGuest ? ['owner' => 'venue owner', 'coach' => 'coach', 'admin' => 'platform admin'][Auth::role()] ?? null : null) ?>
  });
 });
 </script>
