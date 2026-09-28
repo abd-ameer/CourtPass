@@ -1,7 +1,7 @@
 <?php
 /** @var array $account name, email, phone @var array $sessions the coach's sessions @var array $profile @var array $sportTypes @var array $experienceLevels */
 $sportNames = array_column(array_filter($sportTypes, fn (array $s) => in_array((int) $s['id'], $profile['sport_type_ids'], true)), 'name');
-$rating = $sessions[0]['coach_rating'] ?? null;
+$rating = $profile['avg_rating'];
 $initials = strtoupper(implode('', array_map(fn ($w) => mb_substr($w, 0, 1), array_slice(preg_split('/\s+/', trim($account['name'])) ?: [], 0, 2))));
 ?>
 <div class="page-header">
@@ -24,7 +24,11 @@ $initials = strtoupper(implode('', array_map(fn ($w) => mb_substr($w, 0, 1), arr
         </div>
         <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;"><?= e($account['name']) ?></h2>
         <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: var(--space-4);">
-            <span class="badge" style="background: #dbeafe; color: #1d4ed8;">Verified Coach</span>
+            <?php if ($profile['is_verified']): ?>
+                <span class="badge" style="background: #dbeafe; color: #1d4ed8;">Verified Coach</span>
+            <?php else: ?>
+                <span class="badge badge-pending">Not verified yet</span>
+            <?php endif; ?>
         </div>
         <div style="display: flex; justify-content: center; gap: var(--space-6); margin-bottom: var(--space-4); padding: var(--space-4) 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);">
             <div style="text-align: center;">
@@ -58,7 +62,7 @@ $initials = strtoupper(implode('', array_map(fn ($w) => mb_substr($w, 0, 1), arr
                 <h3 style="font-size: 15px; margin-bottom: 0;">About Me</h3>
             </div>
             <div class="card-body">
-                <p style="font-size: 14px; line-height: 1.7; margin-bottom: 0;"><?= e($profile['bio']) ?></p>
+                <p style="font-size: 14px; line-height: 1.7; margin-bottom: 0;"><?= e($profile['bio'] ?: 'No bio yet.') ?></p>
             </div>
         </div>
 
@@ -95,7 +99,7 @@ $initials = strtoupper(implode('', array_map(fn ($w) => mb_substr($w, 0, 1), arr
  <h3 style="font-size: 15px; margin-bottom: 14px;">Edit Profile</h3>
  <div class="form-group">
  <label class="form-label" for="profBio">Bio <span class="required-star">*</span></label>
- <textarea name="bio" id="profBio" class="form-control" rows="4" maxlength="1000" required><?= e($profile['bio']) ?></textarea>
+ <textarea name="bio" id="profBio" class="form-control" rows="4" maxlength="1000" required><?= e($profile['bio'] ?? '') ?></textarea>
  </div>
  <div class="form-group">
  <span class="form-label">Sport Types <span class="required-star">*</span></span>
@@ -117,7 +121,7 @@ $initials = strtoupper(implode('', array_map(fn ($w) => mb_substr($w, 0, 1), arr
  </div>
  <div class="form-group">
  <label class="form-label" for="profCerts">Certifications (text only)</label>
- <textarea name="certifications" id="profCerts" class="form-control" rows="3" maxlength="2000"><?= e($profile['certifications']) ?></textarea>
+ <textarea name="certifications" id="profCerts" class="form-control" rows="3" maxlength="2000"><?= e($profile['certifications'] ?? '') ?></textarea>
  </div>
  <button type="submit" class="btn btn-primary">Save Profile</button>
  </form>

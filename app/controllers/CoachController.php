@@ -64,16 +64,15 @@ class CoachController extends Controller
             'completedCount' => $sessions['counts']['completed'],
             'venues'         => $venues,
             'hasVenues'      => $venues !== [],
+            'stats'          => $service->coachStats(Auth::id()),
+            'profile'        => (new CoachService())->profile(Auth::id()),
+            'reviews'        => (new CoachService())->reviews(Auth::id(), 3),
         ], 'dashboard');
     }
 
     public function editProfile(): void
     {
-        // TODO: load coach_profiles and coach_sports for Auth::id().
-        $profile = [
-            'bio' => 'Former national-level badminton player. Coaching juniors and adults for 8 years.',
-            'experience_level' => 'professional', 'certifications' => 'BWF Level 1 Coach', 'sport_type_ids' => [2, 3],
-        ];
+        $profile = (new CoachService())->profile(Auth::id());
         $this->view('coach/profile', [
             'title'            => 'Coach Profile',
             'account'          => (new AccountService())->details(Auth::id()),
@@ -108,7 +107,7 @@ class CoachController extends Controller
 
     public function reviews(): void
     {
-        $this->view('coach/reviews', ['title' => 'My Reviews'], 'dashboard');
+        $this->view('coach/reviews', ['title' => 'My Reviews', 'reviews' => (new CoachService())->reviews(Auth::id())], 'dashboard');
     }
 
     public function respond(string $id): void
@@ -140,7 +139,10 @@ class CoachController extends Controller
 
     public function ownerRequests(): void
     {
-        $this->view('owner/coach-requests', ['title' => 'Coach Requests'], 'dashboard');
+        $this->view('owner/coach-requests', [
+            'title'    => 'Coach Requests',
+            'requests' => (new CoachService())->ownerRequests(Auth::id()),
+        ], 'dashboard');
     }
 
     public function approveRequest(string $id): void
@@ -190,13 +192,23 @@ class CoachController extends Controller
 
     public function publicProfile(string $id): void
     {
+        $coaches = new CoachService();
+        $profile = $coaches->profile((int) $id);
+        if ($profile === null) {
+            $this->notFound();
+        }
         $sessions = array_values(array_filter((new CoachSessionService())->publicSessions(), fn (array $s) => (int) $s['coach_id'] === (int) $id));
-        $this->view('public/coach-profile', ['title' => 'Coach Profile', 'coachId' => (int) $id, 'sessions' => $sessions]);
+        $this->view('public/coach-profile', [
+            'title'    => $profile['name'],
+            'profile'  => $profile,
+            'sessions' => $sessions,
+            'reviews'  => $coaches->reviews((int) $id),
+        ]);
     }
 
     public function adminIndex(): void
     {
-        $this->view('admin/coach-verifications', ['title' => 'Coach Verification'], 'dashboard');
+        $this->view('admin/coach-verifications', ['title' => 'Coach Verification', 'coaches' => (new CoachService())->adminCoaches()], 'dashboard');
     }
 
     public function verify(string $id): void

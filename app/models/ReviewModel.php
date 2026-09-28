@@ -56,6 +56,42 @@ class ReviewModel extends Model
         return $this->select(self::DETAIL_SELECT . ' WHERE r.reviewer_id = ? ORDER BY r.created_at DESC, r.id DESC', 'i', [$reviewerId]);
     }
 
+    /** A coach's reviews with the session each came from, newest first; active only unless $withRemoved. */
+    public function forCoach(int $coachId, ?int $limit = null, bool $withRemoved = false): array
+    {
+        $sql = "SELECT r.id, r.reviewer_id, r.registration_id, r.rating, r.comment, r.response_text, r.responded_at,
+                       r.status, r.removed_reason, r.created_at, u.name AS reviewer_name,
+                       s.id AS session_id, s.title AS session_title, s.session_date, s.start_time
+                FROM reviews r
+                JOIN users u ON u.id = r.reviewer_id
+                JOIN session_registrations sr ON sr.id = r.registration_id
+                JOIN coach_sessions s ON s.id = sr.session_id
+                WHERE r.coach_id = ?" . ($withRemoved ? '' : " AND r.status = 'active'") . '
+                ORDER BY r.created_at DESC, r.id DESC';
+        if ($limit !== null) {
+            return $this->select($sql . ' LIMIT ?', 'ii', [$coachId, $limit]);
+        }
+        return $this->select($sql, 'i', [$coachId]);
+    }
+
+    /** Coach reviews for the admin's moderation list, newest first. $status is active or removed. */
+    public function coachReviewsForModeration(string $status): array
+    {
+        return $this->select(
+            "SELECT r.id, r.rating, r.comment, r.response_text, r.status, r.removed_reason, r.created_at,
+                    u.name AS reviewer_name, cu.name AS coach_name, s.title AS session_title, s.session_date, s.start_time
+             FROM reviews r
+             JOIN users u ON u.id = r.reviewer_id
+             JOIN users cu ON cu.id = r.coach_id
+             JOIN session_registrations sr ON sr.id = r.registration_id
+             JOIN coach_sessions s ON s.id = sr.session_id
+             WHERE r.coach_id IS NOT NULL AND r.status = ?
+             ORDER BY r.created_at DESC, r.id DESC",
+            's',
+            [$status]
+        );
+    }
+
     public function activeForVenue(int $venueId): array
     {
         return $this->select(

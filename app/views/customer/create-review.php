@@ -4,7 +4,7 @@
  * @var int|null $bookingId venue review of this booking
  * @var int|null $registrationId coach review of this registration
  * @var int|null $reviewId editing an existing review
- * Optional (venue reviews): string $subject, int $rating, string $comment, ?string $reviewUntil, array $errors
+ * Optional: string $subject, int $rating, string $comment, ?string $reviewUntil, array $errors
  */
 $isEdit = $reviewId !== null;
 if ($isEdit) {
@@ -14,10 +14,9 @@ if ($isEdit) {
 } else {
     $action = '/customer/bookings/' . $bookingId . '/review';
 }
-// TODO: the coach review subject, rating and comment come from the registration (coach reviews).
-$subject ??= $target === 'coach' ? 'Coach Ashan Weerasinghe (Beginner Badminton Basics)' : 'Colombo Sports Hub (Badminton Court 1)';
-$rating ??= $target === 'coach' ? 4 : 5;
-$comment ??= $target === 'coach' ? 'Very clear explanations, good for beginners.' : '';
+$subject ??= '';
+$rating ??= 5;
+$comment ??= '';
 $reviewUntil ??= null;
 $errors ??= [];
 $invalid = fn (string $f) => isset($errors[$f]) ? ' is-invalid' : '';

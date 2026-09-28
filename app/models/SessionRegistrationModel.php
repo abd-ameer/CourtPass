@@ -35,6 +35,31 @@ class SessionRegistrationModel extends Model
         );
     }
 
+    /** Every registration of the customer with its session, venue, coach, payment and any coach review, latest session first. */
+    public function forCustomer(int $customerId): array
+    {
+        return $this->select(
+            "SELECT r.id, r.session_id, r.status, r.amount, r.cancel_source, r.cancelled_at, r.attendance_marked_at, r.created_at,
+                    s.title, s.session_date, s.start_time, s.visibility, s.access_token, s.status AS session_status,
+                    c.name AS court_name, v.name AS venue_name, st.name AS sport_name,
+                    s.coach_id, u.name AS coach_name, cp.is_verified AS coach_verified,
+                    (SELECT p.amount FROM payments p
+                     WHERE p.registration_id = r.id AND p.status = 'paid' ORDER BY p.id DESC LIMIT 1) AS paid_amount,
+                    (SELECT rv.id FROM reviews rv WHERE rv.registration_id = r.id) AS review_id
+             FROM session_registrations r
+             JOIN coach_sessions s ON s.id = r.session_id
+             JOIN courts c ON c.id = s.court_id
+             JOIN venues v ON v.id = c.venue_id
+             JOIN sport_types st ON st.id = c.sport_type_id
+             JOIN users u ON u.id = s.coach_id
+             JOIN coach_profiles cp ON cp.coach_id = s.coach_id
+             WHERE r.customer_id = ?
+             ORDER BY s.session_date DESC, s.start_time DESC, r.id DESC",
+            'i',
+            [$customerId]
+        );
+    }
+
     /** Live registrations of a session, locked for the caller's transaction. */
     public function liveForSessionForUpdate(int $sessionId): array
     {

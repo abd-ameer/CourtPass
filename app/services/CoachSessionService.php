@@ -4,6 +4,8 @@ class CoachSessionService
     public const MAX_CAPACITY = 50;
     public const MAX_FEE = 100000;
     public const STATUS_FILTERS = ['upcoming', 'completed', 'cancelled'];
+    public const REVIEW_DAYS = 7;
+    public const REGULAR_SESSIONS = 3;
 
     private CoachSessionModel $sessions;
     private SessionRegistrationModel $registrations;
@@ -208,6 +210,67 @@ class CoachSessionService
             return $r;
         }, $this->registrations->forSession($sessionId));
         return $session;
+    }
+
+    /** Every session on the owner's courts, upcoming first (soonest), then past and cancelled (latest first). */
+    public function ownerSessions(int $ownerId): array
+    {
+        $this->completePast();
+        $all = array_map(fn (array $s) => $this->present($s), $this->sessions->forOwner($ownerId));
+        $upcoming = array_reverse(array_values(array_filter($all, fn (array $s) => $s['group'] === 'upcoming')));
+        $rest = array_values(array_filter($all, fn (array $s) => $s['group'] !== 'upcoming'));
+        return array_merge($upcoming, $rest);
+    }
+
+    /**
+     * The customer's registrations for My Sessions, latest session first, with can_review
+     * (attended, not yet reviewed, within REVIEW_DAYS of the session start).
+     */
+    public function customerRegistrations(int $customerId): array
+    {
+        $this->completePast();
+        $now = now();
+        return array_map(function (array $r) use ($now): array {
+            foreach (['id', 'session_id', 'coach_id'] as $key) {
+                $r[$key] = (int) $r[$key];
+            }
+            $r['amount'] = (float) $r['amount'];
+            $r['paid_amount'] = $r['paid_amount'] === null ? null : (float) $r['paid_amount'];
+            $r['coach_verified'] = (int) $r['coach_verified'] === 1;
+            $r['review_id'] = $r['review_id'] === null ? null : (int) $r['review_id'];
+            $r['starts_at'] = $r['session_date'] . ' ' . $r['start_time'];
+            $r['session_path'] = $r['visibility'] === 'private' ? '/sessions/private/' . $r['access_token'] : '/sessions/' . $r['session_id'];
+            $r['review_until'] = date('Y-m-d H:i:s', strtotime($r['starts_at']) + self::REVIEW_DAYS * 86400);
+            $r['can_review'] = $r['status'] === 'attended' && $r['review_id'] === null && $now < $r['review_until'];
+            $r['can_cancel'] = $r['status'] === 'registered' && $r['starts_at'] > $now;
+            return $r;
+        }, $this->registrations->forCustomer($customerId));
+    }
+
+    /**
+     * Summary figures for the coach dashboard: revenue this month and all time (paid minus refunds),
+     * unique students, regulars (REGULAR_SESSIONS or more sessions) and completed sessions.
+     */
+    public function coachStats(int $coachId): array
+    {
+        $month = date('Y-m');
+        $stats = ['revenue_month' => 0.0, 'revenue_total' => 0.0, 'students' => 0, 'regulars' => 0];
+        $perStudent = [];
+        foreach ($this->sessions->forCoach($coachId) as $s) {
+            foreach ($this->registrations->forSession((int) $s['id']) as $r) {
+                $net = (float) ($r['paid_amount'] ?? 0) - (float) ($r['refund_amount'] ?? 0);
+                $stats['revenue_total'] += $net;
+                if (str_starts_with($s['session_date'], $month)) {
+                    $stats['revenue_month'] += $net;
+                }
+                if ($r['status'] !== 'cancelled') {
+                    $perStudent[(int) $r['customer_id']] = ($perStudent[(int) $r['customer_id']] ?? 0) + 1;
+                }
+            }
+        }
+        $stats['students'] = count($perStudent);
+        $stats['regulars'] = count(array_filter($perStudent, fn (int $n) => $n >= self::REGULAR_SESSIONS));
+        return $stats;
     }
 
     /** The coach's approved venues with the courts they can use: [['id', 'name', 'courts' => [['id', 'name', 'sport']]]]. */

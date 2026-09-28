@@ -107,6 +107,9 @@ $router->post('/owner/coach-requests/{id}/approve', [CoachController::class, 'ap
 $router->post('/owner/coach-requests/{id}/decline', [CoachController::class, 'declineRequest'], ['owner']);
 $router->post('/owner/coach-requests/{id}/revoke', [CoachController::class, 'revokeApproval'], ['owner']);
 
+$router->get('/owner/sessions', [CoachSessionController::class, 'ownerIndex'], ['owner']);
+$router->post('/owner/sessions/{id}/cancel', [CoachSessionController::class, 'ownerCancel'], ['owner']);
+
 $router->get('/admin/coaches', [CoachController::class, 'adminIndex'], ['admin']);
 $router->post('/admin/coaches/{id}/verify', [CoachController::class, 'verify'], ['admin']);
 

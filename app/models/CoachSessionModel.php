@@ -52,6 +52,16 @@ class CoachSessionModel extends Model
         );
     }
 
+    /** Every session on the owner's courts, latest slot first. */
+    public function forOwner(int $ownerId): array
+    {
+        return $this->select(
+            self::DETAIL_SELECT . ' WHERE v.owner_id = ? ORDER BY s.session_date DESC, s.start_time DESC, s.id DESC',
+            'i',
+            [$ownerId]
+        );
+    }
+
     /** Public open or full sessions starting after $now, soonest first, optionally filtered. */
     public function publicUpcoming(string $now, ?string $sportCode, ?int $venueId, ?string $date): array
     {
