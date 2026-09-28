@@ -141,6 +141,17 @@ class ReviewService
     }
 
     /** Admin hides a venue review with a reason; an open flag on it is closed as upheld and the reviewer is told. */
+    /** Active coach reviews for the admin's moderation page, newest first. */
+    public function coachModeration(): array
+    {
+        return array_map(function (array $r): array {
+            $r['id'] = (int) $r['id'];
+            $r['rating'] = (int) $r['rating'];
+            $r['session_starts_at'] = $r['session_date'] . ' ' . $r['start_time'];
+            return $r;
+        }, $this->reviews->coachReviewsForModeration('active'));
+    }
+
     public function remove(int $adminId, int $reviewId, mixed $reason): void
     {
         $reason = self::validReason($reason, 'reason');

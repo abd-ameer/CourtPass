@@ -1,9 +1,10 @@
 <?php
+/** @var bool $sample true for the seeded demo owner, whose rows below match database/seed.sql */
 // Sample rows matching the seed customers of the demo owner until customer intelligence is built.
 $customers = [
-    ['name' => 'Saman Fernando', 'email' => 'saman@gmail.com', 'phone' => '0774567890', 'score' => 92, 'tier' => 'standard', 'bookings' => 10, 'completed' => 7, 'no_shows' => 0, 'spend' => 21000],
-    ['name' => 'Dinesh Kumara', 'email' => 'dinesh@gmail.com', 'phone' => '0776789012', 'score' => 55, 'tier' => 'restricted', 'bookings' => 10, 'completed' => 6, 'no_shows' => 2, 'spend' => 16300],
-    ['name' => 'Ruwan Jayasinghe', 'email' => 'ruwan@gmail.com', 'phone' => '0775678901', 'score' => null, 'tier' => 'new_member', 'bookings' => 2, 'completed' => 1, 'no_shows' => 0, 'spend' => 5000],
+    ['name' => 'Saman Fernando', 'email' => 'saman@gmail.com', 'phone' => '0774567890', 'score' => 92, 'tier' => 'standard', 'bookings' => 11, 'completed' => 7, 'no_shows' => 0, 'spend' => 26000, 'last_visit' => relative_date(-3)],
+    ['name' => 'Dinesh Kumara', 'email' => 'dinesh@gmail.com', 'phone' => '0776789012', 'score' => 55, 'tier' => 'restricted', 'bookings' => 10, 'completed' => 6, 'no_shows' => 2, 'spend' => 16300, 'last_visit' => relative_date(-11)],
+    ['name' => 'Ruwan Jayasinghe', 'email' => 'ruwan@gmail.com', 'phone' => '0775678901', 'score' => null, 'tier' => 'new_member', 'bookings' => 2, 'completed' => 1, 'no_shows' => 0, 'spend' => 5000, 'last_visit' => relative_date(-14)],
 ];
 ?>
 <div class="page-header">
@@ -18,6 +19,14 @@ $customers = [
     </div>
 </div>
 
+<?php if (!$sample): ?>
+<div class="card">
+    <div class="empty-state">
+        <div class="empty-state-title">No customers yet</div>
+        <div class="empty-state-desc">Customers who book at your venues appear here with their reliability, booking history, spend and last visit.</div>
+    </div>
+</div>
+<?php return; endif; ?>
 <div style="display: flex; justify-content: flex-end; margin-bottom: var(--space-4);">
     <input type="text" class="form-control" placeholder="Search by name, phone or email" onkeyup="filterCustomerTable(this.value)" style="max-width: 280px;">
 </div>
@@ -34,6 +43,7 @@ $customers = [
                     <th>Completed</th>
                     <th>No-Shows</th>
                     <th>Total Spend</th>
+                    <th>Last Visit</th>
                     <th>Cash on Arrival</th>
                 </tr>
             </thead>
@@ -50,6 +60,7 @@ $customers = [
                         <td><?= (int) $c['completed'] ?></td>
                         <td><span style="font-weight: 700; color: <?= $c['no_shows'] > 0 ? 'var(--color-danger)' : 'var(--color-success)' ?>;"><?= (int) $c['no_shows'] ?></span></td>
                         <td><strong><?= e(lkr($c['spend'])) ?></strong></td>
+                        <td><?= e(format_datetime($c['last_visit'], false)) ?></td>
                         <td><?= $c['tier'] === 'standard' ? '<span class="badge badge-confirmed">Eligible</span>' : '<span class="badge badge-warning">Online only</span>' ?></td>
                     </tr>
                 <?php endforeach; ?>

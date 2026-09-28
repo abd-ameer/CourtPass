@@ -137,6 +137,7 @@ $router->post('/customer/registrations/{id}/review', [SessionRegistrationControl
 $router->get('/', [DiscoveryController::class, 'home']);
 $router->get('/venues', [DiscoveryController::class, 'venues']);
 $router->get('/venue/{slug}', [DiscoveryController::class, 'venue']);
+$router->get('/available-now', [DiscoveryController::class, 'availableNow']);
 $router->get('/help', [DiscoveryController::class, 'help']);
 
 $router->get('/customer/reviews', [ReviewController::class, 'index'], ['customer']);
@@ -148,6 +149,7 @@ $router->delete('/customer/reviews/{id}', [ReviewController::class, 'destroy'], 
 $router->get('/admin/reviews', [ReviewController::class, 'moderation'], ['admin']);
 $router->post('/admin/reviews/{id}/remove', [ReviewController::class, 'remove'], ['admin']);
 $router->post('/admin/reviews/{id}/dismiss-flag', [ReviewController::class, 'dismissFlag'], ['admin']);
+$router->post('/admin/coach-reviews/{id}/remove', [ReviewController::class, 'removeCoachReview'], ['admin']);
 $router->get('/owner/reviews', [ReviewController::class, 'ownerIndex'], ['owner']);
 $router->post('/owner/reviews/{id}/response', [ReviewController::class, 'respond'], ['owner']);
 $router->post('/owner/reviews/{id}/flag', [ReviewController::class, 'flag'], ['owner']);

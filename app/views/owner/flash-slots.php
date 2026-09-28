@@ -1,5 +1,5 @@
 <?php
-/** @var array $courts the owner's courts with venue_name */
+/** @var array $courts the owner's courts with venue_name @var array $deals from DiscoveryService::ownerFlashDeals() */
 ?>
 <div class="page-header">
  <div>
@@ -79,19 +79,23 @@
   </tr>
  </thead>
  <tbody>
-                <?php // Sample row matching the seed flash deal until flash deals are built. ?>
+                <?php if ($deals === []): ?>
+                    <tr><td colspan="4" class="text-sm text-muted">No active flash deals. Deals appear on the Available Now page until the slot starts.</td></tr>
+                <?php endif; ?>
+                <?php foreach ($deals as $f): ?>
                 <tr>
                     <td>
-                        <strong>Badminton Court 2</strong>
-                        <div class="text-xs text-muted">Colombo Sports Hub · <?= e(format_datetime(relative_date(1), false)) ?> · 14:00 - 15:00</div>
+                        <strong><?= e($f['court_name']) ?></strong>
+                        <div class="text-xs text-muted"><?= e($f['venue_name']) ?> · <?= e(format_datetime($f['slot_date'], false)) ?> · <?= e($f['start']) ?> - <?= e($f['end']) ?></div>
                     </td>
-                    <td><span class="text-muted" style="text-decoration: line-through;"><?= e(lkr(2000)) ?></span></td>
+                    <td><span class="text-muted" style="text-decoration: line-through;"><?= e(lkr($f['original_price'])) ?></span></td>
                     <td>
-                        <strong style="color: #ea580c; font-size: 15px;"><?= e(lkr(1400)) ?></strong>
-                        <span class="badge badge-flash" style="font-size: 10px; margin-left: 4px;">30% OFF</span>
+                        <strong style="color: #ea580c; font-size: 15px;"><?= e(lkr($f['discounted_price'])) ?></strong>
+                        <span class="badge badge-flash" style="font-size: 10px; margin-left: 4px;"><?= (int) $f['percent_off'] ?>% OFF</span>
                     </td>
-                    <td><span class="badge badge-pending">Ends <?= e(format_datetime(relative_date(1, '14:00:00'))) ?></span></td>
+                    <td><span class="badge badge-pending">Ends <?= e(format_datetime($f['starts_at'])) ?></span></td>
                 </tr>
+                <?php endforeach; ?>
             </tbody>
  </table>
  </div>

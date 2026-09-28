@@ -1,10 +1,11 @@
 <?php
-// Sample figures matching the seed bookings of the demo owner (last 30 days) until revenue analytics is built.
-$online = 9000;
+/** @var bool $sample true for the seeded demo owner, whose figures below match database/seed.sql */
+// Sample figures matching the seed bookings of the demo owner (last 30 days and the next 6) until revenue analytics is built.
+$online = 14000;
 $cash = 33300;
 $byCourt = [
+    ['Futsal Court B', 'Colombo Sports Hub', 'Futsal', 3, 15000],
     ['Futsal Court A', 'Colombo Sports Hub', 'Futsal', 2, 10000],
-    ['Futsal Court B', 'Colombo Sports Hub', 'Futsal', 2, 10000],
     ['Badminton Court 1', 'Colombo Sports Hub', 'Badminton', 4, 8000],
     ['Squash Court 1', 'Kandy Court Zone', 'Squash', 2, 6000],
     ['Badminton Court 2', 'Colombo Sports Hub', 'Badminton', 2, 4000],
@@ -28,10 +29,18 @@ $bookings = array_sum(array_column($byCourt, 3));
             <span>Revenue Analytics</span>
         </div>
         <h1 class="page-title">Revenue Analytics</h1>
-        <div class="page-subtitle">Court booking revenue for the last 30 days, split by online payment and Cash on Arrival. Coaching fees are not included.</div>
+        <div class="page-subtitle">Court booking revenue for slots in the last 30 days and the next 6, split by online payment and Cash on Arrival. Coaching fees are not included.</div>
     </div>
 </div>
 
+<?php if (!$sample): ?>
+<div class="card">
+    <div class="empty-state">
+        <div class="empty-state-title">No revenue yet</div>
+        <div class="empty-state-desc">Revenue from online payments and checked-in Cash on Arrival bookings at your venues appears here.</div>
+    </div>
+</div>
+<?php return; endif; ?>
 <div class="grid grid-cols-4 gap-6" style="margin-bottom: var(--space-6);">
     <div class="stat-card">
         <div class="stat-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>

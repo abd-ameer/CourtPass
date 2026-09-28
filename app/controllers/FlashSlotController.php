@@ -10,7 +10,11 @@ class FlashSlotController extends Controller
                 $courts[] = $court + ['venue_name' => $venue['name']];
             }
         }
-        $this->view('owner/flash-slots', ['title' => 'Flash Deals', 'courts' => $courts], 'dashboard');
+        $this->view('owner/flash-slots', [
+            'title'  => 'Flash Deals',
+            'courts' => $courts,
+            'deals'  => (new DiscoveryService())->ownerFlashDeals(Auth::id()),
+        ], 'dashboard');
     }
 
     public function store(): void

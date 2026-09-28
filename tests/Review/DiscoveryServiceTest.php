@@ -25,7 +25,8 @@ class DiscoveryServiceTest extends DatabaseTestCase
         $this->assertSame(1, $hub['review_count']);
         $this->assertSame(1, $hub['first_court_id']);
         $this->assertSame(['Futsal', 'Badminton', 'Table Tennis'], $hub['sports']);
-        $this->assertFalse($hub['has_flash']);
+        $this->assertTrue($hub['has_flash'], 'The seed flash deal is on Badminton Court 2.');
+        $this->assertFalse($page['venues'][1]['has_flash']);
         $this->assertNull($page['venues'][1]['avg_rating']);
 
         $this->execute('UPDATE venues SET is_active = 0 WHERE id = 2');
@@ -98,5 +99,24 @@ class DiscoveryServiceTest extends DatabaseTestCase
         $this->execute("INSERT INTO check_ins (booking_id, checked_in_by, checked_in_at) VALUES ({$id}, 2, '{$date} 10:00:00')");
         $this->execute("INSERT INTO reviews (id, reviewer_id, venue_id, booking_id, rating, comment, created_at)
                         VALUES ({$id}, 4, 1, {$id}, {$rating}, 'Busy evening.', {$createdAt})");
+    }
+
+    public function testAvailableNowListsActiveUpcomingDealsOnListedVenues(): void
+    {
+        $deals = $this->service->availableNow();
+        $this->assertSame([1], array_column($deals, 'id'));
+        $this->assertSame(4, $deals[0]['court_id']);
+        $this->assertSame(1400.0, $deals[0]['discounted_price']);
+        $this->assertSame(30, $deals[0]['percent_off']);
+        $this->assertSame([1], array_column($this->service->ownerFlashDeals(2), 'id'));
+        $this->assertSame([], $this->service->ownerFlashDeals(3));
+
+        $this->execute('UPDATE venues SET is_active = 0 WHERE id = 1');
+        $this->assertSame([], $this->service->availableNow(), 'A switched-off venue shows no deals.');
+        $this->assertSame([1], array_column($this->service->ownerFlashDeals(2), 'id'), 'The owner still sees it.');
+
+        $this->execute('UPDATE venues SET is_active = 1 WHERE id = 1');
+        $this->execute("UPDATE flash_slots SET slot_date = DATE_SUB(CURDATE(), INTERVAL 1 DAY) WHERE id = 1");
+        $this->assertSame([], $this->service->availableNow(), 'A deal ends when its slot starts.');
     }
 }

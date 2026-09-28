@@ -22,8 +22,10 @@ class DiscoveryService
         $venues = $venueService->publicVenues($sportCode === '' ? null : $sportIds[$sportCode], $city, $search);
         $ratings = (new ReviewService())->venueRatings(array_column($venues, 'id'));
         $courts = new CourtService();
+        $flashVenues = array_flip(array_column($this->availableNow(), 'venue_id'));
         foreach ($venues as $i => $venue) {
             $venues[$i] = self::withListingFields($venue, $ratings[$venue['id']]);
+            $venues[$i]['has_flash'] = isset($flashVenues[$venue['id']]);
             $venues[$i]['first_court_id'] = $courts->venueCourts($venue['id'])[0]['id'] ?? null;
         }
 
@@ -46,12 +48,13 @@ class DiscoveryService
             return null;
         }
         $reviewService = new ReviewService();
+        $flashCourts = array_flip(array_column($this->availableNow(), 'court_id'));
         $courts = array_map(fn (array $c) => [
             'id'          => $c['id'],
             'name'        => $c['name'],
             'sport'       => $c['sport_name'],
             'hourly_rate' => $c['hourly_rate'],
-            'has_flash'   => false,
+            'has_flash'   => isset($flashCourts[$c['id']]),
         ], $venue['courts']);
         $reviews = array_map(fn (array $r) => [
             'id'         => $r['id'],
@@ -68,15 +71,43 @@ class DiscoveryService
             'posted_at' => $a['created_at'],
         ], (new AnnouncementModel())->activeForVenue($venue['id']));
 
+        $listing = self::withListingFields($venue, $reviewService->venueRatings([$venue['id']])[$venue['id']]);
+        $listing['has_flash'] = $flashCourts !== [] && array_filter($courts, fn (array $c) => $c['has_flash']) !== [];
         return [
-            'venue'         => self::withListingFields($venue, $reviewService->venueRatings([$venue['id']])[$venue['id']]),
+            'venue'         => $listing,
             'courts'        => $courts,
             'reviews'       => $reviews,
             'announcements' => $announcements,
         ];
     }
 
-    /** Sport names, rating fields and has_flash (flash deals are not built yet) for the venue card and page. */
+    /** Flash deals for the Available Now page: active, upcoming, on listed venues and active courts, soonest first. */
+    public function availableNow(): array
+    {
+        return array_map(fn (array $f) => self::presentFlash($f), (new FlashSlotModel())->activeUpcoming(now()));
+    }
+
+    /** The owner's active, upcoming flash deals, soonest first. */
+    public function ownerFlashDeals(int $ownerId): array
+    {
+        return array_map(fn (array $f) => self::presentFlash($f), (new FlashSlotModel())->activeForOwner($ownerId, now()));
+    }
+
+    private static function presentFlash(array $f): array
+    {
+        foreach (['id', 'court_id', 'venue_id'] as $key) {
+            $f[$key] = (int) $f[$key];
+        }
+        $f['original_price'] = (float) $f['original_price'];
+        $f['discounted_price'] = (float) $f['discounted_price'];
+        $f['percent_off'] = (int) round(100 - $f['discounted_price'] / $f['original_price'] * 100);
+        $f['starts_at'] = $f['slot_date'] . ' ' . $f['start_time'];
+        $f['start'] = substr($f['start_time'], 0, 5);
+        $f['end'] = date('H:i', strtotime($f['starts_at'] . ' +1 hour'));
+        return $f;
+    }
+
+    /** Sport names, rating fields and has_flash (set by the caller) for the venue card and page. */
     private static function withListingFields(array $venue, array $rating): array
     {
         $venue['sports'] = array_column($venue['sports'], 'name');

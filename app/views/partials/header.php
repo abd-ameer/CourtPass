@@ -14,6 +14,9 @@ $currentUri = Request::current()?->path() ?? '/';
             <a href="<?= url('/venues') ?>" style="font-weight: 600; font-size: 14px; color: <?= str_starts_with($currentUri, '/venues') ? 'var(--color-primary-hover)' : 'var(--color-text-main)' ?>;">
                 Browse Venues
             </a>
+            <a href="<?= url('/available-now') ?>" style="font-weight: 600; font-size: 14px; color: <?= str_starts_with($currentUri, '/available-now') ? 'var(--color-primary-hover)' : '#ea580c' ?>;">
+                Available Now
+            </a>
             <a href="<?= url('/coaching') ?>" style="font-weight: 600; font-size: 14px; color: <?= str_starts_with($currentUri, '/coaching') ? 'var(--color-primary-hover)' : 'var(--color-text-main)' ?>;">
                 Coaching Sessions
             </a>

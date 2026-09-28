@@ -1,5 +1,5 @@
 <?php
-/** @var array $reviews @var string $status @var array $counts */
+/** @var array $reviews @var string $status @var array $counts @var array $coachReviews active coach reviews */
 $tabs = ['flagged' => 'Reported by owners', 'active' => 'All active', 'removed' => 'Removed'];
 $stars = fn (int $n) => str_repeat('&#9733;', $n) . '<span style="color: #d1d5db;">' . str_repeat('&#9733;', 5 - $n) . '</span>';
 ?>
@@ -88,3 +88,29 @@ $stars = fn (int $n) => str_repeat('&#9733;', $n) . '<span style="color: #d1d5db
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
+
+<div class="card" style="margin-top: var(--space-8);">
+    <div class="card-header">
+        <h3 style="font-size: 16px; margin-bottom: 0;">Coach Reviews (<?= count($coachReviews) ?> active)</h3>
+        <span class="text-xs text-muted">Reviews students wrote after an attended coaching session</span>
+    </div>
+    <?php if ($coachReviews === []): ?>
+        <div class="card-body text-sm text-muted">No active coach reviews.</div>
+    <?php endif; ?>
+    <?php foreach ($coachReviews as $r): ?>
+        <div style="padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 260px;">
+                <div style="font-weight: 700;">Review #<?= (int) $r['id'] ?> on coach <?= e($r['coach_name']) ?></div>
+                <div class="text-xs text-muted" style="margin-bottom: 6px;">Author: <?= e($r['reviewer_name']) ?> · <?= e($r['session_title']) ?>, <?= e(format_datetime($r['session_starts_at'], false)) ?> · Reviewed <?= e(format_datetime($r['created_at'])) ?></div>
+                <div style="color: #f59e0b; font-size: 12px;"><?= $stars($r['rating']) ?> (<?= (int) $r['rating'] ?>.0)</div>
+                <p class="text-sm" style="margin: 4px 0 0;"><?= e($r['comment']) ?></p>
+                <?php if ($r['response_text'] !== null): ?>
+                    <div style="font-size: 11px; color: var(--color-text-subtle); margin-top: 4px;"><strong>Coach response:</strong> <?= e($r['response_text']) ?></div>
+                <?php endif; ?>
+            </div>
+            <div>
+                <button type="button" class="btn btn-sm btn-outline" style="color: var(--color-danger); border-color: var(--color-danger);" onclick="CourtPassApp.postWithReason('Remove Coach Review', 'A reason is required and is shown to the reviewer.', '/admin/coach-reviews/<?= (int) $r['id'] ?>/remove')">Remove Review</button>
+            </div>
+        </div>
+    <?php endforeach; ?>
+</div>
