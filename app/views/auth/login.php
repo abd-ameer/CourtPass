@@ -30,6 +30,9 @@ $invalid = fn (string $f) => isset($errors[$f]) ? ' is-invalid' : '';
                         <input type="password" name="password" id="loginPassword" class="form-control<?= $invalid('password') ?>" autocomplete="current-password" required>
                     </div>
                     <span class="form-feedback invalid"><?= e($errors['password'] ?? '') ?></span>
+                    <div style="text-align: right; margin-top: 6px; font-size: var(--font-size-sm);">
+                        <a href="<?= url('/forgot-password') ?>">Forgot password?</a>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: var(--space-4);">

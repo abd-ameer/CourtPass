@@ -15,6 +15,8 @@ $router->get('/api/health', [SystemController::class, 'health']);
 // ---------- Member A: Accounts, Booking Engine, Reliability ----------
 $router->get('/login', [AuthController::class, 'login']);
 $router->post('/login', [AuthController::class, 'authenticate']);
+$router->get('/forgot-password', [AuthController::class, 'forgotPassword']);
+$router->post('/forgot-password', [AuthController::class, 'sendResetLink']);
 $router->post('/logout', [AuthController::class, 'logout'], ['*']);
 $router->get('/register', [AuthController::class, 'chooseRole']);
 $router->get('/register/customer', [AuthController::class, 'customerForm']);

@@ -35,6 +35,30 @@ class AuthController extends Controller
         $this->redirect(Auth::homeUrl());
     }
 
+    public function forgotPassword(): void
+    {
+        $this->redirectIfLoggedIn();
+        $this->view('auth/forgot-password', ['title' => 'Forgot Password', 'old' => [], 'errors' => []]);
+    }
+
+    public function sendResetLink(): void
+    {
+        $this->verifyCsrf();
+        $this->redirectIfLoggedIn();
+        $input = ['email' => trim((string) $this->request->input('email', ''))];
+
+        $v = (new Validator($input))->required('email', 'Email')->email('email');
+        if ($v->fails()) {
+            http_response_code(422);
+            $this->view('auth/forgot-password', ['title' => 'Forgot Password', 'old' => $input, 'errors' => $v->errors()]);
+            return;
+        }
+
+        // Same reply for every address, so the page never reveals which emails have accounts.
+        Session::flash('info', 'Password reset by email is not available yet. To reset your password, email support@courtpass.lk from the address you registered with.');
+        $this->redirect('/forgot-password');
+    }
+
     public function logout(): void
     {
         $this->verifyCsrf();
