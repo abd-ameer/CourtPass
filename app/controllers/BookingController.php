@@ -11,7 +11,8 @@ class BookingController extends Controller
     public function dashboard(): void
     {
         $bookings = (new BookingService())->customerBookings(Auth::id());
-        $upcoming = array_values(array_filter($bookings, fn (array $b) => $b['group'] === 'upcoming'));
+        $upcoming = array_values(array_filter($bookings, fn (array $b) => $b['group'] === 'upcoming'
+            && in_array($b['status'], ['pending_payment', 'pending', 'confirmed', 'released'], true)));
         usort($upcoming, fn (array $x, array $y) => strcmp($x['starts_at'], $y['starts_at']));
 
         // Every booking row carries the customer's profile; with no bookings the profile still has its sign-up defaults.
@@ -23,6 +24,7 @@ class BookingController extends Controller
             'upcoming' => $upcoming,
             'released' => array_values(array_filter($bookings, fn (array $b) => $b['status'] === 'released')),
             'profile'  => $profile,
+            'completed' => count(array_filter($bookings, fn (array $b) => $b['status'] === 'completed')),
         ], 'dashboard');
     }
 
@@ -47,7 +49,8 @@ class BookingController extends Controller
             $this->json(['error' => 'Invalid date.'], 422);
         }
 
-        $slots = (new BookingService())->slotGrid((int) $id, $date);
+        $ownerView = Auth::hasRole('owner') && (new CourtService())->ownerCourt(Auth::id(), (int) $id) !== null;
+        $slots = (new BookingService())->slotGrid((int) $id, $date, $ownerView);
         if ($slots === null) {
             $this->notFound();
         }
@@ -138,6 +141,22 @@ class BookingController extends Controller
             'booking' => $booking,
             'reasons' => self::CANCEL_REASONS,
         ], 'dashboard');
+    }
+
+    public function pay(string $id): void
+    {
+        $this->verifyCsrf();
+        try {
+            (new BookingService())->paySimulated(Auth::id(), (int) $id);
+        } catch (ValidationException $e) {
+            if ($e->getMessage() === 'Booking not found.') {
+                $this->notFound();
+            }
+            Session::flash('error', $e->getMessage());
+            $this->redirect('/customer/bookings/' . (int) $id);
+        }
+        Session::flash('success', 'Payment received. Booking #' . (int) $id . ' is confirmed.');
+        $this->redirect('/customer/bookings/' . (int) $id);
     }
 
     public function cancel(string $id): void

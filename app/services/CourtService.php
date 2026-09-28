@@ -64,6 +64,18 @@ class CourtService
         return $blocks;
     }
 
+    /** Slot start (H:i) => owner-facing label for each block on the date, e.g. "Coaching: Ashan Weerasinghe". */
+    public function blockLabels(int $courtId, string $date): array
+    {
+        $labels = [];
+        foreach ((new CourtBlockModel())->labelsOn($courtId, $date) as $b) {
+            $labels[substr($b['start_time'], 0, 5)] = $b['block_type'] === 'coaching'
+                ? 'Coaching: ' . ($b['coach_name'] ?? 'session')
+                : 'Owner block' . ($b['reason'] !== null && $b['reason'] !== '' ? ': ' . $b['reason'] : '');
+        }
+        return $labels;
+    }
+
     public function isBlocked(int $courtId, string $date, string $time): bool
     {
         return (new CourtBlockModel())->existsAt($courtId, $date, $time);

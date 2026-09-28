@@ -163,9 +163,23 @@ class VenueController extends Controller
 
     public function adminIndex(): void
     {
+        $service = new VenueService();
+        $filter = (string) $this->request->query('status', '');
+        $filter = in_array($filter, VenueService::ADMIN_FILTERS, true) ? $filter : '';
+        $all = $service->adminVenues();
         $this->view('admin/venue-approvals', [
             'title'  => 'Venue Approvals',
-            'venues' => (new VenueService())->pendingVenues(),
+            'venues' => $service->pendingVenues(),
+            'all'    => $filter === '' ? $all : $service->adminVenues($filter),
+            'filter' => $filter,
+            'counts' => [
+                ''            => count($all),
+                'listed'      => count(array_filter($all, fn (array $v) => $v['listed'])),
+                'off'         => count(array_filter($all, fn (array $v) => $v['status'] === 'approved' && !$v['is_active'])),
+                'pending'     => count(array_filter($all, fn (array $v) => $v['status'] === 'pending')),
+                'rejected'    => count(array_filter($all, fn (array $v) => $v['status'] === 'rejected')),
+                'deactivated' => count(array_filter($all, fn (array $v) => $v['status'] === 'deactivated')),
+            ],
         ], 'dashboard');
     }
 

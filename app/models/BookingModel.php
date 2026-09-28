@@ -121,6 +121,16 @@ class BookingModel extends Model
         );
     }
 
+    /** Confirms an online booking once its payment is verified. */
+    public function confirmPaid(int $id, string $now): int
+    {
+        return $this->execute(
+            "UPDATE bookings SET status = 'confirmed', confirmed_at = ?, pending_expires_at = NULL WHERE id = ? AND status = 'pending_payment'",
+            'si',
+            [$now, $id]
+        );
+    }
+
     public function confirm(int $id, string $now): int
     {
         return $this->execute(

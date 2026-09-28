@@ -1,6 +1,6 @@
 <?php
 /** @var string $name @var array $venues @var array $pending @var int $confirmed @var array $today waiting, checked_in, missed */
-$approved = count(array_filter($venues, fn (array $v) => $v['status'] === 'approved'));
+$listed = count(array_filter($venues, fn (array $v) => $v['listed']));
 $todayTotal = $today['waiting'] + $today['checked_in'] + $today['missed'];
 ?>
 <div class="page-header">
@@ -62,8 +62,8 @@ $todayTotal = $today['waiting'] + $today['checked_in'] + $today['missed'];
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
         </div>
         <div>
-            <div class="stat-value"><?= (int) $approved ?> / <?= count($venues) ?></div>
-            <div class="stat-label">Venues Approved</div>
+            <div class="stat-value"><?= (int) $listed ?> / <?= count($venues) ?></div>
+            <div class="stat-label">Venues Listed</div>
         </div>
     </div>
 
@@ -138,7 +138,7 @@ $todayTotal = $today['waiting'] + $today['checked_in'] + $today['missed'];
                         <a href="<?= url('/owner/venues/' . $v['id']) ?>" style="font-weight: 700;"><?= e($v['name']) ?></a>
                         <div class="text-xs text-muted"><?= e($v['city']) ?> · <?= (int) $v['court_count'] ?> <?= (int) $v['court_count'] === 1 ? 'court' : 'courts' ?></div>
                     </div>
-                    <?= status_badge($v['status']) ?>
+                    <?= $v['status'] === 'approved' && !$v['is_active'] ? '<span class="badge badge-inactive">Deactivated</span>' : status_badge($v['status']) ?>
                 </div>
             <?php endforeach; ?>
         </div>

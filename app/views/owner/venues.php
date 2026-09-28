@@ -33,9 +33,10 @@
                             <div class="text-xs text-muted"><?= e($venue['address'] . (stripos($venue['address'], $venue['city']) === false ? ', ' . $venue['city'] : '')) ?> · <?= e($venue['court_count']) ?> <?= $venue['court_count'] === 1 ? 'court' : 'courts' ?></div>
                         </div>
                         <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;">
-                            <?= status_badge($venue['status']) ?>
                             <?php if ($venue['status'] === 'approved' && !$venue['is_active']): ?>
-                                <span class="badge badge-inactive">Deactivated by you</span>
+                                <span class="badge badge-inactive">Deactivated</span>
+                            <?php else: ?>
+                                <?= status_badge($venue['status']) ?>
                             <?php endif; ?>
                         </div>
                     </div>

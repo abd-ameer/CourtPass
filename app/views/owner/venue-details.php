@@ -12,9 +12,10 @@
         </div>
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <h1 class="page-title"><?= e($venue['name']) ?></h1>
-            <?= status_badge($venue['status']) ?>
             <?php if ($venue['status'] === 'approved' && !$venue['is_active']): ?>
-                <span class="badge badge-inactive">Deactivated by you</span>
+                <span class="badge badge-inactive">Deactivated</span>
+            <?php else: ?>
+                <?= status_badge($venue['status']) ?>
             <?php endif; ?>
         </div>
         <div class="page-subtitle">
@@ -106,9 +107,10 @@
                                     <td><?= e(lkr($court['hourly_rate'])) ?></td>
                                     <td><?= $court['is_active'] ? status_badge('active') : '<span class="badge badge-inactive">Inactive</span>' ?></td>
                                     <td style="text-align: right;">
+                                        <a href="<?= url('/owner/courts/' . $court['id'] . '/edit') ?>" class="btn btn-sm btn-outline">Edit</a>
                                         <a href="<?= url('/owner/courts/' . $court['id'] . '/hours') ?>" class="btn btn-sm btn-outline">Hours</a>
                                         <?php if ($venue['listed'] && $court['is_active']): ?>
-                                            <a href="<?= url('/courts/' . $court['id']) ?>" class="btn btn-sm btn-outline">Slot Grid</a>
+                                            <a href="<?= url('/owner/slots?court=' . $court['id']) ?>" class="btn btn-sm btn-outline">Slots</a>
                                         <?php endif; ?>
                                     </td>
                                 </tr>

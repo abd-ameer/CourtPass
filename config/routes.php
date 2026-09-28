@@ -32,6 +32,7 @@ $router->get('/customer/bookings', [BookingController::class, 'index'], ['custom
 $router->get('/customer/bookings/create', [BookingController::class, 'create'], ['customer']);
 $router->post('/customer/bookings', [BookingController::class, 'store'], ['customer']);
 $router->get('/customer/bookings/{id}', [BookingController::class, 'show'], ['customer']);
+$router->post('/customer/bookings/{id}/pay', [BookingController::class, 'pay'], ['customer']);
 $router->get('/customer/bookings/{id}/cancel', [BookingController::class, 'confirmCancel'], ['customer']);
 $router->post('/customer/bookings/{id}/cancel', [BookingController::class, 'cancel'], ['customer']);
 

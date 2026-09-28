@@ -40,8 +40,9 @@ class BookingService
     /**
      * One-hour slots for the date, or null when the court cannot be booked.
      * States: available, booked, blocked, unavailable. A released slot shows as available.
+     * $ownerView adds a block_label to blocked slots (coach name or owner reason); callers pass it only for the court's owner.
      */
-    public function slotGrid(int $courtId, string $date): ?array
+    public function slotGrid(int $courtId, string $date, bool $ownerView = false): ?array
     {
         $court = $this->courts->bookableCourt($courtId);
         if ($court === null) {
@@ -53,6 +54,7 @@ class BookingService
         $open = $this->inBookingWindow($date);
         $blocks = $this->courts->blockedStarts($courtId, $date);
         $held = array_flip(array_map(fn (string $t) => substr($t, 0, 5), $this->bookings->heldStarts($courtId, $date)));
+        $labels = $ownerView ? $this->courts->blockLabels($courtId, $date) : [];
 
         $slots = [];
         foreach ($this->courts->slotStarts($courtId, $date) as $start) {
@@ -73,6 +75,9 @@ class BookingService
                 'flash_price' => null,
                 'block_id'    => $block !== null && $block['type'] === 'owner' ? $block['id'] : null,
             ];
+            if ($ownerView && $block !== null) {
+                $slots[array_key_last($slots)]['block_label'] = $labels[$start] ?? null;
+            }
         }
         return $slots;
     }
@@ -272,6 +277,46 @@ class BookingService
                 "/owner/bookings/{$b['id']}");
 
             return ['refund' => $refund, 'refund_percent' => $terms['refund_percent'], 'class' => $terms['class']];
+        });
+    }
+
+    /**
+     * Stands in for the PayHere Sandbox callback until B's payment integration is built:
+     * records a paid payment for a held online booking and confirms it. Refused once the hold has expired.
+     */
+    public function paySimulated(int $customerId, int $bookingId): void
+    {
+        $this->expireStale();
+        $booking = $this->bookings->find($bookingId);
+        if ($booking === null || (int) $booking['customer_id'] !== $customerId) {
+            throw new ValidationException(['booking' => 'Booking not found.']);
+        }
+
+        Database::transaction(function () use ($customerId, $booking): void {
+            $this->courts->lockCourt((int) $booking['court_id']);
+            $row = $this->bookings->lockForUpdate((int) $booking['id']);
+            $id = (int) $row['id'];
+            if ($row['status'] !== 'pending_payment') {
+                throw new ValidationException(['booking' => "Booking #{$id} is " . strtolower(status_label($row['status'])) . ', so it cannot be paid.']);
+            }
+            if ($row['pending_expires_at'] <= now()) {
+                throw new ValidationException(['booking' => "The payment time for booking #{$id} has ended. Book the slot again."]);
+            }
+
+            $now = now();
+            $orderId = "BKG-{$id}";
+            (new PaymentModel())->createPaid('booking', $id, null, $orderId, (float) $row['amount'], 'SIM-' . $orderId, $now);
+            $this->bookings->confirmPaid($id, $now);
+
+            $b = $this->present(array_merge($booking, $row, ['status' => 'confirmed']));
+            (new AuditService())->log($customerId, 'booking.paid', 'booking', $id, 'pending_payment', 'confirmed',
+                json_encode(['order_id' => $orderId, 'amount' => (float) $row['amount'], 'simulated' => true]));
+            $notifications = new NotificationService();
+            $notifications->notify($customerId, 'booking_paid', 'Booking confirmed',
+                'Your payment of ' . lkr($row['amount']) . ' is verified and your booking for ' . self::slotText($b) . ' is confirmed.',
+                "/customer/bookings/{$id}");
+            $notifications->notify($b['owner_id'], 'booking_paid', 'New confirmed booking',
+                "{$b['customer_name']} paid online for " . self::slotText($b) . '.', "/owner/bookings/{$id}");
         });
     }
 
@@ -499,6 +544,7 @@ class BookingService
         $b['end'] = date('H:i', strtotime($startsAt . ' +1 hour'));
         $b['starts_at'] = $startsAt;
         $b['group'] = in_array($b['status'], ['cancelled', 'rejected', 'expired', 'resold'], true) ? 'closed' : ($upcoming ? 'upcoming' : 'past');
+        $b['can_pay'] = $b['status'] === 'pending_payment' && $b['pending_expires_at'] !== null && $b['pending_expires_at'] > now();
         $b['can_cancel'] = $upcoming && ($b['status'] === 'confirmed' || ($b['status'] === 'pending' && $cash));
         $b['can_decide'] = $upcoming && $b['status'] === 'pending';
         $b['can_owner_cancel'] = $upcoming && $b['status'] === 'confirmed';

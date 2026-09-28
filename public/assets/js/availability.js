@@ -6,6 +6,7 @@
 const CourtPassAvailability = {
     courtId: null,
     isGuest: true,
+    signedInRole: null,
     selectedDate: null,
     selectedSlot: null,
     slots: [],
@@ -13,6 +14,7 @@ const CourtPassAvailability = {
     init: function (options) {
         this.courtId = options.courtId;
         this.isGuest = options.isGuest;
+        this.signedInRole = options.signedInRole || null;
         this.selectedDate = this.localDate(new Date());
         this.renderDateTabs();
         this.loadSlots();
@@ -85,7 +87,8 @@ const CourtPassAvailability = {
             card.className = 'slot-card ' + stateClass;
             card.innerHTML = '<div class="slot-time"></div><div class="slot-state-label"></div><div class="slot-price"></div>';
             card.children[0].textContent = slot.start;
-            card.children[1].textContent = isFlash ? 'Flash Deal' : (labels[slot.state] || slot.state);
+            card.children[1].textContent = isFlash ? 'Flash Deal' : (slot.block_label || labels[slot.state] || slot.state);
+            if (slot.block_label) card.title = slot.block_label;
             card.children[2].textContent = slot.state === 'available' ? CourtPass.lkr(isFlash ? slot.flash_price : slot.price) : '';
             card.addEventListener('click', () => this.handleSlotClick(slot));
             container.appendChild(card);
@@ -95,6 +98,10 @@ const CourtPassAvailability = {
     handleSlotClick: function (slot) {
         if (slot.state !== 'available') {
             CourtPassApp.showToast('warning', 'Slot Not Available', 'Choose an available slot.');
+            return;
+        }
+        if (this.isGuest && this.signedInRole) {
+            CourtPassApp.showToast('info', 'Customer Account Needed', `Court slots are booked with a customer account. You are logged in as a ${this.signedInRole}.`);
             return;
         }
         if (this.isGuest) {

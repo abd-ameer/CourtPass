@@ -82,6 +82,9 @@
  <a href="<?= url('/customer/bookings/' . $b['id']) ?>" class="btn btn-sm btn-primary">
  View
  </a>
+ <?php if ($b['can_pay']): ?>
+ <a href="<?= url('/customer/bookings/' . $b['id']) ?>" class="btn btn-sm btn-outline-primary">Pay Now</a>
+ <?php endif; ?>
  <?php if ($b['can_cancel']): ?>
  <a href="<?= url('/customer/bookings/' . $b['id'] . '/cancel') ?>" class="btn btn-sm btn-secondary" style="color: var(--color-danger);">
  Cancel

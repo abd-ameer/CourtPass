@@ -54,12 +54,11 @@ class CourtController extends Controller
 
     public function edit(string $id): void
     {
-        // TODO: load the owner's own court; 404 when it belongs to someone else.
-        $court = ['name' => 'Futsal Court A', 'sport_type_id' => 1, 'hourly_rate' => '5000.00', 'is_active' => 1];
+        $court = $this->ownCourt((int) $id);
         $this->view('owner/edit-court', [
             'title'      => 'Edit Court',
-            'courtId'    => (int) $id,
-            'venueId'    => 1,
+            'courtId'    => (int) $court['id'],
+            'venueId'    => (int) $court['venue_id'],
             'court'      => $court,
             'hours'      => [],
             'venues'     => [],

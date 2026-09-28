@@ -1,5 +1,5 @@
 <?php
-/** @var array $venues */
+/** @var array $venues pending @var array $all @var string $filter @var array $counts */
 ?>
 <div class="page-header">
     <div>
@@ -9,7 +9,7 @@
             <span>Venue Approvals</span>
         </div>
         <h1 class="page-title">Venue Approvals</h1>
-        <div class="page-subtitle">Review newly registered venues and approve them for public listing, or reject them with a reason.</div>
+        <div class="page-subtitle">Review newly registered venues and approve them for public listing, or reject them with a reason. Every venue on the platform is listed below.</div>
     </div>
     <div>
         <span class="badge badge-warning" style="font-size: 13px; padding: 6px 14px;"><?= count($venues) ?> awaiting review</span>
@@ -54,3 +54,38 @@
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
+
+<?php $labels = ['' => 'All', 'listed' => 'Listed', 'off' => 'Switched Off', 'pending' => 'Pending', 'rejected' => 'Rejected', 'deactivated' => 'Deactivated by Admin']; ?>
+<div class="card" style="margin-top: var(--space-6);">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <h3 style="font-size: 16px; margin-bottom: 0;">All Venues</h3>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <?php foreach ($labels as $key => $label): ?>
+                <a href="<?= url('/admin/venues' . ($key === '' ? '' : '?status=' . $key)) ?>" class="btn btn-sm <?= $filter === $key ? 'btn-primary' : 'btn-outline' ?>"><?= e($label) ?> (<?= (int) $counts[$key] ?>)</a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php if ($all === []): ?>
+        <div class="empty-state">
+            <div class="empty-state-title">No venues in this group</div>
+        </div>
+    <?php else: ?>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Venue</th><th>Owner</th><th>Sports</th><th>Courts</th><th>Status</th><th style="text-align: right;">Action</th></tr></thead>
+                <tbody>
+                <?php foreach ($all as $v): ?>
+                    <tr>
+                        <td><strong><?= e($v['name']) ?></strong><div class="text-xs text-muted"><?= e($v['city']) ?> · Registered <?= e(format_datetime($v['created_at'], false)) ?></div></td>
+                        <td><?= e($v['owner_name']) ?><div class="text-xs text-muted"><?= e($v['owner_email']) ?></div></td>
+                        <td class="text-sm"><?= e(implode(', ', array_column($v['sports'], 'name'))) ?></td>
+                        <td><?= (int) $v['court_count'] ?></td>
+                        <td><?= $v['status'] === 'approved' && !$v['is_active'] ? '<span class="badge badge-inactive">Switched Off</span>' : status_badge($v['status']) ?></td>
+                        <td style="text-align: right;"><a href="<?= url('/admin/venues/' . $v['id']) ?>" class="btn btn-sm btn-outline">View</a></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
+</div>
