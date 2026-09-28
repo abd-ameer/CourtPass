@@ -250,7 +250,7 @@ class BookingServiceTest extends DatabaseTestCase
 
     public function testCustomersSeeOnlyTheirOwnBookings(): void
     {
-        $this->assertSame([4, 3, 1, 22, 7, 8, 9, 10, 11, 12], array_column($this->service->customerBookings(4), 'id'));
+        $this->assertSame([4, 3, 23, 1, 22, 7, 8, 9, 10, 11, 12], array_column($this->service->customerBookings(4), 'id'));
         $this->assertNull($this->service->customerBooking(4, 2));
         $this->assertNull($this->service->customerBooking(4, 999));
         $this->assertSame(3, $this->service->customerBooking(4, 3)['id']);
@@ -258,7 +258,7 @@ class BookingServiceTest extends DatabaseTestCase
 
     public function testOwnersSeeOnlyBookingsAtTheirOwnVenues(): void
     {
-        $this->assertCount(22, $this->service->ownerBookings(2));
+        $this->assertCount(23, $this->service->ownerBookings(2));
         $this->assertSame([], $this->service->ownerBookings(3));
         $this->assertNull($this->service->ownerBooking(3, 1));
         $this->assertTrue($this->service->ownerBooking(2, 4)['can_decide']);

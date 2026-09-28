@@ -37,7 +37,7 @@
  <div class="availability-container">
  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); flex-wrap: wrap; gap: 8px;">
  <h3 style="font-size: 16px; margin-bottom: 0;">Click any slot to Block, Unblock, or Convert to Flash Deal</h3>
- <span class="badge tier-standard">Owner Admin Mode</span>
+ 
  </div>
 
  <!-- Date Tabs -->

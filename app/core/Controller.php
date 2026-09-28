@@ -12,6 +12,11 @@ abstract class Controller
 
     protected function view(string $view, array $data = [], string $layout = 'main'): void
     {
+        if ($layout === 'dashboard' && Auth::check()) {
+            $notifications = new NotificationService();
+            $data['headerNotifications'] = $notifications->recent(Auth::id(), 5);
+            $data['headerUnread'] = $notifications->unreadCount(Auth::id());
+        }
         View::render($view, $data, $layout);
     }
 

@@ -34,7 +34,7 @@
                     <tbody>
                         <tr><td><?= status_badge('new_member') ?></td><td>Fewer than 5 completed bookings</td><td>Online payment only</td></tr>
                         <tr><td><?= status_badge('restricted') ?></td><td>Below 70%</td><td>Online payment only</td></tr>
-                        <tr><td><?= status_badge('standard') ?></td><td>70% and above</td><td>Online payment or cash on arrival</td></tr>
+                        <tr><td><?= status_badge('standard') ?></td><td>70% and above, with 5 or more completed bookings</td><td>Online payment or cash on arrival</td></tr>
                     </tbody>
                 </table>
             </div>

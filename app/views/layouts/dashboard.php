@@ -14,7 +14,7 @@
         <?php View::partial('sidebar') ?>
 
         <div class="dashboard-main">
-            <?php View::partial('dashboard-header') ?>
+            <?php View::partial('dashboard-header', ['notifications' => $headerNotifications ?? [], 'unread' => $headerUnread ?? 0]) ?>
 
             <div class="dashboard-content">
                 <?php $flashes = Session::takeFlash(); ?>
