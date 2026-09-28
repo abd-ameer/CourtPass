@@ -83,11 +83,15 @@ $percent = $s['capacity'] > 0 ? min(100, round($s['registration_count'] / $s['ca
                 <div class="text-sm" style="text-align: center; color: var(--color-danger);">This session was cancelled by the coach.</div>
             <?php elseif ($s['group'] !== 'upcoming'): ?>
                 <div class="text-sm text-muted" style="text-align: center;">This session has already taken place.</div>
+            <?php elseif (($mine ?? null) !== null): ?>
+                <div style="padding: 12px; background: var(--color-primary-light); border-radius: var(--radius-md); text-align: center;" class="text-sm">
+                    <strong>You are registered</strong> (registration #<?= (int) $mine['id'] ?>).
+                    <div style="margin-top: 6px;"><a href="<?= url('/customer/sessions') ?>">View My Sessions &rarr;</a></div>
+                </div>
             <?php elseif (!$open): ?>
                 <button type="button" class="btn btn-secondary btn-block" disabled>Session Full</button>
             <?php elseif (Auth::hasRole('customer')): ?>
-                <button type="button" class="btn btn-secondary btn-block" disabled>Registration Opens Soon</button>
-                <div class="text-xs text-muted" style="margin-top: 8px; text-align: center;">Registration with online payment opens when PayHere payments are connected.</div>
+                <button type="button" class="btn btn-primary btn-block btn-lg" onclick="CourtPassApp.openModal('registrationUnavailableModal')"><?= $s['fee'] > 0 ? 'Register &amp; Pay ' . e($s['fee_label']) : 'Register for Free' ?></button>
             <?php elseif (!Auth::check()): ?>
                 <a href="<?= url('/login') ?>" class="btn btn-primary btn-block btn-lg">Log In to Register</a>
                 <div class="text-xs text-muted" style="margin-top: 8px; text-align: center;">New here? <a href="<?= url('/register/customer') ?>">Create a customer account</a></div>
@@ -105,3 +109,20 @@ $percent = $s['capacity'] > 0 ? min(100, round($s['registration_count'] / $s['ca
     </div>
 </div>
 </div>
+
+<?php if (Auth::hasRole('customer')): ?>
+<div class="modal-backdrop" id="registrationUnavailableModal">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h3 class="modal-title">Registration Not Available Yet</h3>
+            <button type="button" class="modal-close" onclick="CourtPassApp.closeModal('registrationUnavailableModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size: 15px; color: var(--color-text-main); margin-bottom: 0;">Registering for coaching sessions is not available yet. Please check back soon.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="CourtPassApp.closeModal('registrationUnavailableModal')">OK</button>
+        </div>
+    </div>
+</div>
+<?php endif; ?>

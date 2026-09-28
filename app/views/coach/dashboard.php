@@ -1,5 +1,6 @@
 <?php
-/** @var string $coachName @var array $upcoming upcoming sessions, soonest first @var int $completedCount @var array $venues approved venues with their courts @var bool $hasVenues */
+/** @var string $coachName @var array $upcoming upcoming sessions, soonest first @var int $completedCount @var array $venues approved venues with their courts @var bool $hasVenues
+ * @var array $stats from CoachSessionService::coachStats() @var array $profile @var array $reviews latest three */
 ?>
 <div class="page-header">
  <div>
@@ -65,6 +66,35 @@
  </div>
  </div>
 
+ </div>
+
+ <!-- Earnings, students and rating -->
+ <div class="grid grid-cols-4 gap-6" style="margin-bottom: var(--space-6);">
+ <div class="stat-card">
+ <div>
+ <div class="stat-value"><?= e(lkr($stats['revenue_month'])) ?></div>
+ <div class="stat-label">Revenue in <?= e(date('F')) ?></div>
+ <div class="text-xs text-muted">All time: <?= e(lkr($stats['revenue_total'])) ?></div>
+ </div>
+ </div>
+ <div class="stat-card">
+ <div>
+ <div class="stat-value"><?= (int) $stats['students'] ?></div>
+ <div class="stat-label">Unique Students</div>
+ </div>
+ </div>
+ <div class="stat-card">
+ <div>
+ <div class="stat-value"><?= (int) $stats['regulars'] ?></div>
+ <div class="stat-label">Regulars (3+ sessions)</div>
+ </div>
+ </div>
+ <div class="stat-card">
+ <div>
+ <div class="stat-value"><?= $profile['avg_rating'] === null ? '-' : e(number_format($profile['avg_rating'], 1)) . ' ★' ?></div>
+ <div class="stat-label">Average Rating (<?= (int) $profile['review_count'] ?> <?= $profile['review_count'] === 1 ? 'review' : 'reviews' ?>)</div>
+ </div>
+ </div>
  </div>
 
 <!-- Upcoming Sessions -->
@@ -152,6 +182,26 @@
                     <div class="text-xs text-muted">
                         Next session: <?= $next === [] ? 'none scheduled' : e(format_datetime($next[0]['starts_at'])) ?>
                     </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <!-- Recent reviews -->
+    <div class="card">
+        <div class="card-header">
+            <h3 style="font-size: 15px; margin-bottom: 0;">Recent Reviews</h3>
+            <a href="<?= url('/coach/reviews') ?>" style="font-size: 12px; font-weight: 600;">All reviews &rarr;</a>
+        </div>
+        <div class="card-body">
+            <?php if ($reviews === []): ?>
+                <p class="text-sm text-muted" style="margin-bottom: 0;">No reviews yet. Students marked Attended can review a session within 7 days.</p>
+            <?php endif; ?>
+            <?php foreach ($reviews as $r): ?>
+                <div style="padding: 8px 0; border-bottom: 1px solid var(--color-border);">
+                    <div style="display: flex; justify-content: space-between;"><strong class="text-sm"><?= e($r['reviewer_name']) ?></strong><span style="color: #f59e0b;"><?= str_repeat('★', $r['rating']) . str_repeat('☆', 5 - $r['rating']) ?></span></div>
+                    <div class="text-xs text-muted"><?= e($r['session_title']) ?></div>
+                    <p class="text-sm" style="margin: 4px 0 0;"><?= e(mb_strimwidth($r['comment'], 0, 140, '...')) ?></p>
                 </div>
             <?php endforeach; ?>
         </div>

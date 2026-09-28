@@ -1,13 +1,14 @@
 <?php
-// Sample rows matching the seed approvals of the demo owner until coach venue approval is built.
-$pending = [
-    ['id' => 2, 'name' => 'Dilani Rathnayake', 'email' => 'dilani@coach.lk', 'phone' => '0778901234', 'sports' => 'Futsal',
-     'level' => 'Intermediate', 'certs' => 'None listed', 'verified' => false, 'venue' => 'Colombo Sports Hub', 'requested' => relative_date(-1)],
-];
-$approved = [
-    ['id' => 1, 'name' => 'Ashan Weerasinghe', 'certs' => 'BWF Level 1 Coach', 'sports' => 'Badminton, Pickleball', 'verified' => true,
-     'venue' => 'Colombo Sports Hub', 'upcoming' => 2, 'next' => relative_date(5, '08:00:00')],
-];
+/** @var array $requests from CoachService::ownerRequests() */
+$pending = array_map(fn (array $r) => [
+    'id' => $r['id'], 'name' => $r['coach_name'], 'email' => $r['coach_email'], 'phone' => $r['coach_phone'], 'sports' => $r['sport_names'],
+    'level' => ucfirst($r['experience_level']), 'certs' => $r['certifications'] ?: 'None listed', 'verified' => $r['is_verified'],
+    'venue' => $r['venue_name'], 'requested' => $r['requested_at'],
+], $requests['pending']);
+$approved = array_map(fn (array $r) => [
+    'id' => $r['id'], 'name' => $r['coach_name'], 'certs' => $r['certifications'] ?: 'No certifications listed', 'sports' => $r['sport_names'],
+    'verified' => $r['is_verified'], 'venue' => $r['venue_name'], 'upcoming' => $r['upcoming_count'], 'next' => $r['next_session_at'],
+], $requests['approved']);
 ?>
 <div class="page-header">
     <div>
@@ -39,6 +40,9 @@ $approved = [
                 </tr>
             </thead>
             <tbody>
+                <?php if ($pending === []): ?>
+                    <tr><td colspan="5" class="text-sm text-muted">No coach requests are waiting for you.</td></tr>
+                <?php endif; ?>
                 <?php foreach ($pending as $c): ?>
                     <tr>
                         <td>
@@ -89,6 +93,9 @@ $approved = [
                 </tr>
             </thead>
             <tbody>
+                <?php if ($approved === []): ?>
+                    <tr><td colspan="6" class="text-sm text-muted">No coaches are approved at your venues yet.</td></tr>
+                <?php endif; ?>
                 <?php foreach ($approved as $c): ?>
                     <tr>
                         <td>
@@ -96,9 +103,9 @@ $approved = [
                             <div class="text-xs text-muted"><?= e($c['certs']) ?></div>
                         </td>
                         <td><?= e($c['sports']) ?></td>
-                        <td><span class="badge badge-verified"><?= $c['verified'] ? 'Verified' : 'Not verified' ?></span></td>
+                        <td><?php if ($c['verified']): ?><span class="badge badge-verified">Verified</span><?php else: ?><span class="badge badge-secondary">Not verified yet</span><?php endif; ?></td>
                         <td><?= e($c['venue']) ?></td>
-                        <td><strong><?= (int) $c['upcoming'] ?></strong> <span class="text-xs text-muted">(next <?= e(format_datetime($c['next'])) ?>)</span></td>
+                        <td><strong><?= (int) $c['upcoming'] ?></strong><?php if ($c['next'] !== null): ?> <span class="text-xs text-muted">(next <?= e(format_datetime($c['next'])) ?>)</span><?php endif; ?></td>
                         <td style="text-align: right;">
                             <button type="button" class="btn btn-sm btn-secondary" style="color: var(--color-danger);" onclick="CourtPassApp.confirmPost('Revoke Approval', 'The coach keeps existing sessions but cannot create new ones here.', 'Revoke', '/owner/coach-requests/<?= (int) $c['id'] ?>/revoke')">
                                 Revoke Approval...

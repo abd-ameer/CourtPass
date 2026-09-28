@@ -1,12 +1,12 @@
 <?php
-// Sample rows matching the seed coaches until coach verification is built.
-$pending = [
-    ['id' => 8, 'name' => 'Dilani Rathnayake', 'email' => 'dilani@coach.lk', 'phone' => '0778901234', 'sports' => 'Futsal', 'level' => 'Intermediate',
-     'certs' => 'None listed', 'bio' => 'Futsal coach focusing on school teams and beginners.'],
+/** @var array $coaches from CoachService::adminCoaches() */
+$row = fn (array $c) => [
+    'id' => $c['coach_id'], 'name' => $c['name'], 'email' => $c['email'], 'phone' => $c['phone'],
+    'sports' => $c['sport_names'], 'level' => ucfirst($c['experience_level']),
+    'certs' => $c['certifications'] ?: 'None listed', 'bio' => $c['bio'] ?? '',
 ];
-$verified = [
-    ['id' => 7, 'name' => 'Ashan Weerasinghe', 'sports' => 'Badminton, Pickleball', 'level' => 'Professional', 'certs' => 'BWF Level 1 Coach'],
-];
+$pending = array_map($row, array_values(array_filter($coaches, fn (array $c) => !$c['is_verified'])));
+$verified = array_map($row, array_values(array_filter($coaches, fn (array $c) => $c['is_verified'])));
 ?>
 <div class="page-header">
     <div>
@@ -30,6 +30,9 @@ $verified = [
                 <tr><th>Coach</th><th>Sports & Experience</th><th>Certifications (as listed)</th><th style="text-align: right;">Action</th></tr>
             </thead>
             <tbody>
+                <?php if ($pending === []): ?>
+                    <tr><td colspan="4" class="text-sm text-muted">No coaches are waiting for verification.</td></tr>
+                <?php endif; ?>
                 <?php foreach ($pending as $c): ?>
                     <tr>
                         <td><strong><?= e($c['name']) ?></strong><div class="text-xs text-muted"><?= e($c['email']) ?> · <?= e($c['phone']) ?></div></td>
@@ -55,6 +58,9 @@ $verified = [
                 <tr><th>Coach</th><th>Sports & Experience</th><th>Certifications</th><th>Status</th></tr>
             </thead>
             <tbody>
+                <?php if ($verified === []): ?>
+                    <tr><td colspan="4" class="text-sm text-muted">No verified coaches yet.</td></tr>
+                <?php endif; ?>
                 <?php foreach ($verified as $c): ?>
                     <tr>
                         <td><strong><?= e($c['name']) ?></strong></td>

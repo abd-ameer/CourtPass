@@ -252,4 +252,20 @@ class CoachSessionController extends Controller
             'errors'  => $errors,
         ], 'dashboard');
     }
+
+    public function ownerIndex(): void
+    {
+        $this->view('owner/sessions', [
+            'title'    => 'Coaching Sessions',
+            'sessions' => (new CoachSessionService())->ownerSessions(Auth::id()),
+        ], 'dashboard');
+    }
+
+    public function ownerCancel(string $id): void
+    {
+        $this->verifyCsrf();
+        // TODO: cancel a session at the owner's venue with a reason (UC-VO-23); refunds and notifications as for a coach cancel.
+        Session::flash('info', 'Cancelling a coach session from the venue is not available yet.');
+        $this->redirect('/owner/sessions');
+    }
 }
