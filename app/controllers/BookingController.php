@@ -176,7 +176,7 @@ class BookingController extends Controller
     {
         $bookings = (new BookingService())->ownerBookings(Auth::id());
         $this->view('owner/bookings', [
-            'title'    => 'Booking Requests',
+            'title'    => 'Venue Bookings',
             'bookings' => $bookings,
             'counts'   => array_count_values(array_column($bookings, 'status')),
         ], 'dashboard');

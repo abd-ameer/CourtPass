@@ -56,16 +56,18 @@ INSERT INTO coach_sports (coach_id, sport_type_id) VALUES
 
 -- Venues, courts and operating hours
 INSERT INTO venues (id, owner_id, name, slug, description, address, city, contact_phone,
-        status, reviewed_by, reviewed_at) VALUES
+        status, reviewed_by, reviewed_at, created_at) VALUES
     (1, 2, 'Colombo Sports Hub', 'colombo-sports-hub',
         'Indoor futsal, badminton and table tennis courts. Air-conditioned, open 7 days.',
-        '45 Galle Road, Colombo 03', 'Colombo', '0112345678', 'approved', 1, NOW()),
+        '45 Galle Road, Colombo 03', 'Colombo', '0112345678', 'approved', 1,
+        TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 44 DAY), '11:30:00'), TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 45 DAY), '09:15:00')),
     (2, 2, 'Kandy Court Zone', 'kandy-court-zone',
         'Squash courts, billiard tables and a carrom lounge near Kandy town.',
-        '12 Peradeniya Road, Kandy', 'Kandy', '0812345678', 'approved', 1, NOW()),
+        '12 Peradeniya Road, Kandy', 'Kandy', '0812345678', 'approved', 1,
+        TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 40 DAY), '14:00:00'), TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 41 DAY), '10:20:00')),
     (3, 3, 'Galle Racquet Club', 'galle-racquet-club',
         'Badminton and pickleball centre in Galle.',
-        '78 Matara Road, Galle', 'Galle', '0912345678', 'pending', NULL, NULL);
+        '78 Matara Road, Galle', 'Galle', '0912345678', 'pending', NULL, NULL, DATE_SUB(NOW(), INTERVAL 1 DAY));
 
 INSERT INTO venue_sports (venue_id, sport_type_id) VALUES
     (1, 1), (1, 2), (1, 7),
@@ -150,6 +152,12 @@ INSERT INTO bookings (id, customer_id, court_id, slot_date, start_time, amount, 
     (22, 4, 3, DATE_SUB(CURDATE(), INTERVAL 9 DAY), '18:00:00', 2000.00, 'cash_on_arrival',
         'cancelled', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 11 DAY), '10:00:00'), NULL, 4, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 12 DAY), '09:00:00'), 'Plans changed', 'responsible', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 12 DAY), '09:00:00'));
 
+-- Confirmed online booking for tomorrow, inside the 12 to 48 hour window where it can be released for resale
+INSERT INTO bookings (id, customer_id, court_id, slot_date, start_time, amount, payment_method,
+        status, confirmed_at, released_at, cancelled_by, cancelled_at, cancel_reason, cancellation_class, created_at) VALUES
+    (23, 4, 2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '18:00:00', 5000.00, 'online',
+        'confirmed', DATE_SUB(NOW(), INTERVAL 2 DAY), NULL, NULL, NULL, NULL, NULL, DATE_SUB(NOW(), INTERVAL 2 DAY));
+
 INSERT INTO check_ins (booking_id, checked_in_by, checked_in_at) VALUES
     (1, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 3 DAY), '16:55:00')),
     (7, 2, TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 12 DAY), '17:55:00')),
@@ -185,10 +193,10 @@ INSERT INTO coach_sessions (id, coach_id, court_id, block_id, session_date, star
     (3, 7, 3, 4, DATE_ADD(CURDATE(), INTERVAL 6 DAY), '08:00:00', 'Private Family Session',
         'Private session for one family.', 3, 2500.00, 'private', '9f2c4e6a8b0d1f3e5a7c9e1b3d5f7a90', 'open');
 
-INSERT INTO session_registrations (id, session_id, customer_id, status, amount, attendance_marked_at) VALUES
-    (1, 1, 4, 'attended',   1500.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
-    (2, 1, 5, 'absent',     1500.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
-    (3, 2, 4, 'registered', 1800.00, NULL);
+INSERT INTO session_registrations (id, session_id, customer_id, status, amount, attendance_marked_at, created_at) VALUES
+    (1, 1, 4, 'attended',   1500.00, DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_SUB(NOW(), INTERVAL 8 DAY)),
+    (2, 1, 5, 'absent',     1500.00, DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_SUB(NOW(), INTERVAL 7 DAY)),
+    (3, 2, 4, 'registered', 1800.00, NULL,                            DATE_SUB(NOW(), INTERVAL 1 DAY));
 
 -- Payments
 INSERT INTO payments (id, purpose, booking_id, registration_id, order_id, amount, status,
@@ -196,28 +204,47 @@ INSERT INTO payments (id, purpose, booking_id, registration_id, order_id, amount
     (1, 'booking',      1, NULL, 'BKG-1',  2000.00, 'paid', '320027150501', 2, 'VISA', DATE_SUB(NOW(), INTERVAL 5 DAY)),
     (2, 'booking',      3, NULL, 'BKG-3',  5000.00, 'paid', '320027150502', 2, 'VISA', NOW()),
     (3, 'booking',      5, NULL, 'BKG-5',  2000.00, 'paid', '320027150503', 2, 'MASTER', DATE_SUB(NOW(), INTERVAL 1 DAY)),
-    (4, 'registration', NULL, 1, 'REG-1',  1500.00, 'paid', '320027150504', 2, 'VISA', DATE_SUB(NOW(), INTERVAL 6 DAY)),
-    (5, 'registration', NULL, 2, 'REG-2',  1500.00, 'paid', '320027150505', 2, 'VISA', DATE_SUB(NOW(), INTERVAL 6 DAY)),
-    (6, 'registration', NULL, 3, 'REG-3',  1800.00, 'paid', '320027150506', 2, 'VISA', NOW());
+    (4, 'registration', NULL, 1, 'REG-1',  1500.00, 'paid', '320027150504', 2, 'VISA', DATE_SUB(NOW(), INTERVAL 8 DAY)),
+    (5, 'registration', NULL, 2, 'REG-2',  1500.00, 'paid', '320027150505', 2, 'VISA', DATE_SUB(NOW(), INTERVAL 7 DAY)),
+    (6, 'registration', NULL, 3, 'REG-3',  1800.00, 'paid', '320027150506', 2, 'VISA', DATE_SUB(NOW(), INTERVAL 1 DAY)),
+    (7, 'booking',      23, NULL, 'BKG-23', 5000.00, 'paid', '320027150507', 2, 'VISA', DATE_SUB(NOW(), INTERVAL 2 DAY));
 
 -- Reviews, announcements, notifications and audit entries
-INSERT INTO reviews (id, reviewer_id, venue_id, booking_id, rating, comment, response_text, responded_by, responded_at) VALUES
-    (1, 4, 1, 1, 5, 'Clean courts and staff were helpful.', 'Thank you, see you again!', 2, NOW());
+INSERT INTO reviews (id, reviewer_id, venue_id, booking_id, rating, comment, response_text, responded_by, responded_at, created_at) VALUES
+    (1, 4, 1, 1, 5, 'Clean courts and staff were helpful.', 'Thank you, see you again!', 2,
+        DATE_SUB(NOW(), INTERVAL 1 HOUR), DATE_SUB(NOW(), INTERVAL 3 HOUR));
 
-INSERT INTO reviews (id, reviewer_id, coach_id, registration_id, rating, comment) VALUES
-    (2, 4, 7, 1, 4, 'Very clear explanations, good for beginners.');
+INSERT INTO reviews (id, reviewer_id, coach_id, registration_id, rating, comment, created_at) VALUES
+    (2, 4, 7, 1, 4, 'Very clear explanations, good for beginners.', DATE_SUB(NOW(), INTERVAL 1 DAY));
 
-INSERT INTO announcements (id, venue_id, posted_by, type, title, body) VALUES
-    (1, 1, 2, 'operational', 'Court B maintenance', 'Futsal Court B will get new turf next week.'),
-    (2, 1, 2, 'promotional', 'Weekday morning discount', 'Book before 10 am on weekdays and look out for flash deals.');
+INSERT INTO announcements (id, venue_id, posted_by, type, title, body, created_at) VALUES
+    (1, 1, 2, 'operational', 'Court B maintenance', 'Futsal Court B will get new turf next week.', DATE_SUB(NOW(), INTERVAL 5 DAY)),
+    (2, 1, 2, 'promotional', 'Weekday morning discount', 'Book before 10 am on weekdays and look out for flash deals.', DATE_SUB(NOW(), INTERVAL 3 DAY));
 
-INSERT INTO notifications (user_id, type, title, message, link_url) VALUES
-    (4, 'booking_confirmed', 'Booking confirmed', 'Your Futsal Court A booking is confirmed.', '/customer/bookings/3'),
-    (7, 'review_posted',     'New review',        'You received a new 4-star review.',       '/coach/reviews'),
-    (2, 'review_posted',     'New review',        'Colombo Sports Hub received a 5-star review.', '/owner/reviews');
+INSERT INTO notifications (user_id, type, title, message, link_url, is_read, read_at, created_at) VALUES
+    (2, 'venue_approved',    'Venue approved',    'Colombo Sports Hub is approved and listed publicly.', '/owner/venues/1', 1, DATE_SUB(NOW(), INTERVAL 43 DAY), TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 44 DAY), '11:30:00')),
+    (2, 'venue_approved',    'Venue approved',    'Kandy Court Zone is approved and listed publicly.', '/owner/venues/2', 1, DATE_SUB(NOW(), INTERVAL 39 DAY), TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 40 DAY), '14:00:00')),
+    (2, 'review_posted',     'New review',        'Colombo Sports Hub received a 5-star review from Saman Fernando.', '/owner/reviews', 0, NULL, DATE_SUB(NOW(), INTERVAL 3 HOUR)),
+    (2, 'booking_request',   'New booking request', 'Saman Fernando requested Squash Court 1 at Kandy Court Zone, paying cash on arrival.', '/owner/bookings/4', 0, NULL, NOW()),
+    (4, 'review_response',   'Owner responded to your review', 'Colombo Sports Hub responded to your review.', '/customer/reviews', 0, NULL, DATE_SUB(NOW(), INTERVAL 1 HOUR)),
+    (4, 'booking_confirmed', 'Booking confirmed', 'Your payment for Futsal Court B at Colombo Sports Hub is verified and the booking is confirmed.', '/customer/bookings/23', 1, DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY)),
+    (4, 'booking_confirmed', 'Booking confirmed', 'Your payment for Futsal Court A at Colombo Sports Hub is verified and the booking is confirmed.', '/customer/bookings/3', 0, NULL, NOW()),
+    (5, 'booking_released',  'Booking released for resale', 'Your Badminton Court 1 booking is back in the booking calendar. You get a 90% refund if another customer books it.', '/customer/releases', 0, NULL, NOW()),
+    (6, 'booking_no_show',   'Marked as no-show', 'You did not check in for Futsal Court A at Colombo Sports Hub. A no-show lowers your reliability score.', '/customer/reliability', 1, DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY)),
+    (7, 'venue_approval',    'Venue approval granted', 'Colombo Sports Hub approved you to run sessions on its courts.', '/coach/venues', 1, DATE_SUB(NOW(), INTERVAL 9 DAY), DATE_SUB(NOW(), INTERVAL 9 DAY)),
+    (7, 'review_posted',     'New review',        'Saman Fernando left a 4-star review for Beginner Badminton Basics.', '/coach/reviews', 0, NULL, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+    (7, 'session_registration', 'New registration', 'Saman Fernando registered for Intermediate Rally Drills.', '/coach/sessions/2', 0, NULL, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+    (3, 'venue_submitted',   'Venue submitted',   'Galle Racquet Club is waiting for Platform Admin approval.', '/owner/venues/3', 0, NULL, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+    (1, 'venue_submitted',   'New venue to review', 'Nimal Silva registered Galle Racquet Club. It is waiting for approval.', '/admin/venues/3', 0, NULL, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+    (1, 'dispute_opened',    'New no-show dispute', 'Dinesh Kumara disputed the no-show on booking #2.', '/admin/disputes/no-show', 0, NULL, DATE_SUB(NOW(), INTERVAL 1 DAY));
 
-INSERT INTO audit_log (actor_id, event_type, entity_type, entity_id, old_status, new_status) VALUES
-    (1, 'venue.approved',    'venue',   1, 'pending',   'approved'),
-    (1, 'venue.approved',    'venue',   2, 'pending',   'approved'),
-    (4, 'booking.created',   'booking', 3, NULL,        'pending_payment'),
-    (NULL, 'booking.confirmed', 'booking', 3, 'pending_payment', 'confirmed');
+-- Open disputes for the admin queues
+INSERT INTO disputes (id, dispute_type, booking_id, raised_by, reason, created_at) VALUES
+    (1, 'no_show', 2, 6, 'I arrived at 19:05 and played the full hour. The front desk forgot to mark me as checked in.', DATE_SUB(NOW(), INTERVAL 1 DAY)),
+    (2, 'resale',  5, 5, 'I released this slot for resale. Please confirm I still get the 90% refund if another customer books it before it starts.', NOW());
+
+INSERT INTO audit_log (actor_id, event_type, entity_type, entity_id, old_status, new_status, created_at) VALUES
+    (1, 'venue.approved',    'venue',   1, 'pending',   'approved', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 44 DAY), '11:30:00')),
+    (1, 'venue.approved',    'venue',   2, 'pending',   'approved', TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 40 DAY), '14:00:00')),
+    (4, 'booking.created',   'booking', 3, NULL,        'pending_payment', NOW()),
+    (NULL, 'booking.confirmed', 'booking', 3, 'pending_payment', 'confirmed', NOW());

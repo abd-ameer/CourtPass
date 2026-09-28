@@ -39,7 +39,7 @@ $cash = $tier === 'standard';
                 <p class="text-sm" style="color: var(--color-text-main); margin-bottom: 4px;">
                     You have <strong><?= (int) $profile['completed_count'] ?> completed bookings</strong> and <strong><?= (int) $profile['no_show_count'] ?> no-shows</strong>.
                 </p>
-                <div class="text-xs text-muted">Recalculated when a booking is completed or cancelled, never on a timer.</div>
+                <div class="text-xs text-muted">As of the last update. Recalculated on your next login or booking attempt, never on a timer.</div>
             </div>
         </div>
         <div style="background: white; padding: 12px 18px; border-radius: var(--radius-lg); border: 1px solid var(--color-border); text-align: center;">

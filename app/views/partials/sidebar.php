@@ -84,7 +84,7 @@ $currentPath = Request::current()?->path() ?? '';
         <div class="sidebar-section-title">Operations</div>
         <a href="<?= url('/owner/bookings') ?>" class="sidebar-link <?= is_active_route('/owner/bookings', $currentPath) ?>">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-            Bookings Table
+            Venue Bookings
         </a>
         <a href="<?= url('/owner/check-in') ?>" class="sidebar-link <?= is_active_route('/owner/check-in', $currentPath) ?>">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
@@ -120,6 +120,12 @@ $currentPath = Request::current()?->path() ?? '';
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
             Customer Intelligence
         </a>
+
+        <div class="sidebar-section-title">Account</div>
+        <a href="<?= url('/notifications') ?>" class="sidebar-link <?= is_active_route('/notifications', $currentPath) ?>">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            Notifications
+        </a>
         <a href="<?= url('/account') ?>" class="sidebar-link <?= is_active_route('/account', $currentPath) ?>">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             Account Settings
@@ -133,7 +139,11 @@ $currentPath = Request::current()?->path() ?? '';
         </a>
 
         <div class="sidebar-section-title">Coaching Sessions</div>
-        <a href="<?= url('/coach/sessions') ?>" class="sidebar-link <?= is_active_route('/coach/sessions', $currentPath) ?>">
+        <?php
+        $attendanceActive = str_ends_with($currentPath, '/attendance') || ($currentPath === '/coach/sessions' && ($_GET['status'] ?? '') === 'completed');
+        $sessionsActive = !$attendanceActive && $currentPath !== '/coach/sessions/create' && is_active_route('/coach/sessions', $currentPath) !== '';
+        ?>
+        <a href="<?= url('/coach/sessions') ?>" class="sidebar-link <?= $sessionsActive ? 'active' : '' ?>">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             My Sessions
         </a>
@@ -141,7 +151,7 @@ $currentPath = Request::current()?->path() ?? '';
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
             Create Session
         </a>
-        <a href="<?= url('/coach/sessions?status=completed') ?>" class="sidebar-link ">
+        <a href="<?= url('/coach/sessions?status=completed') ?>" class="sidebar-link <?= $attendanceActive ? 'active' : '' ?>">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
             Mark Attendance
         </a>
@@ -164,6 +174,16 @@ $currentPath = Request::current()?->path() ?? '';
             Profile &amp; Certs
         </a>
 
+        <div class="sidebar-section-title">Account</div>
+        <a href="<?= url('/notifications') ?>" class="sidebar-link <?= is_active_route('/notifications', $currentPath) ?>">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            Notifications
+        </a>
+        <a href="<?= url('/account') ?>" class="sidebar-link <?= is_active_route('/account', $currentPath) ?>">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            Account Settings
+        </a>
+
     <?php elseif ($role === 'admin'): ?>
         <div class="sidebar-section-title">Administration</div>
         <a href="<?= url('/admin/dashboard') ?>" class="sidebar-link <?= is_active_route('/admin/dashboard', $currentPath) ?>">
@@ -172,7 +192,7 @@ $currentPath = Request::current()?->path() ?? '';
         </a>
         <a href="<?= url('/admin/venues') ?>" class="sidebar-link <?= is_active_route('/admin/venues', $currentPath) ?>">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            Pending Venues
+            Venue Approvals
         </a>
         <a href="<?= url('/admin/coaches') ?>" class="sidebar-link <?= is_active_route('/admin/coaches', $currentPath) ?>">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
@@ -199,6 +219,16 @@ $currentPath = Request::current()?->path() ?? '';
         <a href="<?= url('/admin/announcements') ?>" class="sidebar-link <?= is_active_route('/admin/announcements', $currentPath) ?>">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
             Announcements
+        </a>
+
+        <div class="sidebar-section-title">Account</div>
+        <a href="<?= url('/notifications') ?>" class="sidebar-link <?= is_active_route('/notifications', $currentPath) ?>">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            Notifications
+        </a>
+        <a href="<?= url('/account') ?>" class="sidebar-link <?= is_active_route('/account', $currentPath) ?>">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            Account Settings
         </a>
     <?php endif; ?>
 

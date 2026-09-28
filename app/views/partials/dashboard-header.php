@@ -1,4 +1,7 @@
 <?php
+/** @var array $notifications latest from NotificationService::recent() @var int $unread */
+$notifications = $notifications ?? [];
+$unread = $unread ?? 0;
 $roleTitles = ['customer' => 'Customer', 'owner' => 'Venue Owner', 'coach' => 'Coach', 'admin' => 'Platform Admin'];
 $roleTitle = $roleTitles[Auth::role()] ?? '';
 $userName = Auth::user()['name'] ?? '';
@@ -30,14 +33,25 @@ $initials = strtoupper(implode('', array_map(fn ($w) => mb_substr($w, 0, 1), arr
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                     <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                 </svg>
+                <?php if ($unread > 0): ?>
+                    <span style="position: absolute; top: 2px; right: 2px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 9999px; background: #dc2626; color: #fff; font-size: 10px; font-weight: 700; line-height: 16px; text-align: center;"><?= $unread > 9 ? '9+' : $unread ?></span>
+                <?php endif; ?>
             </button>
 
             <div class="dropdown-menu" id="notifDropdown" style="width: 320px; padding: 12px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--color-border); padding-bottom: 8px;">
                     <span style="font-size: 13px; font-weight: 700;">In-App Notifications</span>
-                    
+                    <?php if ($unread > 0): ?><span class="text-xs text-muted"><?= $unread ?> unread</span><?php endif; ?>
                 </div>
-                <div class="text-sm" style="color: var(--color-text-muted); padding: 8px 0;">No new notifications.</div>
+                <?php if ($notifications === []): ?>
+                    <div class="text-sm" style="color: var(--color-text-muted); padding: 8px 0;">No notifications yet.</div>
+                <?php endif; ?>
+                <?php foreach ($notifications as $n): ?>
+                    <a href="<?= url($n['link'] ?: '/notifications') ?>" style="display: block; padding: 8px 4px; border-bottom: 1px solid var(--color-border); text-decoration: none;">
+                        <div style="font-size: 13px; font-weight: <?= $n['is_read'] ? '600' : '700' ?>; color: var(--color-text-title);"><?= e($n['title']) ?></div>
+                        <div class="text-xs text-muted" style="margin-top: 2px;"><?= e(mb_strimwidth($n['message'], 0, 90, '...')) ?></div>
+                    </a>
+                <?php endforeach; ?>
                 <div style="margin-top: 10px; text-align: center; border-top: 1px solid var(--color-border); padding-top: 8px;">
                     <a href="<?= url('/notifications') ?>" style="font-size: 12px; font-weight: 600;">View All Notifications &rarr;</a>
                 </div>
