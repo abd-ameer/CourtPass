@@ -52,18 +52,24 @@ $initials = strtoupper(implode('', array_map(fn ($w) => mb_substr($w, 0, 1), arr
 
             <div class="form-group">
                 <label class="form-label" for="accCurrent">Current Password <span class="required-star">*</span></label>
-                <input type="password" name="current_password" id="accCurrent" class="form-control<?= $invalid('current_password') ?>" autocomplete="current-password" required>
+                <div class="password-field">
+                    <input type="password" name="current_password" id="accCurrent" class="form-control<?= $invalid('current_password') ?>" autocomplete="current-password" required>
+                </div>
                 <span class="form-feedback invalid"><?= e($errors['current_password'] ?? '') ?></span>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
                 <div class="form-group">
                     <label class="form-label" for="accNew">New Password <span class="required-star">*</span></label>
-                    <input type="password" name="new_password" id="accNew" class="form-control<?= $invalid('new_password') ?>" minlength="8" maxlength="72" autocomplete="new-password" required>
+                    <div class="password-field">
+                        <input type="password" name="new_password" id="accNew" class="form-control<?= $invalid('new_password') ?>" minlength="8" maxlength="72" autocomplete="new-password" required>
+                    </div>
                     <span class="form-feedback invalid"><?= e($errors['new_password'] ?? '') ?></span>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="accConfirm">Confirm New Password <span class="required-star">*</span></label>
-                    <input type="password" name="confirm_password" id="accConfirm" class="form-control<?= $invalid('confirm_password') ?>" autocomplete="new-password" required>
+                    <div class="password-field">
+                        <input type="password" name="confirm_password" id="accConfirm" class="form-control<?= $invalid('confirm_password') ?>" autocomplete="new-password" required>
+                    </div>
                     <span class="form-feedback invalid"><?= e($errors['confirm_password'] ?? '') ?></span>
                 </div>
             </div>

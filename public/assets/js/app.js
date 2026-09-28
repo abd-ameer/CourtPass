@@ -131,7 +131,7 @@ const CourtPassApp = {
             const requiredInputs = form.querySelectorAll('[required]');
 
             requiredInputs.forEach(input => {
-                const feedback = input.parentElement.querySelector('.form-feedback');
+                const feedback = (input.closest('.form-group') || input.parentElement).querySelector('.form-feedback');
                 if (!input.value.trim()) {
                     input.classList.add('is-invalid');
                     if (feedback) feedback.textContent = 'This field is required.';
@@ -156,7 +156,7 @@ const CourtPassApp = {
             const confirmPwd = form.querySelector('input[name="confirm_password"]');
             if (pwd && confirmPwd && pwd.value !== confirmPwd.value) {
                 confirmPwd.classList.add('is-invalid');
-                const feedback = confirmPwd.parentElement.querySelector('.form-feedback');
+                const feedback = (confirmPwd.closest('.form-group') || confirmPwd.parentElement).querySelector('.form-feedback');
                 if (feedback) feedback.textContent = 'Passwords do not match.';
                 isValid = false;
             }
@@ -252,6 +252,41 @@ const CourtPassApp = {
     },
 
     // Close dropdowns when clicking outside
+    // Show / hide toggle for every password input wrapped in .password-field
+    setupPasswordToggles: function() {
+        const eye = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+        const eyeOff = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+
+        const setState = (input, btn, show) => {
+            input.type = show ? 'text' : 'password';
+            btn.innerHTML = show ? eyeOff : eye;
+            btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+            btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+            btn.title = btn.getAttribute('aria-label');
+        };
+
+        document.querySelectorAll('.password-field').forEach(field => {
+            const input = field.querySelector('input');
+            if (!input || field.querySelector('.password-toggle')) return;
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'password-toggle';
+            setState(input, btn, false);
+            field.appendChild(btn);
+
+            btn.addEventListener('click', () => {
+                setState(input, btn, input.type === 'password');
+                input.focus();
+            });
+
+            // Hide it again before the form is sent so browsers still treat it as a password
+            if (input.form) {
+                input.form.addEventListener('submit', () => setState(input, btn, false));
+            }
+        });
+    },
+
     initGlobalEvents: function() {
         window.addEventListener('click', function(e) {
             if (!e.target.closest('.dropdown')) {
@@ -266,4 +301,5 @@ const CourtPassApp = {
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {
     CourtPassApp.initGlobalEvents();
+    CourtPassApp.setupPasswordToggles();
 });
